@@ -1,0 +1,260 @@
+.select2-container--default .select2-selection--single {
+    background-color: transparent; 
+    border: none; 
+    border-radius: 0;
+}
+.select2-selection__arrow{
+    display: none;
+}
+.select2-results__option{
+    font-size : 14px;
+}
+.select2-results__options{
+    overflow-x:hidden;
+}
+.select2-selection__rendered{
+    font-size: 22px;
+    width: 87%;
+    border: none;
+    background: transparent;
+    font-weight: 500;
+    height: 35px;
+    padding: 0;
+}
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.select2-search__field{
+    outline: transparent;
+}
+.flightDetails {
+    border-radius: 4px;
+    border: 1px solid #dfdfdf;
+    border-top: none !important;
+    width: 100%;
+}
+.flightDetailsHead {
+    border-bottom: 1px solid #dfdfdf;
+    padding: 12px 10px;
+    color: #000;
+    font-weight: 700;
+}
+.flightDetailsInfo {
+    padding: 12px;
+}
+.makeFlex.hrtlCenter {
+    align-items: center;
+}
+.makeFlex.hrtlCenter {
+    align-items: center;
+}
+.makeFlex {
+    display: flex;
+}
+.appendBottom20 {
+    margin-bottom: 20px;
+}
+.bgProperties {
+    background-repeat: no-repeat;
+    background-position: 50%;
+    display: inline-block;
+    background-size: contain;
+}
+.gap-x-10>* {
+    margin-right: 10px;
+}
+.bgProperties {
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    background-size: contain;
+}
+.icon32 {
+    width: 32px;
+    height: 32px;
+}
+.splitViewFlightDtl .flightDtlInfo {
+    flex-direction: column;
+}
+.makeFlex {
+    display: flex;
+}
+.airlineInfo {
+    display: flex;
+    justify-content: space-between;
+}
+.airlineInfo {
+    width: 50%;
+}
+.airlineDTInfoCol {
+    flex: 1;
+}
+.gap-x-10>* {
+    margin-right: 10px;
+}
+.blackText {
+    color: #000000;
+}
+.blackText {
+    color: #000;
+}
+.blackFont {
+    font-weight: 900;
+}
+.fontSize18 {
+    font-size: calc(var(--font-scale, 1)*18px);
+}
+.fontSize14 {
+    font-size: calc(var(--font-scale, 1)*14px);
+}
+.blackText {
+    color: #000;
+}
+.blackFont {
+    font-weight: 900;
+}
+.blackFont {
+    font-weight: 900;
+}
+.fontSize18 {
+    font-size: calc(var(--font-scale, 1)*18px);
+}
+.blackText {
+    color: #000;
+}
+.appendBottom8 {
+    margin-bottom: 8px;
+}
+
+.blackText {
+    color: #000000;
+}
+.blackText {
+    color: #000;
+}
+.blackText {
+    color: #000;
+}
+.fontSize12 {
+    font-size: calc(var(--font-scale, 1)*12px);
+}
+.appendBottom8 {
+    margin-bottom: 8px;
+}
+.boldFont {
+    font-weight: 700;
+}
+.airlineDtlDuration {
+    width: 90px;
+    text-align: center;
+    margin-right: 30px;
+}
+.airlineDtlDuration {
+    margin-right: 40px;
+}
+.fontSize12 {
+    font-size: calc(var(--font-scale, 1)*12px);
+}
+.fliStopsSep {
+    height: 17px;
+}
+.relative {
+    position: relative;
+}
+.fliStopsSepLine {
+    border-top: 3px solid #979797;
+    width: 50px;
+    height: 2px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 2px;
+    bottom: 0;
+    z-index: 1;
+}
+.airlineDTInfoCol {
+    flex: 1;
+}
+.baggageInfo {
+    margin: 0 50px;
+    font-size: calc(var(--font-scale, 1)*12px);
+    flex: 1;
+}
+.baggageInfo {
+    font-size: calc(var(--font-scale, 1)*14px);
+}
+
+
+.makeFlex.spaceBetween {
+    justify-content: space-between;
+}
+.flightLayoverOuter {
+    text-align: center;
+    position: relative;
+    margin: 25px 0;
+}
+.flightLayover {
+    border-radius: 4px;
+    background-color: #f4f4f4;
+    padding: 5px 10px;
+    display: inline-block;
+    position: relative;
+    color: #ff4d2a;
+    font-size: calc(var(--font-scale, 1)*12px);
+}
+.mmtConnectLayover {
+    color: #4a4a4a!important;
+}
+.makeFlex.hrtlCenter {
+    align-items: center;
+}
+.fareBreakupText{
+    width: 200px;
+    display: inline-flex;
+}
+
+.return-title{
+    padding: 20px 2px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    color: #1fba71;
+}
+
+.fontSize24{
+    font-size: 24px !important;
+}
+.fareRule-heading{
+    margin-bottom: 10px;
+    color: #1fba71;
+}
+
+.w-100px{
+    width: 100px !important;
+}
+.w-130px{
+    width: 130px !important;
+}
+.p-10px{
+    padding: 10px !important;
+}
+
+.float-right{
+    float:right;
+}
+.fs-20{
+    font-size: 20px !important;
+    padding: 0 !important;
+}
+.hide{
+    display: none;
+}
+.show{
+    display: block;
+}
+.bagError{
+    text-align: end;
+    color: red;
+}
