@@ -8,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 use Session;
 
 class LoginController extends Controller
@@ -57,6 +58,13 @@ class LoginController extends Controller
         } else {
             if (Auth::attempt($request->only(["email", "password"]))) {
                 if(Auth::user()->user_type == "user" || Auth::user()->user_type == "admin" || (Auth::user()->user_type == "agent" && Auth::user()->is_approved == 1)){
+                    // $parents = User::where('id', Auth::user()->id)->first();
+                    // $getAllParents = $parents->getAllParents();
+                    // echo '<pre>';
+                    // print_r($parents); 
+                    // echo $getAllParents;
+                    // print_r($getAllParents); 
+                    
                     return response()->json([
                         "status" => true, 
                         "redirect" => url("web-dashboard")

@@ -34,6 +34,11 @@ class HomeController extends Controller
         return  view('web.user.dashboard',compact('bookings'));
     }
 
+    public function bookingDetails(){
+        $bookings = [];
+        return  view('web.user.booking_details',compact('bookings'));
+    }
+
     public function search(){
         
         $response = Http::withOptions($this->options)->post('https://travelnext.works/api/aeroVE5/availability', [

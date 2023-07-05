@@ -72,7 +72,7 @@
                                                     @php   
                                                         $timeDiff = time() - strtotime($book->created_at);
                                                     @endphp
-                                                    <a href="javascript:void(0)" class="info-icon" title="View Ticket Details"><i class="fas fa-eye"></i></a> &nbsp;
+                                                    <a href="{{ route('booking-details') }}" class="info-icon" title="View Ticket Details"><i class="fas fa-eye"></i></a> &nbsp;
                                                     @if($book->is_cancelled == 0 && $book->cancel_request == 0)
                                                         @if($timeDiff < 86400)
                                                             @if(strtolower($book->fare_type) == 'webfare' )

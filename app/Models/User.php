@@ -55,4 +55,16 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'parent_id');
     }
+    public function getAllParents()
+    {
+        $parents = collect([]);
+        $parent = $this->parent;
+
+        while(!is_null($parent)) {
+            $parents->push($parent);
+            $parent = $parent->parent;
+        }
+
+        return $parents;
+    }
 }
