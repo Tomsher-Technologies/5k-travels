@@ -22,6 +22,8 @@
 <section id="tour_booking_submission" class="section_padding">
     <div class="container container-bboking">
         <div class="row">
+            <input type="hidden" name="fare_source" id="fare_source" value="{{$data['fare_sourceCode']}}">
+            <input type="hidden" name="sessionId" id="sessionId" value="{{ $data['session_id'] }}">
             @if(isset($data['flightsOutgoing']))
                 <div class="col-lg-8">
                     <div class="tou_booking_form_Wrapper">
@@ -335,19 +337,20 @@
             
                         @endphp
                         <form action="{{ route('flight.create-booking') }}" method="post" id="bookingForm">
-                                @csrf
+                            @csrf
+                            <input type="hidden" name="total_addons" id="total_addons" value="0">
+                            <input type="hidden" name="currency" id="currency" value="{{$currencyCode}}">
+                            <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFare['Amount']}}">
+                            <input type="hidden" name="total_tax" id="total_tax" value="{{$TotalTax['Amount']}}">
+                            <input type="hidden" name="adult_amount" id="adult_amount" value="{{$adult_amount}}">
+                            <input type="hidden" name="child_amount" id="child_amount" value="{{$child_amount}}">
+                            <input type="hidden" name="infant_amount" id="infant_amount" value="{{$infant_amount}}">
                             @if(isset($data['extraBaggage']))
                             <div class="tour_detail_right_sidebar">
                                 <div class="tour_details_right_boxed">
                                     <div class="tour_details_right_box_heading">
                                         <h3>Extra Baggage</h3>
-                                        <input type="hidden" name="total_addons" id="total_addons" value="0">
-                                        <input type="hidden" name="currency" id="currency" value="{{$currencyCode}}">
-                                        <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFare['Amount']}}">
-                                        <input type="hidden" name="total_tax" id="total_tax" value="{{$TotalTax['Amount']}}">
-                                        <input type="hidden" name="adult_amount" id="adult_amount" value="{{$adult_amount}}">
-                                        <input type="hidden" name="child_amount" id="child_amount" value="{{$child_amount}}">
-                                        <input type="hidden" name="infant_amount" id="infant_amount" value="{{$infant_amount}}">
+                                        
                                     </div>
                                     <div class="tour_package_details_bar_list">
                                         @php  
@@ -829,7 +832,11 @@
 
                                     </div>
                                     <div class="booking_btn float-right">
-                                        <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to payment</button>
+                                        @if(Auth::check())
+                                            <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
+                                        @else
+                                            <button type="button" id="loginCheck" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
+                                        @endif
                                     </div>
                                 
                             </div>
@@ -1002,10 +1009,39 @@
 </style>
 @endpush
 @push('footer')
+<!-- SweetAlert -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="{{ asset('assets/js/jquery-ui.js') }}"></script>
 <script src="{{ asset('assets/js/intlTelInput.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
+
 <script type="text/javascript">
+
+    setInterval(function() {
+        var session_id = $('#sessionId').val();
+        var fare_source_code = $('#fare_source').val();
+        $.ajax({
+            url: "{{ route('flight.revalidate')}}",
+            type: "GET",
+            data: { "_token": "{{ csrf_token() }}", "fare_source_code":fare_source_code, "session_id":session_id},
+            success: function( response ) {
+                console.log(response);
+                if(response == "failed"){
+                    swal({
+                        title: "Not Available", 
+                        text: "Flight details not available. Choose another one.", 
+                        icon: "warning"
+                    }).then(function() {
+                        window.close();
+                    });
+                }
+            }
+        });
+    }, 1000*60*0.2); 
+
+    $('#loginCheck').on('click', function () {
+       $('#common_author-forms').modal('show');
+    });
 
     var input = document.querySelector("#mobile_no"),
     errorMsg = document.querySelector("#error-msg"),
@@ -1322,5 +1358,8 @@
         }
     });
 
+   
+    
+    
 </script>
 @endpush
