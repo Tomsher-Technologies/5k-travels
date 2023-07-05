@@ -258,3 +258,15 @@
     text-align: end;
     color: red;
 }
+.info-icon{
+    color: rgb(45, 134, 213) ;
+}
+.danger-icon{
+    color: rgb(218, 55, 55);
+}
+.swal-footer {
+    text-align: center !important;
+}
+.padding-1rem{
+    padding: 1rem !important;
+}

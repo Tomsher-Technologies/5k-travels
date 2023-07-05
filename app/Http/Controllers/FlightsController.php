@@ -9,6 +9,8 @@ use App\Models\Airports;
 use App\Models\Airlines;
 use App\Models\Countries;
 use App\Models\FlightBookings;
+use App\Models\FlightPassengers;
+use App\Models\FlightItineraryDetails;
 use App;
 use Session;
 use Helper;
@@ -1185,6 +1187,7 @@ class FlightsController extends Controller
             ];
         }
         $data['session_id'] = $request->session_id;
+        $data['fare_sourceCode'] = $request->FareSourceCode;
         $data['search_type'] = $request->search_type;
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
         $data['countries'] = Countries::orderBy('name','ASC')->get();
@@ -1353,7 +1356,9 @@ class FlightsController extends Controller
         
         $adultArray = $childArray = $infantArray = [];
         $details = $request->all();
-        
+        // echo '<pre>';
+        // print_r($details);
+        // die;
         $data['flightBookingInfo']['flight_session_id'] = $request->session_id;
         $data['flightBookingInfo']['fare_source_code'] = $request->fare_source_code;
         $data['flightBookingInfo']['IsPassportMandatory'] = $request->IsPassportMandatory;
@@ -1406,14 +1411,31 @@ class FlightsController extends Controller
 
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
-        $bookResult = $result['BookFlightResponse']['BookFlightResult'];
-        if($bookResult['Success'] == 'true' || $bookResult['Success'] == '1'){
-            $bookingId = $bookResult['UniqueID'];
-            if($request->FareType != "WebFare"){
-                $ticketOrderRes = $this->ticketOrder($bookingId);
-                $ticketOrderRes = json_decode($ticketOrderRes, true);
-                $ticketOrderResSuccess = $ticketOrderRes['AirOrderTicketRS']['TicketOrderResult']['Success'];
-                if($ticketOrderResSuccess == "true" || $ticketOrderResSuccess == "1"){
+        // echo '<pre>';
+        // print_r($result);
+        // die;
+        if(!isset($result['status']['errors'])){
+            $bookResult = $result['BookFlightResponse']['BookFlightResult'];
+            if($bookResult['Success'] == 'true' || $bookResult['Success'] == '1'){
+                $bookingId = $bookResult['UniqueID'];
+                if(strtolower($request->FareType) != "webfare"){
+                    $ticketOrderRes = $this->ticketOrder($bookingId);
+                    $ticketOrderRes = json_decode($ticketOrderRes, true);
+                    // echo '<pre>';
+                    // print_r($ticketOrderRes);
+                
+                    $ticketOrderResSuccess = $ticketOrderRes['AirOrderTicketRS']['TicketOrderResult']['Success'];
+                    if($ticketOrderResSuccess == "true" || $ticketOrderResSuccess == "1"){
+                        $tripDetails = $this->getTripDetails($bookingId);
+                        $tripDetails = json_decode($tripDetails, true);
+                        if(isset($tripDetails['TripDetailsResponse'])){
+                            $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
+                            if($tripDetailsResult['Success'] == 'true'){
+                                $this->saveFlightBookingData($tripDetailsResult, $details);
+                            }
+                        } 
+                    }
+                }else{
                     $tripDetails = $this->getTripDetails($bookingId);
                     $tripDetails = json_decode($tripDetails, true);
                     if(isset($tripDetails['TripDetailsResponse'])){
@@ -1421,22 +1443,15 @@ class FlightsController extends Controller
                         if($tripDetailsResult['Success'] == 'true'){
                             $this->saveFlightBookingData($tripDetailsResult, $details);
                         }
-                    } 
-                }
-            }else{
-                $tripDetails = $this->getTripDetails($bookingId);
-                $tripDetails = json_decode($tripDetails, true);
-                if(isset($tripDetails['TripDetailsResponse'])){
-                    $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
-                    if($tripDetailsResult['Success'] == 'true'){
-                        $this->saveFlightBookingData($tripDetailsResult, $details);
                     }
                 }
+                $msg = 'success';
+            }else{
+                $msg =  $bookResult['Errors']['Error']['ErrorMessage'];
             }
-            $msg = 'success';
         }else{
-            $msg =  $bookResult['Errors']['Errors']['ErrorMessage'];
-        }
+            $msg =  (isset($result['status']['errors'][0])) ? $result['status']['errors'][0]['errorMessage'] : 'Something went wrong';
+        }   
         return  view('web.booking_success',compact('msg'));
    }
 
@@ -1468,14 +1483,19 @@ class FlightsController extends Controller
 
     public function saveFlightBookingData($tripDetailsResult, $data){
         $travelItinerary = $tripDetailsResult['TravelItinerary'];
-        echo '<pre>';
-        print_r($travelItinerary);
-        die;
+        // echo '<pre>';
+        // print_r($data);
+        // print_r($travelItinerary);
+        
+        $ItineraryInfo = $travelItinerary['ItineraryInfo'];
+        $CustomerInfos = $ItineraryInfo['CustomerInfos'];
+        $ReservationItems = $ItineraryInfo['ReservationItems'];
+                        
         $bookData = [
             'user_id' => 5, 
             'unique_booking_id' => $travelItinerary['UniqueID'], 
             'client_ref' => $data['clientRef'], 
-            'fare_type' => $travelItinerary['FareType'],
+            'fare_type' => $data['FareType'],
             'origin' => $travelItinerary['Origin'], 
             'destination' => $travelItinerary['Destination'], 
             'customer_email' => $data['email'], 
@@ -1486,6 +1506,7 @@ class FlightsController extends Controller
             'infant_count' => $data['infantCount'], 
             'booking_status' => $travelItinerary['BookingStatus'], 
             'ticket_status' => $travelItinerary['TicketStatus'], 
+            'currency' => $data['currency'],
             'adult_amount' => $data['adult_amount'], 
             'child_amount' => $data['child_amount'], 
             'infant_amount' => $data['infant_amount'], 
@@ -1496,8 +1517,402 @@ class FlightsController extends Controller
         ];
         $flightBook = FlightBookings::create($bookData);
         $flightBookId = $flightBook->id;
+       
+        $passengers = $itinerary = [];
+        if($CustomerInfos){
+            foreach($CustomerInfos as $custInfo){
+                $info = $custInfo['CustomerInfo'];
+                $passengers[] = [
+                    'booking_id' => $flightBookId,
+                    'passenger_type' => $info['PassengerType'],
+                    'passport_number' => $info['PassportNumber'],
+                    'passenger_first_name' => $info['PassengerFirstName'],
+                    'passenger_last_name' => $info['PassengerLastName'],
+                    'passenger_title' => $info['PassengerTitle'],
+                    'itemRPH' => $info['ItemRPH'],
+                    'eticket_number' => $info['eTicketNumber'],
+                    'date_of_birth' => $info['DateOfBirth'],
+                    'gender' => $info['Gender'],
+                    'passenger_nationality' => $info['PassengerNationality'],
+                    'created_at'=> date('Y-m-d H:i:s')
+                ];
+            }
+            // print_r($passengers);
+            FlightPassengers::insert($passengers);
+        }
+       
+        if($ReservationItems){
+            foreach($ReservationItems as $resItem){
+                $resInfo = $resItem['ReservationItem'];
+                $itinerary[] = [
+                    'booking_id' => $flightBookId,
+                    'airline_pnr' => $resInfo['AirlinePNR'],
+                    'arrival_airport' => $resInfo['ArrivalAirportLocationCode'],
+                    'arrival_date_time' => $resInfo['ArrivalDateTime'],
+                    'arrival_terminal' => $resInfo['ArrivalTerminal'],
+                    'baggage' => $resInfo['Baggage'],
+                    'cabin_class' => $resInfo['CabinClassText'],
+                    'departure_airport' => $resInfo['DepartureAirportLocationCode'],
+                    'departure_date_time' => $resInfo['DepartureDateTime'],
+                    'departure_terminal' => $resInfo['DepartureTerminal'],
+                    'flight_number' => $resInfo['FlightNumber'],
+                    'item_rph' => $resInfo['ItemRPH'],
+                    'journey_duration' => $resInfo['JourneyDuration'],
+                    'marketing_airline_code' => $resInfo['MarketingAirlineCode'],
+                    'number_in_party' => $resInfo['NumberInParty'],
+                    'operating_airline_code' => $resInfo['OperatingAirlineCode'],
+                    'res_book_desig_code' => $resInfo['ResBookDesigCode'],
+                    'stop_quantity' => $resInfo['StopQuantity'],
+                    'created_at'=> date('Y-m-d H:i:s')
+                ];
+            }
+            // print_r($itinerary);
+            FlightItineraryDetails::insert($itinerary);
+        }
+        // die;
+    }
 
+    public function revalidate(Request $request){
+        $apiKeys = [ 
+            "session_id" => $request->session_id,
+            "fare_source_code" => $request->fare_source_code
+        ];
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'revalidate', $apiKeys);
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // echo '<pre>';
+        // print_r($result);
+        $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
+        if($IsValid == 1 || $IsValid == true){
+            $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
+            $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
+            if(isset($FareItineraries['FareItinerary'])){
+                echo 'success';
+            }else{
+                echo 'failed';
+            }
+        }else{
+            echo 'failed';
+        }
+    }
 
+    public function cancelTicket(Request $request){
+        $uniqueBookId = $request->bookId;
+        // echo '<pre>';
+        // echo $uniqueBookId; 
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'cancel', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId
+                    ]);
+
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // print_r($result);
+        // die;
+        $CancelBookingResult = $result['CancelBookingResponse']['CancelBookingResult'];
+        if( $CancelBookingResult['Success'] == true){
+            FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1]);
+            $msg = ['status' => 'success','msg' => 'Cancel request send successfully'];
+        }else{
+            $msg =  ['status' => 'failed','msg' => (isset($CancelBookingResult['Errors']['ErrorMessage'])) ? $CancelBookingResult['Errors']['ErrorMessage'] : 'Something went wrong'];
+        }
+        return  json_encode($msg);
+    }
+
+    public function voidQuote(Request $request){
+        $uniqueBookId = $request->bookId;
+        $id = $request->id;
+        $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+        $paxDetails = [];
+        foreach ($bookDetails as $key) {
+            $paxDetails[] =  array(
+                                    "type" => $key->passenger_type,
+                                    "title" => $key->passenger_title,
+                                    "firstName" => $key->passenger_first_name,
+                                    "lastName" => $key->passenger_last_name, 
+                                    "eTicket" => $key->eticket_number
+                            );   
+        }
+                
+        // echo '<pre>';
+        // print_r($paxDetails);
+        // echo json_encode($paxDetails);
+        // die;
+        // echo $uniqueBookId; 
+        $data['id'] = $id;
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket_quote', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "paxDetails" => $paxDetails
+                    ]);
+
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // print_r($result);
+        $TotalVoidingFee = $TotalRefundAmount = 0;
+        if(!isset($result['Errors'])){
+            $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
+            if( $VoidQuoteResult['Success'] == true){
+                $data['UniqueID'] = $VoidQuoteResult['UniqueID'];
+                $data['ptrUniqueID'] = $VoidQuoteResult['ptrUniqueID'];
+                if(isset($VoidQuoteResult['VoidQuotes'])){
+                    foreach($VoidQuoteResult['VoidQuotes'] as $void){
+                        $tVoid =  $void['QuotedFares']['TotalVoidingFee'];
+                        $tRefund =  $void['QuotedFares']['TotalRefundAmount'];
+                        $TotalVoidingFee = $TotalVoidingFee + $tVoid['Amount'];
+                        $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
+                        $data['currency'] = $tRefund['CurrencyCode'];
+                    }
+                }
+                $data['voidFee'] = number_format(floor($TotalVoidingFee*100)/100, 2);
+                $data['refundAmount'] = number_format(floor($TotalRefundAmount*100)/100, 2);
+                $msg = array('status' => true, 'data' => $data);
+            }else{
+                $msg = array('status' => false ,'data' => array(), 'msg' => (isset($VoidQuoteResult['Errors'])) ? $VoidQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
+            }
+        }else{
+            $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+        }
+        // print_r($data);
+        // die;
+        
+        return json_encode($msg);
+    }
+
+    public function voidAPI(Request $request){
+        $uniqueBookId = $request->bookId;
+        $id = $request->id;
+        $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+        $paxDetails = [];
+        foreach ($bookDetails as $key) {
+            $paxDetails[] =  array(
+                                    "type" => $key->passenger_type,
+                                    "title" => $key->passenger_title,
+                                    "firstName" => $key->passenger_first_name,
+                                    "lastName" => $key->passenger_last_name, 
+                                    "eTicket" => $key->eticket_number
+                            );   
+        }
+                
+        // echo '<pre>';
+       
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "paxDetails" => $paxDetails,
+                        "remark" => "Kindly void booking."
+                    ]);
+
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // echo '<pre>';
+        // print_r($result);
+        // die;
+        if(!isset($result['Errors'])){
+            $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
+            if( $VoidQuoteResult['Success'] == true){
+                FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1,'cancel_ptr' => $VoidQuoteResult['ptrUniqueID']]);
+                $msg = ['status' => true,'msg' => 'Cancel request send successfully'];
+            }else{
+                $msg = array('status' => false ,'msg' => (isset($VoidQuoteResult['Errors'])) ? $VoidQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
+            }
+        }else{
+            $msg = array('status' => false , 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+        }
+        return json_encode($msg);
+    }
+
+    public function ptrStatusCheck(Request $request){
+        $uniqueId = $request->id;
+        $ptrUniqueId = $request->ptr;
+
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
+            "user_id"=> config('global.api_user_id'),
+            "user_password"=> config('global.api_user_password'),
+            "access"=> config('global.api_access'),
+            "ip_address"=> config('global.api_ip_address'),
+            "UniqueID"=> $uniqueId,
+            "ptrUniqueID" => $ptrUniqueId
+        ]);
+
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // echo '<pre>';
+        // print_r($result);
+
+        if(isset($result['PtrResponse'])){
+            $PtrResult = $result['PtrResponse']['PtrResult'];
+            if($PtrResult['Success'] == true){
+                if(isset($PtrResult['PtrDetails'][0])){
+                    $PtrDetails = $PtrResult['PtrDetails'][0];
+                    if($PtrDetails['PtrStatus'] == 'Completed'){
+                        if($PtrDetails['PtrType'] == 'Void' || $PtrDetails['PtrType'] == 'Refund'){
+                            FlightBookings::where('unique_booking_id', $uniqueId)->update(['is_cancelled' => 1]);
+                        }
+                        $msg = "Your Request for ticket cancellation is Completed.";
+                    }else{
+                        $msg = "Your Request for ticket cancellation is InProcess.";
+                    }  
+                }
+            }else{
+                $msg = (isset($PtrResult['Errors']['ErrorMessage'])) ? $PtrResult['Errors']['ErrorMessage'] : 'Something went wrong' ;
+            }
+        }else{
+            $msg = (isset($result['Errors']['ErrorMessage'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong' ;
+        }
+        return $msg;
+    }
+
+    public function refundQuote(Request $request){
+        $uniqueBookId = $request->bookId;
+        $id = $request->id;
+        $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+        $paxDetails = [];
+        foreach ($bookDetails as $key) {
+            $paxDetails[] =  array(
+                                    "type" => $key->passenger_type,
+                                    "title" => $key->passenger_title,
+                                    "firstName" => $key->passenger_first_name,
+                                    "lastName" => $key->passenger_last_name, 
+                                    "eTicket" => $key->eticket_number
+                            );   
+        }
+                
+        // echo '<pre>';
+        // print_r($paxDetails);
+        // echo json_encode($paxDetails);
+        // die;
+        // echo $uniqueBookId; 
+        $data['id'] = $id;
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund_quote', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "paxDetails" => $paxDetails
+                    ]);
+
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // print_r($result);
+        $ptrUniqueId = '';
+        $TotalRefundFee = $TotalRefundAmount = 0;
+        if(!isset($result['Errors'])){
+            $RefundQuoteResult = $result['RefundQuoteResponse']['RefundQuoteResult'];
+            if( $RefundQuoteResult['Success'] == true){
+                $ptrUniqueId = $RefundQuoteResult['ptrUniqueID'];
+                if($ptrUniqueId != ''){
+                    $responseCheck = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "ptrUniqueID" => $ptrUniqueId
+                    ]);
+                    $resultCheck = $responseCheck->getBody()->getContents();
+                    $resultCheck = json_decode($resultCheck, true);
+                    // print_r($resultCheck);
+
+                    if(!isset($resultCheck['Errors'])){
+                        $PtrResult = $resultCheck['PtrResponse']['PtrResult'];
+                        if( $PtrResult['Success'] == true){
+                            $PtrDetails = (isset($PtrResult['PtrDetails'][0])) ? $PtrResult['PtrDetails'][0] : [];
+                            if($PtrDetails){
+                                $data['UniqueID'] = $PtrDetails['UniqueID'];
+                                $data['ptrUniqueID'] = $PtrDetails['PtrUniqueID'];
+                                if(isset($PtrDetails['PaxDetails'])){
+                                    foreach($PtrDetails['PaxDetails'] as $refund){
+                                        $tFee =  $refund['QuotedFares']['TotalRefundCharges'];
+                                        $tRefund =  $refund['QuotedFares']['TotalRefundAmount'];
+                                        $TotalRefundFee = $TotalRefundFee + $tFee['Amount'];
+                                        $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
+                                        $data['currency'] = $tRefund['CurrencyCode'];
+                                    }
+                                }
+                                $data['refundFee'] = number_format(floor($TotalRefundFee*100)/100, 2);
+                                $data['refundAmount'] = number_format(floor($TotalRefundAmount*100)/100, 2);
+                                $msg = array('status' => true, 'data' => $data);
+                            }else{
+                                $msg = array('status' => false, 'data' => $data, 'msg' => 'Something went wrong');
+                            }
+                            
+                        }else{
+                            $msg = array('status' => false ,'data' => array(), 'msg' => (isset($PtrResult['Errors'])) ? $PtrResult['Errors']['ErrorMessage'] : 'Something went wrong');
+                        }
+                    }else{
+                        $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+                    }
+                }else{
+                    $msg = array('status' => false, 'data' => $data, 'msg' => 'Something went wrong');
+                }
+            }else{
+                $msg = array('status' => false ,'data' => array(), 'msg' => (isset($RefundQuoteResult['Errors'])) ? $RefundQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
+            }
+        }else{
+            $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+        }
+        // print_r($data);
+        // die;
+        
+        return json_encode($msg);
+    }
+
+    public function refundAPI(Request $request){
+        $uniqueBookId = $request->bookId;
+        $id = $request->id;
+        $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+        $paxDetails = [];
+        foreach ($bookDetails as $key) {
+            $paxDetails[] =  array(
+                                    "type" => $key->passenger_type,
+                                    "title" => $key->passenger_title,
+                                    "firstName" => $key->passenger_first_name,
+                                    "lastName" => $key->passenger_last_name, 
+                                    "eTicket" => $key->eticket_number
+                            );   
+        }
+                
+        // echo '<pre>';
+       
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "paxDetails" => $paxDetails,
+                        "remark" => "Kindly void booking."
+                    ]);
+
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // echo '<pre>';
+        // print_r($result);
+        // die;
+        if(!isset($result['Errors'])){
+            // $RefundResult = $result['RefundResponse']['RefundResult'];
+            $RefundResult = $result['ReissueResponse']['ReissueResult'];
+            if( $RefundResult['Success'] == true){
+                FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1,'cancel_ptr' => $RefundResult['ptrUniqueID']]);
+                $msg = ['status' => true,'msg' => (isset($RefundResult['Message']) && $RefundResult['Message'] != '') ? $RefundResult['Message'] : 'Cancel request send successfully'];
+            }else{
+                $msg = array('status' => false ,'msg' => (isset($RefundResult['Errors'])) ? $RefundResult['Errors']['ErrorMessage'] : 'Something went wrong');
+            }
+        }else{
+            $msg = array('status' => false , 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+        }
+        return json_encode($msg);
     }
 }
 

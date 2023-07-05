@@ -23,12 +23,15 @@ class FlightBookings extends Model
         'infant_count', 
         'booking_status', 
         'ticket_status', 
+        'cancel_request',
+        'is_cancelled',
         'adult_amount', 
         'child_amount', 
         'infant_amount', 
         'total_amount', 
         'addon_amount', 
         'total_tax',
-        'created_at'
+        'created_at',
+        'currency'
     ];
 }

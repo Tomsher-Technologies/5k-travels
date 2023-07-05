@@ -17,9 +17,12 @@
                     </div>
                     <div class="col-lg-6 col-md-6">
                         <ul class="topbar-others-options">
-                            <li><a href="#common_author-forms" data-bs-toggle="modal"
+                            @if(Auth::check())
+                                <li><a href="{{ route('web.logout') }}" >Logout</a></li>
+                            @else
+                                <li><a href="#common_author-forms" data-bs-toggle="modal"
                                     data-bs-target="#common_author-forms">Login</a></li>
-
+                            @endif
 
                             <li>
                                 <div class="dropdown language-option">
@@ -73,11 +76,16 @@
 
                             </ul>
                             <div class="others-options d-flex align-items-center">
-
-                                <div class="option-item">
-                                    <a href="#common_author-forms" data-bs-toggle="modal"
-                                    data-bs-target="#common_author-forms" class="btn  btn_navber">LOGIN</a>
-                                </div>
+                                @if(Auth::check())
+                                    <div class="option-item">
+                                        <a href="{{ route('dashboard') }}"  class="btn  btn_navber">My Account</a>
+                                    </div>
+                                @else
+                                    <div class="option-item">
+                                        <a href="#common_author-forms" data-bs-toggle="modal"
+                                        data-bs-target="#common_author-forms" class="btn  btn_navber">LOGIN</a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </nav>

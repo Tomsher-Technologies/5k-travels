@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <!-- Title -->
     <title>{{ env('APP_NAME') }} - @yield('title') </title>
     <!-- Bootstrap css -->
@@ -53,6 +54,27 @@
             </div>
         </div>
     </div>
+    <!-- preloader Area -->
+    <div class="ajaxloader" style="display:none;">
+        <div class="d-table">
+            <div class="d-table-cell">
+                <div class="lds-spinner">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Header Area -->
     @include('web.includes.header')
     <!-- /Header Area -->
@@ -64,17 +86,13 @@
     <div class="modal common_author" id="common_author-forms">
         <div class="modal-dialog">
             <div class="modal-content">
-
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <h4 class="modal-title">login your account</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <!-- Modal body -->
                 <div class="modal-body">
-
-
                     <!-- Form Area -->
                     <section id="theme_search_form_tour">
                         <div class="container">
@@ -83,41 +101,27 @@
                                     <div class="">
                                         <div class="theme_common_author_form_tabbtn">
                                             <ul class="nav nav-tabs" role="tablist">
-
                                                 <li class="nav-item " role="presentation">
                                                     <button class="nav-link active" id="login-account-tab"
                                                         data-bs-toggle="tab" data-bs-target="#login-account"
                                                         type="button" role="tab" aria-controls="login-account"
-                                                        aria-selected="true"><i class="fas fa-user"></i>Login</button>
+                                                        aria-selected="true"><i class="fas fa-user"></i> Login</button>
                                                 </li>
-
-
-
-
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link" id="register-tab" data-bs-toggle="tab"
                                                         data-bs-target="#register" type="button" role="tab"
                                                         aria-controls="register" aria-selected="false"><i
-                                                            class="fas fa-edit"></i>Register</button>
+                                                            class="fas fa-edit"></i> Register</button>
                                                 </li>
-
-
-
                                             </ul>
                                         </div>
                                         <div class="tab-content" id="myTabContent">
-
-
-                                            <div class="tab-pane fade active show" id="login-account" role="tabpanel"
-                                                aria-labelledby="login-account-tab">
-
+                                            <div class="tab-pane fade active show" id="login-account" role="tabpanel" aria-labelledby="login-account-tab">
                                                 <!--  Common Author Area -->
                                                 <div id="common_author_area">
-
                                                     <div class="common_author_boxed">
-
                                                         <div class="common_author_form">
-                                                            <form action="{{route('login')}}" id="main_author_form" method="POST">
+                                                            <form action="{{ route('web.login.post') }}" id="main_author_form" method="POST">
                                                                 @csrf
                                                                 <div class="form-group">
                                                                     <input type="text" class="form-control" name="email" placeholder="Enter user name" />
@@ -126,6 +130,7 @@
                                                                     <input type="password" class="form-control" name="password" placeholder="Enter password" />
                                                                     <a href="forgot-password.html">Forgot password?</a>
                                                                 </div>
+                                                                <div id="errors-list"></div>
                                                                 <div class="common_form_submit">
                                                                     <button type="submit" class="btn btn_theme btn_md">Log in</button>
                                                                 </div>
@@ -140,10 +145,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </div>
-
-
                                             <div class="tab-pane fade" id="register" role="tabpanel"
                                                 aria-labelledby="register-tab">
 
@@ -154,7 +156,7 @@
                                                         <div class="common_author_form">
 
 
-                                                            <form action="#" id="main_author_form">
+                                                            <form action="#" id="main_author_form_register">
                                                                 <div class="form-group">
                                                                     <input type="text" class="form-control"
                                                                         placeholder="Enter first name*">
@@ -205,24 +207,13 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-
-
-
-
-
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </section>
-
-
-
                 </div>
-
                 <!-- Modal footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
@@ -278,18 +269,27 @@
         errorPlacement: function (error, element) {
             error.appendTo(element.parent("div"));
         },
-        submitHandler: function(form) {
-            // form.submit();
-            var data = new FormData($('#main_author_form')[0]);
+        submitHandler: function(form, event) {
+            var data = $('#main_author_form').serialize();
+            event.preventDefault();
+           
             $.ajax({
-                url: "{{ route('login')}}",
+                url: "{{ route('web.login.post') }}",
                 type: "POST",
                 data: data,
+                processData: false,
                 success: function(response) {
-                    
+                    if (response.status) {
+                        window.location.reload();
+                    }else{
+                        $(".alert").remove();
+                        $.each(response.errors, function (key, val) {
+                            $("#errors-list").append("<div class='alert alert-danger'>" + val + "</div>");
+                        });
+                    }
                 }
             });
-
+            return false;
         }
     });
     </script>
