@@ -61,7 +61,7 @@ class User extends Authenticatable
         $parent = $this->parent;
 
         while(!is_null($parent)) {
-            $parents->push($parent);
+            $parents->push($parent->user_details);
             $parent = $parent->parent;
         }
 

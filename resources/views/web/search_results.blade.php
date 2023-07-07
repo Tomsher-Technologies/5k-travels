@@ -11,6 +11,8 @@
     <div class="container">
 
         @php
+            $marginData = $data['margins'];
+            $totalmargin = $marginData['totalmargin'];
         @endphp
         <!-- Section Heading -->
         <div class="row">
@@ -171,6 +173,8 @@
                                             @php
                                                 $OriginDestinationOptionsOutbound   = $fdata['OriginDestinationOptionsOutbound'];  
                                                 $totalFares = $fdata['TotalFares']['TotalFare'];
+                                                $totalFareMargin = (($totalFares['Amount']/100) * $totalmargin) + $totalFares['Amount'];
+                                                $totalFareMargin = number_format(floor($totalFareMargin*100)/100, 2);
 
                                                 $firstFlight = head($OriginDestinationOptionsOutbound);
                                                 $lastFlight = last($OriginDestinationOptionsOutbound);
@@ -298,8 +302,10 @@
                                         <div class="flight_search_right">
                                             <!-- <h5><del>AED 1260</del></h5> -->
                                             <h2>{{ $totalFares['CurrencyCode'] }}
-                                                {{ $totalFares['Amount'] }}
+                                                <!-- {{ $totalFares['Amount'] }} -->
                                                 <!-- <sup>*20% OFF</sup> -->
+                                                <!-- ===== -->
+                                                {{ $totalFareMargin }}
                                             </h2>
                                             <a href="{{ route('flight.booking',['search_type' => $data['search_type'], 'session_id' => $data['session_id'],'FareSourceCode' => $fdata['FareSourceCode']]) }}" target="_blank" class="btn btn_theme btn_sm">Book now</a>
                                             <!-- <p>*Discount applicable on some conditions</p> -->
@@ -504,21 +510,30 @@
                                                     <div id="flightDetailsTab-29-tabpane-2" aria-labelledby="flightDetailsTab-29-tab-2" role="tabpanel" aria-hidden="false" class="fade tab-pane active show">
                                                         <div class="flightDetails">
                                                             <p class="flightDetailsHead">Fare Breakup</p>
+                                                            <!-- $totalBaseMargin = (($fareBase['Amount']/100) * $totalmargin) + $fareBase['Amount']; -->
                                                             @php   
                                                                 $fareTotal = $fdata['TotalFares'];
+                                                                $fareBase = $fareTotal['BaseFare'];
+                                                                $fareTax = $fareTotal['TotalTax'];
+                                                                
+                                                                $totalBaseMargin = (($fareBase['Amount']/100) * $totalmargin) + $fareBase['Amount'];
+                                                                $totalBaseMargin = number_format(floor($totalBaseMargin*100)/100, 2);
+
+                                                                $totalTaxMargin = (($fareTax['Amount']/100) * $totalmargin) + $fareTax['Amount'];
+                                                                $totalTaxMargin = number_format(floor($totalTaxMargin*100)/100, 2);
                                                             @endphp
                                                             <div class="flightDetailsInfo">
                                                                 <p class="appendBottom8 fontSize12">
                                                                     <span class="fareBreakupText"  style="font-size: 14px; color: rgb(0, 0, 0);">TOTAL</span>
-                                                                    <span style="font-size: 14px; color: rgb(0, 0, 0);">{{$totalFares['CurrencyCode']}} {{$totalFares['Amount']}}</span>
+                                                                    <span style="font-size: 14px; color: rgb(0, 0, 0);">{{$totalFares['CurrencyCode']}} {{$totalFareMargin}}</span>
                                                                 </p>
                                                                 <p class="appendBottom8 fontSize12">
                                                                     <span class="fareBreakupText" style="color: rgb(135, 135, 135);"> Base Fare </span>
-                                                                    <span style="color: rgb(135, 135, 135);">{{$fareTotal['BaseFare']['CurrencyCode']}} {{$fareTotal['BaseFare']['Amount']}}</span>
+                                                                    <span style="color: rgb(135, 135, 135);">{{$fareBase['CurrencyCode']}} {{ $totalBaseMargin }}</span>
                                                                 </p>
                                                                 <p class="appendBottom8 fontSize12">
                                                                     <span class="fareBreakupText" style="color: rgb(135, 135, 135);">Tax</span>
-                                                                    <span style="color: rgb(135, 135, 135);">{{$fareTotal['TotalTax']['CurrencyCode']}} {{$fareTotal['TotalTax']['Amount']}}</span>
+                                                                    <span style="color: rgb(135, 135, 135);">{{$fareTax['CurrencyCode']}} {{$totalTaxMargin}}</span>
                                                                 </p>
                                                             </div>
                                                         </div>

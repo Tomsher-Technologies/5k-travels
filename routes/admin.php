@@ -60,6 +60,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('/agent/approve', [AgentsController::class, 'approve'])->name('agent.approve');
         Route::post('/agent/change-status', [AgentsController::class, 'statusChange'])->name('agent.change.status');
 
+        
         /* ------------------- Users -----------------*/
         Route::get('/user/', [UserController::class, 'index'])->name('user.index');
         Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
@@ -89,5 +90,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('/settings/faq/delete', [HomeController::class, 'faqDelete'])->name('settings.faq.delete');
         Route::post('/faq/change-status', [HomeController::class, 'faqStatusChange'])->name('faq.change.status');
         Route::post('/faq/delete/', [HomeController::class, 'deleteFaq'])->name('faq.category.delete');
+
+        Route::get('/flight-bookings', [HomeController::class, 'getAllBookings'])->name('bookings');
     });
 });

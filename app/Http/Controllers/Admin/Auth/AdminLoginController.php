@@ -75,7 +75,7 @@ class AdminLoginController extends Controller
         return redirect()
             ->back()
             ->withInput()
-            ->with('error','Login failed, please try again!');
+            ->with('status', 'These credentials do not match our records.');
     }
 
     public function login(Request $request)
@@ -84,9 +84,19 @@ class AdminLoginController extends Controller
        
         if(Auth::attempt($request->only('email','password'),$request->filled('remember'))){
             //Authentication passed...
-            return redirect()->route('admin.dashboard');
-        }
+            if(Auth::user()->user_type == "admin"){
+                return redirect()->route('admin.dashboard');
+            }else{
+                auth()->guard()->logout();
+       
+                $request->session()->invalidate();
 
+                $request->session()->regenerateToken();
+                return back()->with('status', 'Permission Denied!');
+            }
+            
+        }
+        
         //Authentication failed...
         return $this->loginFailed();
     }

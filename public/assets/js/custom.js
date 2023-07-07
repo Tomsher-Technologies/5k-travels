@@ -388,4 +388,4 @@ function backSp(backKey) {
     }
 }
 
-jQuery(window).on('load', function () { jQuery(".preloader").fadeOut(500); });
+jQuery(window).on('load', function () { jQuery(".preloader").fadeOut(200); });

@@ -31,6 +31,7 @@ Route::post('/flights/create-booking', [FlightsController::class, 'createBooking
 Route::get('/flights/revalidate', [FlightsController::class, 'revalidate'])->name('flight.revalidate');
 
 Route::post('web-post-login', [LoginController::class, 'postLogin'])->name('web.login.post');
+Route::post('post-registration', [LoginController::class, 'postRegistration'])->name('register.post'); 
 // Logout Routes...
 Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logout');
 
@@ -38,9 +39,23 @@ Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logou
 
 Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
-    Route::get('/booking-details', [HomeController::class, 'bookingDetails'])->name('booking-details');
+    Route::get('/booking-details/{type}/{id}', [HomeController::class, 'bookingDetails'])->name('booking-details');
 
     Route::get('/web-dashboard', [HomeController::class, 'dashboard'])->name('web-dashboard');
+    Route::get('/cancelled', [HomeController::class, 'cancelled'])->name('cancelled');
+    Route::get('/completed', [HomeController::class, 'completed'])->name('completed');
+    Route::get('/upcoming', [HomeController::class, 'upcoming'])->name('upcoming');
+    Route::get('/sub-agents', [HomeController::class, 'subAgents'])->name('sub-agents');
+
+    Route::post('/change-agent-status', [HomeController::class, 'statusChange'])->name('change.agent.status');
+    Route::get('/subagent-create', [HomeController::class, 'createSubAgent'])->name('subagent.create');
+    Route::post('/subagent-store', [HomeController::class, 'storeSubAgent'])->name('subagent.store');
+    Route::get('/subagent-edit/{agent}', [HomeController::class, 'editSubAgent'])->name('subagent.edit');
+    Route::post('/subagent-update', [HomeController::class, 'updateSubAgent'])->name('subagent.update');
+    Route::post('/subagent-delete/', [HomeController::class, 'deleteSubAgent'])->name('subagent.delete');
+    Route::get('/subagent-view/{agent}', [HomeController::class, 'viewSubAgent'])->name('subagent.view');
+    Route::post('/agent-profile-update', [HomeController::class, 'updateAgentProfile'])->name('agent.profile.update');
+    Route::get('/agent-profile', [HomeController::class, 'viewAgentProfile'])->name('agent.profile');
 
     Route::get('/flights/cancel', [FlightsController::class, 'cancelTicket'])->name('flight.cancel');
     Route::get('/flights/voidQuote', [FlightsController::class, 'voidQuote'])->name('flight.voidQuote');

@@ -49,7 +49,7 @@
                 <div class="container">
                     <div class="main-responsive-menu">
                         <div class="logo">
-                            <a href="index.html">
+                            <a href="{{ route('home') }}">
                                 <img src="{{ asset('assets/img/logo.png') }}" alt="logo">
                             </a>
                         </div>
@@ -65,10 +65,10 @@
                         </a>
                         <div class="collapse navbar-collapse mean-menu" id="navbarSupportedContent">
                             <ul class="navbar-nav">
-                                <li class="nav-item"><a href="super-offers.html" class="nav-link ">Super Offers</a>
-                                <li class="nav-item"><a href="top_destinations.html" class="nav-link ">Top Destinations</a>
-                                <li class="nav-item"><a href="support.html" class="nav-link ">Support</a>
-                                <li class="nav-item"><a href="business.html" class="nav-link ">5K for Business</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">Super Offers</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">Top Destinations</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">Support</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">5K for Business</a>
                                 <li class="nav-item"><a href="#" class="nav-link ">Help</a>
                             </ul>
                             </li>

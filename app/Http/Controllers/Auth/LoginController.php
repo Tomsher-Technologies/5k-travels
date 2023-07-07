@@ -9,8 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Models\UserDetails;
 use Session;
-
+use Helper;
+use Hash;
 class LoginController extends Controller
 {
     /*
@@ -58,30 +60,76 @@ class LoginController extends Controller
         } else {
             if (Auth::attempt($request->only(["email", "password"]))) {
                 if(Auth::user()->user_type == "user" || Auth::user()->user_type == "admin" || (Auth::user()->user_type == "agent" && Auth::user()->is_approved == 1)){
-                    // $parents = User::where('id', Auth::user()->id)->first();
-                    // $getAllParents = $parents->getAllParents();
-                    // echo '<pre>';
-                    // print_r($parents); 
-                    // echo $getAllParents;
-                    // print_r($getAllParents); 
-                    
                     return response()->json([
                         "status" => true, 
-                        "redirect" => url("web-dashboard")
+                        "redirect" => url("web-dashboard"),
+                        "token" => csrf_token()
                     ]);
                 }elseif(Auth::user()->user_type == "agent" && Auth::user()->is_approved == 0){
                     return response()->json([
                         "status" => false,
-                        "errors" => ["Your account is waiting for our administrator approval. Please check back later."]
+                        "errors" => ["Your account is waiting for our administrator approval. Please check back later."],
+                        "token" => csrf_token()
                     ]);
                 }    
             } else {
                 return response()->json([
                     "status" => false,
-                    "errors" => ["These credentials do not match our records."]
+                    "errors" => ["These credentials do not match our records."],
+                    "token" => csrf_token()
                 ]);
             }
         }
+    }
+
+    public function postRegistration(Request $request)
+    {  
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'confirm_password' => 'required|min:6|same:password',
+        ]);
+  
+        if ($validator->fails()){
+            return response()->json([
+                    "status" => false,
+                    "msg" => $validator->errors()
+                ]);
+        }
+  
+        $data = $request->all();
+        // echo '<pre>';
+        // print_r($data); die;
+        $user = User::create([
+            'user_type' => 'agent',
+            'parent_id' => NULL,
+            'name' => $request->first_name.' '.$request->last_name,
+            'email' => $request->email,
+            'password' =>  Hash::make($request->password),
+            'is_approved' => 0,
+            'is_active' => 1,
+        ]);
+
+        $user_details = UserDetails::create([
+            'user_id' => $user->id, 
+            'code' => generateUniqueCode('agent'), 
+            'first_name' => $request->first_name, 
+            'last_name' => $request->last_name,  
+            'phone_number' => $request->phone,  
+            'logo' => NULL, 
+            'company_name' => $request->company_name
+        ]);
+        // $user = $this->create($data);
+  
+        // Auth::login($user);
+  
+        return response()->json([
+            "status" => true, 
+            "msg" => 'You have been successfully registered!. Please wait for the admin approval'
+        ]);
+        
     }
 
     public function logoutWeb() {
