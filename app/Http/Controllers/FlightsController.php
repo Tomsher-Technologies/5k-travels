@@ -43,10 +43,6 @@ class FlightsController extends Controller
     }
 
     public function search(Request $request){
-        $airports = Airports::select('id', 'AirportCode', 'AirportName', 'City', 'Country')
-                            ->orderBy('City','ASC')
-                            ->get();
-
         $mFrom = $request->mFrom;
         $mTo = $request->mTo;
         $mDate = $request->mDate;
@@ -756,11 +752,11 @@ class FlightsController extends Controller
             $data['totalCount'] = count($flights) + count($flightsIn);
             $data['flightDetails'] = $flights;
             $data['flightDetailsInbound'] = $flightsIn;
-            return  view('web.search_results_domestic',compact('data','airports'));
+            return  view('web.search_results_domestic',compact('data'));
         }else{
             $data['totalCount'] = count($flights);
             $data['flightDetails'] = $flights;
-            return  view('web.search_results',compact('data','airports'));
+            return  view('web.search_results',compact('data'));
         }
        
     }
