@@ -123,6 +123,7 @@
                                                         <div class="common_author_form">
                                                             <form action="{{ route('web.login.post') }}" id="main_author_form" method="POST">
                                                                 @csrf
+                                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token() }}">
                                                                 <div class="form-group">
                                                                     <input type="text" class="form-control" name="email" placeholder="Enter user name" />
                                                                 </div>
@@ -153,39 +154,36 @@
 
                                                     <div class="common_author_boxed">
 
-                                                        <div class="common_author_form">
+                                                        <div class="common_author_form form_area">
 
 
                                                             <form action="#" id="main_author_form_register">
                                                                 <div class="form-group">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="Enter first name*">
+                                                                    <input type="text" class="form-control" autocomplete="off" name="first_name" id="first_name" placeholder="Enter first name*">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="Enter last name*">
+                                                                    <input type="text" class="form-control"  autocomplete="off" name="last_name" id="last_name" placeholder="Enter last name*">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="your email address (Optional)">
+                                                                    <input type="text" class="form-control" autocomplete="off" name="email" id="email" placeholder="Your email address*">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="Mobile number*">
+                                                                    <input type="text" class="form-control" autocomplete="off" name="phone" id="phone" placeholder="Mobile number*">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="User name*">
+                                                                    <input type="text" class="form-control" autocomplete="off" placeholder="Company Name" name="company_name" id="company_name">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <input type="password" class="form-control"
-                                                                        placeholder="Password">
+                                                                    <input type="password" class="form-control" autocomplete="new-password" placeholder="Password*" name="password" id="password">
                                                                 </div>
+                                                                <div class="form-group">
+                                                                    <input type="password" class="form-control" autocomplete="off" placeholder="Confirm Password*" name="confirm_password" id="confirm_password">
+                                                                </div>
+                                                                <div id="reg-errors-list"></div>
                                                                 <div class="common_form_submit">
-                                                                    <button
-                                                                        class="btn btn_theme btn_md">Register</button>
+                                                                    <button type="submit" class="btn btn_theme btn_md">Register</button>
                                                                 </div>
-                                                                <div class="have_acount_area other_author_option">
+                                                                <!-- <div class="have_acount_area other_author_option">
                                                                     <div class="line_or">
                                                                         <span>or</span>
                                                                     </div>
@@ -200,7 +198,7 @@
                                                                                     src="{{ asset('assets/img/icon/twitter.png') }}"
                                                                                     alt="icon"></a></li>
                                                                     </ul>
-                                                                </div>
+                                                                </div> -->
                                                             </form>
                                                         </div>
 
@@ -285,6 +283,63 @@
                         $(".alert").remove();
                         $.each(response.errors, function (key, val) {
                             $("#errors-list").append("<div class='alert alert-danger'>" + val + "</div>");
+                        });
+                        // $('meta[name="csrf-token"]').attr('content').val(response.token);
+                    }
+                }
+            });
+            return false;
+        }
+    });
+
+    $("#main_author_form_register").validate({
+        rules: {
+            email: {
+                required: true,
+                email: true
+            },
+            first_name:'required',
+            last_name:'required',
+            phone:'required',
+            password: {
+                required:true,
+                minlength: 6,
+            },
+            confirm_password: {
+                required:true,
+                minlength: 6,
+                equalTo: "#password"
+            }
+        },
+        messages: {
+            password: {
+                minlength: "Your password must be at least 6 characters long"
+            },
+            confirm_password: {
+                minlength: "Your password must be at least 6 characters long",
+                equalTo: "Please enter the same password as above"
+            }
+        },
+        errorPlacement: function (error, element) {
+            error.appendTo(element.parent("div"));
+        },
+        submitHandler: function(form, event) {
+            var data = $('#main_author_form_register').serialize();
+            event.preventDefault();
+           
+            $.ajax({
+                url: "{{ route('register.post') }}",
+                type: "POST",
+                data: data,
+                processData: false,
+                success: function(response) {
+                    if (response.status) {
+                        $('#main_author_form_register')[0].reset();
+                        $("#reg-errors-list").append("<div class='alert reg-alert alert-success'>" + response.msg + "</div>");
+                    }else{
+                        $(".reg-alert").remove();
+                        $.each(response.msg, function (key, val) {
+                            $("#reg-errors-list").append("<div class='alert reg-alert alert-danger'>" + val + "</div>");
                         });
                     }
                 }

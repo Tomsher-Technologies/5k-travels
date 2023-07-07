@@ -5145,7 +5145,7 @@ textarea {
 }
 
 .table_common_area tbody tr td {
-    padding: 16px 0;
+    padding: 16px 5px;
 }
 
 .table_common_area tbody tr td.complete {
@@ -5163,23 +5163,23 @@ textarea {
 }
 
 /* ---My Profile Page--- */
-#profile_form_area {
+.form_area {
     padding-top: 35px;
 }
 
-#profile_form_area .form-group {
-    margin-bottom: 30px;
+.form_area .form-group {
+    margin-bottom: 15px;
 }
 
-#profile_form_area label {
+.form_area label {
     margin-bottom: 10px;
 }
 
-#profile_form_area .change_password_field {
+.form_area .change_password_field {
     position: relative;
 }
 
-#profile_form_area .change_password_field p {
+.form_area .change_password_field p {
     position: absolute;
     bottom: 14px;
     right: 15px;
@@ -6710,4 +6710,96 @@ textarea {
     -webkit-animation-delay: 0s;
     animation-delay: 0s
 }
+.label-danger{
+    color: red;
+}
+.label-success{
+    color: green;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #c65858b0;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 17px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #259b258f;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+  .radio-label {
+        display: flex;
+        width: 100px;
+        float: left;
+        margin-top: 1%;
+    }
+    .radio-size {
+        width: 50%;
+    }
+    .w-150{
+        width:150px;
+    }
+    .w-100px{
+        width: 100px;
+    }
+    .required{
+        color: red;
+    }
+    .wh-150{
+        width: 150px;
+        height: 150px;
+    }
+    .readonly{
+        pointer-events: none;
+    }
 /* Jisha End */

@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="common_bannner_text">
-                        <h2>Dashboard </h2>
+                        <h2>{{ ($type == 'my_bookings') ? 'My Bookings' : 'Upcoming Bookings' }}  </h2>
                         
                     </div>
                 </div>
@@ -27,7 +27,7 @@
                 <div class="col-lg-9">
               
                     <div class="dashboard_common_table">
-                        <h3>My Bookings</h3>
+                        <h3>{{ ($type == 'my_bookings') ? 'My Bookings' : 'Upcoming Bookings' }}  </h3>
                         <div class="table-responsive-lg table_common_area">
                             <table class="table">
                                 <thead>
@@ -78,10 +78,22 @@
                                                             @if(strtolower($book->fare_type) == 'webfare' )
                                                                 <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id=""  data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                             @else
-                                                                <a href="javascript:void(0)" class="voidQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                                @if($book->ticket_status == "Ticketed" || $book->ticket_status == "OK")
+                                                                    <a href="javascript:void(0)" class="voidQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                                @else
+                                                                    <a href="javascript:void(0)" class="cancelTicket danger-icon" title="Cancel Ticket" data-type="void" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                                @endif
                                                             @endif
                                                         @elseif($timeDiff > 86400)
-                                                            <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                            @if(strtolower($book->fare_type) == 'webfare' )
+                                                                <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                            @else
+                                                                @if($book->ticket_status == "Ticketed" || $book->ticket_status == "OK")
+                                                                    <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                                @else
+                                                                    <a href="javascript:void(0)" class="cancelTicket danger-icon" data-type="refund" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                                @endif
+                                                            @endif
                                                         @endif
                                                     @elseif($book->is_cancelled == 0 && $book->cancel_request == 1)
                                                         <a href="javascript:void(0)" class="success-icon cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $book->unique_booking_id }}" data-ptr="{{ $book->cancel_ptr }}"><i class="fas fa-refresh"></i></a> &nbsp;
@@ -123,9 +135,17 @@
                                             <div class="row">
                                                 <div class="col-sm-12 d-flex padding-1rem">
                                                     <div class="col-sm-6">
-                                                        Total Cancellation Fee :
+                                                        Cancellation Fee :
                                                     </div>
                                                     <div class="col-sm-6" id="totalCancelFee">
+                                                    
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 d-flex padding-1rem">
+                                                    <div class="col-sm-6">
+                                                        Service Charge :
+                                                    </div>
+                                                    <div class="col-sm-6" id="serviceCharge">
                                                     
                                                     </div>
                                                 </div>
@@ -146,6 +166,8 @@
                                 <div class="modal-footer">
                                     <input type="hidden" id="book_Id" name="book_Id" value="">
                                     <input type="hidden" id="unique_BookId" name="unique_BookId" value="">
+                                    <input type="hidden" id="cancel_fee" name="cancel_fee" value="">
+                                    <input type="hidden" id="refund_amount" name="refund_amount" value="">
                                     <input type="hidden" id="request_type" name="request_type" value="">
                                     <button type="button" class="btn btn-success" id="requestCancel">Send Cancel Request</button>
                                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
@@ -174,25 +196,43 @@
 
     $('.cancelTicket').on('click', function () {
         $('.ajaxloader').css('display','block');
-        var bookId = $(this).attr('data-id');
+        var uniquebookId = $(this).attr('data-id');
+        var id = $(this).attr('data-bookid');
+        var type = $(this).attr('data-type');
         $.ajax({
             url: "{{ route('flight.cancel')}}",
             type: "GET",
-            data: { "_token": "{{ csrf_token() }}", "bookId" : bookId},
+            data: { "_token": "{{ csrf_token() }}", "uniquebookId" : uniquebookId, "id" : id, "type" : type},
             success: function( response ) {
                 $('.ajaxloader').css('display','none');
+                console.log(response);
                 var resp = JSON.parse(response);
+                if(resp.status == true){
+                    if(resp.type == 'cancel'){
+                        swal({
+                            title: "Success!", 
+                            text: resp.msg, 
+                            icon: "success",
+                            closeOnClickOutside: false,
+                        }).then(function() {
+                            location.reload();
+                        });
+                    }else{
+                        $('#book_Id').val(resp.data.id);
+                        $('#request_type').val(resp.type);
+                        $('#unique_BookId').val(resp.data.UniqueID);
 
-                if(resp.status == "success"){
-                    swal({
-                        title: "Success!", 
-                        text: resp.msg, 
-                        icon: "success",
-                        closeOnClickOutside: false,
-                    }).then(function() {
-                        location.reload();
-                    });
+                        $('#refund_amount').val(resp.data.refundAmount);
+                        $('#cancel_fee').val(resp.data.voidFee);
+
+                        $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.voidFee);
+                        $('#serviceCharge').html(resp.data.currency +' '+ resp.data.serviceCharge);
+                        $('#totalRefund').html(resp.data.currency +' '+ resp.data.refundAmount);
+                        $('#cancelQuote').modal({backdrop: 'static', keyboard: false})  
+                        $('#cancelQuote').modal('show');
+                    }
                 }else{
+                    $('#cancelQuote').modal('hide');
                     swal({
                         title: "Something went wrong!", 
                         text: resp.msg, 
@@ -209,6 +249,7 @@
     $('.voidQuoteTicket').on('click', function () {
         $('.ajaxloader').css('display','block');
         $('#totalCancelFee').html('');
+        $('#serviceCharge').html('');
         $('#totalRefund').html('');
         $('#bookId').val('');
         $('#uniqueBookId').val('');
@@ -226,7 +267,12 @@
                     $('#book_Id').val(resp.data.id);
                     $('#request_type').val('void');
                     $('#unique_BookId').val(resp.data.UniqueID);
+
+                    $('#refund_amount').val(resp.data.refundAmount);
+                    $('#cancel_fee').val(resp.data.voidFee);
+
                     $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.voidFee);
+                    $('#serviceCharge').html(resp.data.currency +' '+ resp.data.serviceCharge);
                     $('#totalRefund').html(resp.data.currency +' '+ resp.data.refundAmount);
                     $('#cancelQuote').modal({backdrop: 'static', keyboard: false})  
                     $('#cancelQuote').modal('show');
@@ -248,10 +294,15 @@
     
     $('#requestCancel').on('click', function () {
         $('.ajaxloader').css('display','block');
-        var bookId = $('#book_Id').val();
-        var uniqueBookId = $('#unique_BookId').val();
+       
         var request_type = $('#request_type').val();
 
+         var data ={'id' : $('#book_Id').val(),
+                    'bookId' : $('#unique_BookId').val(),
+                    'refund_amount' : $('#refund_amount').val(),
+                    'cancel_fee'    :  $('#cancel_fee').val(),
+                    '_token' : "{{ csrf_token() }}"
+                    };
         var requesturl = '';
         if(request_type == 'void'){
             requesturl = "{{ route('flight.void')}}";
@@ -261,7 +312,7 @@
         $.ajax({
             url: requesturl,
             type: "POST",
-            data: { "_token": "{{ csrf_token() }}", "bookId" : uniqueBookId, "id" : bookId},
+            data: data,
             success: function( response ) {
                 $('.ajaxloader').css('display','none');
                 var resp = JSON.parse(response);
@@ -315,6 +366,7 @@
     $('.refundQuoteTicket').on('click', function () {
         $('.ajaxloader').css('display','block');
         $('#totalCancelFee').html('');
+        $('#serviceCharge').html('');
         $('#totalRefund').html('');
         $('#bookId').val('');
         $('#uniqueBookId').val('');
@@ -331,8 +383,11 @@
                 if(resp.status == true){
                     $('#book_Id').val(resp.data.id);
                     $('#unique_BookId').val(resp.data.UniqueID);
+                    $('#refund_amount').val(resp.data.refundAmount);
+                    $('#cancel_fee').val(resp.data.refundFee);
                     $('#request_type').val('refund');
                     $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.refundFee);
+                    $('#serviceCharge').html(resp.data.currency +' '+ resp.data.serviceCharge);
                     $('#totalRefund').html(resp.data.currency +' '+ resp.data.refundAmount);
                     $('#cancelQuote').modal({backdrop: 'static', keyboard: false})  
                     $('#cancelQuote').modal('show');

@@ -16,7 +16,11 @@
             </div>
         </div>
     </div>
-    @php  $data['flightData'] = getAirlines(); @endphp
+    @php  
+        $data['flightData'] = getAirlines(); 
+        $marginData = $data['margins'];
+        $totalmargin = $marginData['totalmargin'];
+    @endphp
 </section>
 <!-- Tour Booking Submission Areas -->
 <section id="tour_booking_submission" class="section_padding">
@@ -298,22 +302,29 @@
                         @php 
                             $amountLi  = $passengerName ='';
                             $totalBase = $totalTax = 0;
+
                             $adult_amount = $child_amount = $infant_amount = 0;
+
                             if(isset($data['FareBreakdown'])){
                                 foreach($data['FareBreakdown'] as $fkey=>$fvalue){
-                                    $totalBase = $totalBase + $fvalue['BaseFare']['Amount'];
+                                    $fareBase = $fvalue['BaseFare']['Amount'];
+                                    $fareBaseMargin = (($fareBase/100) * $totalmargin) + $fareBase;
+                                    $fareBaseMargin = number_format(floor($fareBaseMargin*100)/100, 2);
+
+                                    $totalBase = $totalBase + $fareBaseMargin;
+
                                     $currencyCode = $fvalue['BaseFare']['CurrencyCode'];
                                     if($fkey == 'ADT'){
                                         $passengerName = 'Adult';
-                                        $adult_amount = $fvalue['BaseFare']['Amount'];
+                                        $adult_amount = $fareBaseMargin;
                                     }elseif($fkey == 'CHD'){
                                         $passengerName = 'Child';
-                                        $child_amount = $fvalue['BaseFare']['Amount'];
+                                        $child_amount = $fareBaseMargin;
                                     }elseif($fkey == 'INF'){
                                         $passengerName = 'Infant';
-                                        $infant_amount = $fvalue['BaseFare']['Amount'];
+                                        $infant_amount = $fareBaseMargin;
                                     }
-                                    $amountLi .= "<li> ".$passengerName." Price x ". $fvalue['Quantity']."  <span>".$fvalue['BaseFare']['CurrencyCode']." ".$fvalue['BaseFare']['Amount']."</span></li>";
+                                    $amountLi .= "<li> ".$passengerName." Price x ". $fvalue['Quantity']."  <span>".$currencyCode." ".$fareBaseMargin."</span></li>";
                                 }
                             }
                         
@@ -331,8 +342,18 @@
                             $ItinTotalFares =  $data['ItinTotalFares'];
 
                             $TotalFare = $ItinTotalFares['TotalFare'];
+
+                            $TotalFareMargin = (($TotalFare['Amount']/100) * $totalmargin) + $TotalFare['Amount'];
+                            $TotalFareMargin = number_format(floor($TotalFareMargin*100)/100, 2);
+                            
                             $BaseFare = $ItinTotalFares['BaseFare'];
-                            $TotalTax = $ItinTotalFares['TotalTax'];
+                            $baseFareMargin = (($BaseFare['Amount']/100) * $totalmargin) + $BaseFare['Amount'];
+                            $baseFareMargin = number_format(floor($baseFareMargin*100)/100, 2);
+
+                            $TotalTax = $ItinTotalFares['TotalTax']['Amount'];
+
+                            $taxFareMargin = (($TotalTax/100) * $totalmargin) + $TotalTax;
+                            $taxFareMargin = number_format(floor($taxFareMargin*100)/100, 2);
                             $currencyCode = $TotalFare['CurrencyCode'];
             
                         @endphp
@@ -340,8 +361,10 @@
                             @csrf
                             <input type="hidden" name="total_addons" id="total_addons" value="0">
                             <input type="hidden" name="currency" id="currency" value="{{$currencyCode}}">
-                            <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFare['Amount']}}">
-                            <input type="hidden" name="total_tax" id="total_tax" value="{{$TotalTax['Amount']}}">
+                            <input type="hidden" name="total_amount_org" id="total_amount_org" value="{{$TotalFare['Amount']}}">
+                            <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFareMargin}}">
+                            <input type="hidden" name="total_tax" id="total_tax" value="{{$taxFareMargin}}">
+                            <input type="hidden" name="total_tax_org" id="total_tax_org" value="{{$TotalTax}}">
                             <input type="hidden" name="adult_amount" id="adult_amount" value="{{$adult_amount}}">
                             <input type="hidden" name="child_amount" id="child_amount" value="{{$child_amount}}">
                             <input type="hidden" name="infant_amount" id="infant_amount" value="{{$infant_amount}}">
@@ -833,7 +856,12 @@
                                     </div>
                                     <div class="booking_btn float-right">
                                         @if(Auth::check())
-                                            <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
+                                            @php $balance = getAgentWalletBalance(Auth::user()->id);  @endphp
+                                            @if($balance >= str_replace(',','',$TotalFareMargin))
+                                                <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
+                                            @else
+                                                <div class='alert alert-danger mt-3' style="width: 300px;text-align: center;">Insufficient balance in wallet. </div>
+                                            @endif
                                         @else
                                             <button type="button" id="loginCheck" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
                                         @endif
@@ -874,10 +902,10 @@
                                        {!! $amountLi !!}
                                     </ul>
                                     <div class="tour_bokking_subtotal_area">
-                                        <h6>Total Base Fare <span>{{$currencyCode}} {{ $BaseFare['Amount'] }}</span></h6>
+                                        <h6>Total Base Fare <span>{{$currencyCode}} {{  $baseFareMargin }}</span></h6>
                                     </div>
                                     <div class="tour_bokking_subtotal_area">
-                                        <h6>Total Tax <span>{{$currencyCode}} {{ $TotalTax['Amount'] }}</span></h6>
+                                        <h6>Total Tax <span>{{$currencyCode}} {{ $taxFareMargin }}</span></h6>
                                     </div>
 
                                     <div class="tour_bokking_subtotal_area">
@@ -889,7 +917,7 @@
                                         </h6> -->
                                     </div>
                                     <div class="total_subtotal_booking">
-                                        <h4>Total Amount <span id="amountSpan">{{$currencyCode}} {{ $TotalFare['Amount'] }}</span> </h4>
+                                        <h4>Total Amount <span id="amountSpan">{{$currencyCode}} {{ $TotalFareMargin }}</span> </h4>
                                     </div>
                                     <!-- <hr>
                                     <div class="form-check write_spical_check mt-3">
@@ -1237,7 +1265,7 @@
             errorPlacement: function (error, element) {
                 error.appendTo(element.parent("div"));
             },
-            submitHandler: function(form) {
+            submitHandler: function(form,event) {
                 form.submit();
             }
         });

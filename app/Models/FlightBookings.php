@@ -32,6 +32,11 @@ class FlightBookings extends Model
         'addon_amount', 
         'total_tax',
         'created_at',
-        'currency'
+        'currency',
+        'total_amount_actual', 
+        'total_tax_actual', 
+        'admin_margin', 
+        'admin_amount', 
+        'agents_amount'
     ];
 }

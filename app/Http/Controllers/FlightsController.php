@@ -11,10 +11,14 @@ use App\Models\Countries;
 use App\Models\FlightBookings;
 use App\Models\FlightPassengers;
 use App\Models\FlightItineraryDetails;
+use App\Models\FlightMarginAmounts;
+use App\Models\UserDetails;
+use App\Models\User;
 use App;
 use Session;
 use Helper;
 use DB;
+use Auth;
 
 class FlightsController extends Controller
 {
@@ -42,10 +46,6 @@ class FlightsController extends Controller
         $airports = Airports::select('id', 'AirportCode', 'AirportName', 'City', 'Country')
                             ->orderBy('City','ASC')
                             ->get();
-        //     echo '<pre>';
-        //     print_r($request->all());
-        //    die;
-        
 
         $mFrom = $request->mFrom;
         $mTo = $request->mTo;
@@ -751,6 +751,7 @@ class FlightsController extends Controller
         $data['refund'] = $refund;
         $data['no_refund'] = $no_refund;
 
+        $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData(); 
         if($request->search_type == 'Return' && isset($result['AirSearchResponse']['AirSearchResultInbound'])){
             $data['totalCount'] = count($flights) + count($flightsIn);
             $data['flightDetails'] = $flights;
@@ -764,412 +765,6 @@ class FlightsController extends Controller
        
     }
 
-    // public function searchOld(Request $request){
-    //     $airports = Airports::select('id', 'AirportCode', 'AirportName', 'City', 'Country')
-    //                         ->orderBy('City','ASC')
-    //                         ->get();
-    //     //     echo '<pre>';
-    //     //     print_r($request->all());
-    //     //    die;
-        
-
-    //     $mFrom = $request->mFrom;
-    //     $mTo = $request->mTo;
-    //     $mDate = $request->mDate;
-    //     $adult = $child = $infant = 0;
-    //     $cabinClass = '';
-    //     if($request->search_type == 'OneWay'){
-    //         Session::put('flight_search_oneway', $request->all());
-    //         $originDestinationInfo[] = [
-    //             "departureDate"=> $request->oDate,
-    //             "airportOriginCode"=> $request->oFrom,
-    //             "airportDestinationCode"=> $request->oTo
-    //         ];
-            
-    //         $adult = $request->oAdult;
-    //         $child = $request->oChild;
-    //         $infant = $request->oInfant;
-    //         $cabinClass = $request->oClass;
-
-    //         $airlineFilters = ($request->oairline_filter != '') ? explode(',', rtrim($request->oairline_filter, ',')) : array();
-    //         $stopFilters = ($request->ostop_filter != '') ? explode(',', rtrim($request->ostop_filter, ',')) : array();
-    //         $refundFilter = ($request->orefund_filter != '') ?  explode(',', rtrim($request->orefund_filter, ',')) : array();
-    //         $isFilter  = 0;
-    //         if(!empty($airlineFilters) || !empty($stopFilters) || !empty($refundFilter)){
-    //             $isFilter = 1;
-    //         }
-
-    //     }elseif($request->search_type == 'Return'){
-    //         Session::put('flight_search_return', $request->all());
-    //         $originDestinationInfo[] = [
-    //             "departureDate"=> $request->rDate,
-    //             "returnDate" => $request->rReturnDate,
-    //             "airportOriginCode"=> $request->rFrom,
-    //             "airportDestinationCode"=> $request->rTo
-    //         ];
-    //         $adult = $request->rAdult;
-    //         $child = $request->rChild;
-    //         $infant = $request->rInfant;
-    //         $cabinClass = $request->rClass;
-
-    //         $airlineFilters = ($request->rairline_filter != '') ? explode(',', rtrim($request->rairline_filter, ',')) : array();
-    //         $stopFilters = ($request->rstop_filter != '') ? explode(',', rtrim($request->rstop_filter, ',')) : array();
-    //         $refundFilter = ($request->rrefund_filter != '') ?  explode(',', rtrim($request->rrefund_filter, ',')) : array();
-    //         $isFilter  = 0;
-    //         if(!empty($airlineFilters) || !empty($stopFilters) || !empty($refundFilter)){
-    //             $isFilter = 1;
-    //         }
-
-    //     }elseif($request->search_type == 'Circle'){
-    //         Session::put('flight_search_multi', $request->all());
-
-    //         $multiCount = count($request->mFrom);
-    //         for($i=0; $i<$multiCount; $i++){
-    //             $originDestinationInfo[] = [
-    //                 "departureDate"=> $mDate[$i],
-    //                 "airportOriginCode"=> $mFrom[$i],
-    //                 "airportDestinationCode"=> $mTo[$i]
-    //             ];
-    //         }
-    //         $adult = $request->mAdult;
-    //         $child = $request->mChild;
-    //         $infant = $request->mInfant;
-    //         $cabinClass = $request->mClass;
-
-    //         $airlineFilters = ($request->mairline_filter != '') ? explode(',', rtrim($request->mairline_filter, ',')) : array();
-    //         $stopFilters = ($request->mstop_filter != '') ? explode(',', rtrim($request->mstop_filter, ',')) : array();
-    //         $refundFilter = ($request->mrefund_filter != '') ?  explode(',', rtrim($request->mrefund_filter, ',')) : array();
-    //         $isFilter  = 0;
-    //         if(!empty($airlineFilters) || !empty($stopFilters) || !empty($refundFilter)){
-    //             $isFilter = 1;
-    //         }
-    //     }
-    //     // print_r($request->session()->get('flight_search_oneway'));
-    //     // // echo json_encode($originDestinationInfo);
-    //     // die;
-        
-    //     $data = $flightCodes = [];
-    //     $data['flightData'] = Airlines::get()->keyBy('AirLineCode')->toArray();
-
-    //     $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
-       
-    //     $response = Http::timeout(120)->withOptions($this->options)->post(config('global.api_base_url').'availability', [
-    //                                                 "user_id"=> config('global.api_user_id'),
-    //                                                 "user_password"=> config('global.api_user_password'),
-    //                                                 "access"=> config('global.api_access'),
-    //                                                 "ip_address"=> config('global.api_ip_address'),
-    //                                                 "requiredCurrency"=> config('global.api_requiredCurrency'),
-    //                                                 "journeyType"=> $request->search_type,
-    //                                                 "OriginDestinationInfo"=> $originDestinationInfo,
-    //                                                 "class"=> $cabinClass,
-    //                                                 // "airlineCode"=> "QR",
-    //                                                 "adults"=> (int)$adult,
-    //                                                 "childs"=> (int)$child,
-    //                                                 "infants"=> (int)$infant,
-    //                                                 "directFlight" => (isset($request->direct) ? 1 : 0)
-    //                                             ]);
-        
-    //     $result = $response->getBody()->getContents();
-    //     $result = json_decode($result, true);
-    //     // echo '<pre>';
-    //     // // print_r($request->all());
-    //     // print_r($result);
-    //     // die;
-    //     $data['session_id'] = isset($result['AirSearchResponse']['session_id']) ? $result['AirSearchResponse']['session_id'] : '';
-
-    //     $flightDetails = isset($result['AirSearchResponse']['AirSearchResult']['FareItineraries']) ? $result['AirSearchResponse']['AirSearchResult']['FareItineraries'] : array();
-        
-    //     $one_stop = $two_stop = $three_stop = $non_stop = $refund = $no_refund = 0;
-    //     // $one_stop_data = $two_stop_data = $three_stop_data = $non_stop_data = array();
-    //     $flights = [];
-    //     if($flightDetails){
-    //         $loop = 0;
-    //         $unsetLoops = array();
-    //         $airLoops = array();
-    //         $stopsLoop = $refundLoop = array();
-    //         foreach($flightDetails as $fd){
-    //             // echo '<br><br>Normal loop  ==== '.$loop;
-    //             $refundStatus = $fd['FareItinerary']['AirItineraryFareInfo']['IsRefundable'];
-    //             $flights[$loop]['FareSourceCode'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareSourceCode'];
-    //             $flights[$loop]['FareType'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareType'];
-    //             $flights[$loop]['IsRefundable'] = $refundStatus;
-    //             $flights[$loop]['TotalFares'] = $fd['FareItinerary']['AirItineraryFareInfo']['ItinTotalFares'];
-    //             $flights[$loop]['DirectionInd'] = $fd['FareItinerary']['DirectionInd'];
-
-    //             $baggage = [];
-    //             foreach($fd['FareItinerary']['AirItineraryFareInfo']['FareBreakdown'] as $fareBreak){
-    //                 $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['Baggage'] = $fareBreak['Baggage'];
-    //                 $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['CabinBaggage'] = $fareBreak['CabinBaggage'];
-    //             }
-    //             $flights[$loop]['Baggage'] = $baggage;
-
-    //             if(strtolower($refundStatus) == 'no' || strtolower($refundStatus) == false){
-    //                 $no_refund++;
-    //             }else{
-    //                 $refund++;
-    //             }
-        
-    //             /*================================================  One Way =============================================================*/
-    //             if($fd['FareItinerary']['DirectionInd'] == "OneWay"){  
-    //                 $totalStopsCount = $fd['FareItinerary']['OriginDestinationOptions'][0]['TotalStops'];
-    //                 // print_r($stopFilters);
-                    
-    //                 if($totalStopsCount == 0){
-    //                     $non_stop++;
-    //                 }elseif($totalStopsCount == 1){
-    //                     $one_stop++;
-    //                 }elseif($totalStopsCount == 2){
-    //                     $two_stop++;
-    //                 }elseif($totalStopsCount == 3){
-    //                     $three_stop++;
-    //                 }
-
-    //                 $flights[$loop]['totalOutStops'] = $totalStopsCount;
-    //                 $flights[$loop]['OriginDestinationOptionsOutbound'] = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
-                    
-    //                 $layover = [];
-    //                 $journeyDurations = 0;
-    //                 $flightBaggage = [];
-    //                 // echo '<br><br><br> Mian loop ======== '.$loop;
-    //                 // echo '<br>Total Stops ====== '.$totalStopsCount;
-                    
-    //                 for($i=0; $i <= $totalStopsCount; $i++){
-    //                     $journeyDurations += $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][$i]['FlightSegment']['JourneyDuration'];
-    //                     $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
-    //                     if($totalStopsCount > 0){
-    //                         if($i != 0){
-    //                             if($flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
-    //                                 $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$i]['FlightSegment']['DepartureDateTime']);
-    //                                 $layover[$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMin;
-    //                                 $layover['place'][] = $data['airports'][$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']]['City'];
-    //                                 $layover['duration'][] = $timeInMin;                                
-    //                             }
-    //                         }
-    //                     }
-    //                     $airlineCode = $flightSegment[$i]['FlightSegment']['MarketingAirlineCode'];
-    //                     $flightCodes [] = $airlineCode;
-    //                     $data['airlines'][$airlineCode] = isset($data['airlines'][$airlineCode]) ? ($data['airlines'][$airlineCode] + 1) : 1;
-
-    //                     $originCode = $flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'];
-    //                     $destinationCode = $flightSegment[$i]['FlightSegment']['ArrivalAirportLocationCode'];
-                       
-    //                     if(!empty($airlineFilters) && in_array($airlineCode, $airlineFilters)){
-    //                         $unsetLoops[] = $loop;
-    //                     }
-    //                     foreach($baggage as $key=>$value){
-    //                         $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = $value['Baggage'][$i];
-    //                         $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = $value['CabinBaggage'][$i];
-    //                     }
-    //                 }
-                   
-    //                 if($totalStopsCount == 0){
-    //                     $totalDuration = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'];
-    //                 }else{
-    //                     $totalDuration = (isset($layover['duration'])) ? array_sum($layover['duration']) + $journeyDurations : $journeyDurations;
-    //                 }
-    //                 $flights[$loop]['totalDuration'] = $totalDuration;
-    //                 $flights[$loop]['layovers'] = $layover;
-    //                 $flights[$loop]['flightBaggage'] = $flightBaggage;
-                   
-    //                 // print_r($unsetLoops);
-    //                 if(!empty($stopFilters) && in_array($totalStopsCount, $stopFilters)){
-    //                     $stopsLoop[] = $loop;
-                    
-    //                 }
-    //                 if(!empty($refundFilter) && in_array(strtolower($refundStatus), $refundFilter)){
-    //                     $refundLoop[] = $loop;
-    //                 }
-    //             }
-    //             /*================================================= Return ===========================================================================*/
-    //             elseif($fd['FareItinerary']['DirectionInd'] == "Return"){          
-    //                 $totalStopsOutCount = $fd['FareItinerary']['OriginDestinationOptions'][0]['TotalStops'];
-    //                 $totalStopsInCount = $fd['FareItinerary']['OriginDestinationOptions'][1]['TotalStops'];
-
-    //                 if($totalStopsOutCount == 0){
-    //                     $non_stop++;
-    //                 }elseif($totalStopsOutCount == 1){
-    //                     $one_stop++;
-    //                 }elseif($totalStopsOutCount == 2){
-    //                     $two_stop++;
-    //                 }elseif($totalStopsOutCount == 3){
-    //                     $three_stop++;
-    //                 }
-
-    //                 if($totalStopsInCount == 0){
-    //                     $non_stop++;
-    //                 }elseif($totalStopsInCount == 1){
-    //                     $one_stop++;
-    //                 }elseif($totalStopsInCount == 2){
-    //                     $two_stop++;
-    //                 }elseif($totalStopsInCount == 3){
-    //                     $three_stop++;
-    //                 }
-
-    //                 $flights[$loop]['totalOutStops'] = $totalStopsOutCount;
-    //                 $flights[$loop]['totalInStops'] = $totalStopsInCount;
-    //                 $flights[$loop]['OriginDestinationOptionsOutbound'] = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
-    //                 $flights[$loop]['OriginDestinationOptionsInbound'] = $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'];
-
-    //                 $layover = [];
-    //                 $journeyDurations = 0;
-    //                 $bagCount = 0;
-    //                 $flightBaggage = [];
-    //                 for($i=0; $i <= $totalStopsOutCount; $i++){
-    //                     $journeyDurations += $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][$i]['FlightSegment']['JourneyDuration'];
-    //                     $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
-    //                     if($totalStopsOutCount > 0){
-    //                         if($i != 0){
-    //                             if($flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
-
-    //                                 $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$i]['FlightSegment']['DepartureDateTime']);
-    //                                 $layover[$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMin;
-    //                                 $layover['place'][] = $data['airports'][$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']]['City'];
-    //                                 $layover['duration'][] = $timeInMin;    
-    //                             }
-    //                         }
-    //                     }
-    //                     $airlineCode = $flightSegment[$i]['FlightSegment']['MarketingAirlineCode'];
-    //                     $flightCodes [] = $airlineCode;
-    //                     $data['airlines'][$airlineCode] = isset($data['airlines'][$airlineCode]) ? ($data['airlines'][$airlineCode] + 1) : 1;
-
-    //                     $originCode = $flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'];
-    //                     $destinationCode = $flightSegment[$i]['FlightSegment']['ArrivalAirportLocationCode'];
-                        
-    //                     foreach($baggage as $key=>$value){
-    //                         $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = $value['Baggage'][$bagCount];
-    //                         $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = $value['CabinBaggage'][$bagCount];
-    //                     }
-    //                     $bagCount = $bagCount + 1;
-    //                     if(!empty($airlineFilters) && in_array($airlineCode, $airlineFilters)){
-    //                         $unsetLoops[] = $loop;
-    //                     }
-    //                 }
-
-    //                 if($totalStopsOutCount == 0){
-    //                     $totalDuration = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'];
-    //                 }else{
-    //                     $totalDuration = array_sum($layover['duration']) + $journeyDurations;
-    //                 }
-
-
-    //                 $layoverIn = [];
-    //                 $journeyDurationsIn = 0;
-    //                 $flightBaggageIn = [];
-    //                 for($j=0; $j <= $totalStopsInCount; $j++){
-    //                     $journeyDurationsIn += $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'][$j]['FlightSegment']['JourneyDuration'];
-    //                     $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'];
-    //                     if($totalStopsInCount > 0){
-    //                         if($j != 0){
-    //                             if($flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$j-1]['FlightSegment']['ArrivalAirportLocationCode']){
-
-    //                                 $timeInMin = getTimeDiffInMInutes($flightSegment[$j-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$j]['FlightSegment']['DepartureDateTime']);
-    //                                 $layoverIn[$flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMin;
-    //                                 $layoverIn['place'][] = $data['airports'][$flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode']]['City'];
-    //                                 $layoverIn['duration'][] = $timeInMin;                               
-    //                             }
-    //                         }
-    //                     }
-    //                     $airlineCode = $flightSegment[$j]['FlightSegment']['MarketingAirlineCode'];
-    //                     $flightCodes [] = $airlineCode;
-    //                     $data['airlines'][$airlineCode] = isset($data['airlines'][$airlineCode]) ? ($data['airlines'][$airlineCode] + 1) : 1;
-
-    //                     $originCode = $flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode'];
-    //                     $destinationCode = $flightSegment[$j]['FlightSegment']['ArrivalAirportLocationCode'];
-                       
-    //                     foreach($baggage as $key=>$value){
-    //                         $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = $value['Baggage'][$bagCount];
-    //                         $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = $value['CabinBaggage'][$bagCount];
-    //                     }
-    //                     $bagCount = $bagCount + 1;
-    //                     if(!empty($airlineFilters) && in_array($airlineCode, $airlineFilters)){
-    //                         $unsetLoops[] = $loop;
-    //                     }
-    //                 }
-
-    //                 if($totalStopsInCount == 0){
-    //                     $totalDurationIn = $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'];
-    //                 }else{
-    //                     $totalDurationIn = array_sum($layoverIn['duration']) + $journeyDurationsIn;
-    //                 }
-
-    //                 $flights[$loop]['totalDurationIn'] = $totalDurationIn;
-    //                 $flights[$loop]['layoversIn'] = $layoverIn;
-    //                 $flights[$loop]['flightBaggageIn'] = $flightBaggageIn;
-
-    //                 $flights[$loop]['totalDuration'] = $totalDuration;
-    //                 $flights[$loop]['layovers'] = $layover;
-    //                 $flights[$loop]['flightBaggage'] = $flightBaggage;
-
-    //                 if(!empty($stopFilters) && (in_array($totalStopsOutCount, $stopFilters) || in_array($totalStopsInCount, $stopFilters))){
-    //                     $stopsLoop[] = $loop;
-    //                 }
-    //                 if(!empty($refundFilter) && in_array(strtolower($refundStatus), $refundFilter)){
-    //                     $refundLoop[] = $loop;
-    //                 }
-    //             }
-    //             $loop++;
-               
-    //         }
-    //         // die;
-    //         // echo '<pre>';
-    //         // print_r($flights);
-    //         // echo '<br><br>';
-    //         // echo '<br>Airline Loops ====== <br>';
-    //         // print_r( $unsetLoops);
-    //         // echo '<br>Stops Loops ====== <br>';
-    //         // print_r($stopsLoop);
-    //         // echo '<br>Refund Loop  ====== <br>';
-    //         // print_r($refundLoop);
-             
-    //         $filterArrays[] = $unsetLoops;
-    //         $filterArrays[] = $stopsLoop;
-    //         $filterArrays[] = $refundLoop;
-    //         $filterArrays = array_filter($filterArrays);
-    //         $common = array();
-    //         if(empty($airlineFilters) && empty($stopFilters) && empty($refundFilter)){
-    //             $common = array();
-    //         }
-    //         elseif(!empty($airlineFilters) && !empty($stopFilters) && !empty($refundFilter)){
-    //             $common = array_intersect($unsetLoops, $stopsLoop, $refundLoop);
-    //         }
-    //         elseif(!empty($airlineFilters) && !empty($stopFilters) && empty($refundFilter)){
-    //             $common = array_intersect($unsetLoops, $stopsLoop);
-    //         }
-    //         elseif((!empty($airlineFilters) && empty($stopFilters) && !empty($refundFilter))){
-    //             $common = array_intersect($unsetLoops, $refundLoop);
-    //         }
-    //         elseif(empty($airlineFilters) && !empty($stopFilters) && !empty($refundFilter)){
-    //             $common = array_intersect($stopsLoop, $refundLoop);
-    //         }
-    //         elseif(!empty($airlineFilters) && empty($stopFilters) && empty($refundFilter)){
-    //             $common = $unsetLoops;
-    //         }
-    //         elseif(empty($airlineFilters) && !empty($stopFilters) && empty($refundFilter)){
-    //             $common = $stopsLoop;
-    //         }
-    //         elseif(empty($airlineFilters) && empty($stopFilters) && !empty($refundFilter)){
-    //             $common = $refundLoop;
-    //         }
-           
-    //         // print_r($common);
-    //         $flights = ($isFilter == 0) ? $flights : ( (!empty($common)) ? array_intersect_key($flights, array_flip($common)) : array());
-    //         // echo '<pre>';
-    //         // print_r($flights);
-    //         // die;
-    //     }
-    //     $data['search_type'] = $request->search_type;
-    //     $data['totalCount'] = count($flights);
-    //     $data['non_stop'] = $non_stop;
-    //     $data['one_stop'] = $one_stop;
-    //     $data['two_stop'] = $two_stop;
-    //     $data['three_stop'] = $three_stop;
-    //     $data['refund'] = $refund;
-    //     $data['no_refund'] = $no_refund;
-    //     $data['flightDetails'] = $flights;
-    //     // print_r($data); die;
-       
-    //     return  view('web.search_results',compact('data','airports'));
-    // }
     public function booking(Request $request){
         $data = [];
         // echo '<pre>';
@@ -1186,6 +781,8 @@ class FlightsController extends Controller
                 "fare_source_code" => $request->FareSourceCode
             ];
         }
+        $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData(); 
+        
         $data['session_id'] = $request->session_id;
         $data['fare_sourceCode'] = $request->FareSourceCode;
         $data['search_type'] = $request->search_type;
@@ -1357,7 +954,13 @@ class FlightsController extends Controller
         $adultArray = $childArray = $infantArray = [];
         $details = $request->all();
         // echo '<pre>';
-        // print_r($details);
+        // // print_r($details);
+        // $agentMargins = [] ;
+        // echo '<br>'. $details['total_amount_org'];
+        
+        // echo '<br>';
+        // print_r($margins);
+        // print_r($agentMargins);
         // die;
         $data['flightBookingInfo']['flight_session_id'] = $request->session_id;
         $data['flightBookingInfo']['fare_source_code'] = $request->fare_source_code;
@@ -1486,13 +1089,23 @@ class FlightsController extends Controller
         // echo '<pre>';
         // print_r($data);
         // print_r($travelItinerary);
+        $agentMargins = [];
+        $totalOrgAmount = $data['total_amount_org'];
+        $margins = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData(); 
         
+        $adminMargin = $margins['admin_margin'];
+        $adminMarginAmount = (($totalOrgAmount/100) * $margins['admin_margin']);
+        $adminMarginAmount = str_replace(',','',number_format(floor($adminMarginAmount*100)/100, 2));
+
+        $agentsMarginAmount = (($totalOrgAmount/100) * ($margins['totalmargin'] - $margins['admin_margin']));
+        $agentsMarginAmount = ($agentsMarginAmount != 0) ? str_replace(',','',number_format(floor($agentsMarginAmount*100)/100, 2)) : 0;
+
         $ItineraryInfo = $travelItinerary['ItineraryInfo'];
         $CustomerInfos = $ItineraryInfo['CustomerInfos'];
         $ReservationItems = $ItineraryInfo['ReservationItems'];
-                        
+        $totalAmount = str_replace(',','',$data['total_amount']);       
         $bookData = [
-            'user_id' => 5, 
+            'user_id' => Auth::user()->id, 
             'unique_booking_id' => $travelItinerary['UniqueID'], 
             'client_ref' => $data['clientRef'], 
             'fare_type' => $data['FareType'],
@@ -1510,13 +1123,52 @@ class FlightsController extends Controller
             'adult_amount' => $data['adult_amount'], 
             'child_amount' => $data['child_amount'], 
             'infant_amount' => $data['infant_amount'], 
-            'total_amount' => $data['total_amount'], 
+            'total_amount' => $totalAmount, 
             'total_tax' => $data['total_tax'], 
             'addon_amount' => $data['total_addons'],
-            'created_at'=> date('Y-m-d H:i:s')
+            'created_at'=> date('Y-m-d H:i:s'),
+            'total_amount_actual' => $totalOrgAmount, 
+            'total_tax_actual' => $data['total_tax_org'], 
+            'admin_margin' => $adminMargin, 
+            'admin_amount' => $adminMarginAmount, 
+            'agents_amount' => $agentsMarginAmount, 
         ];
+       
         $flightBook = FlightBookings::create($bookData);
         $flightBookId = $flightBook->id;
+
+        if(isset($margins['agent_margin'])){
+            $currentAgentMargin = $margins['agent_margin'];
+            $agentAmount = (($totalOrgAmount/100) * $currentAgentMargin);
+            $agentAmount = str_replace(',','',number_format(floor($agentAmount*100)/100, 2));
+            $agentMargins[] = array(
+                'booking_id' => $flightBookId,
+                'agent_id'   => Auth::user()->id,
+                'margin'     => $currentAgentMargin,
+                'amount'    => $agentAmount,
+            );
+            $currentAgent = UserDetails::where('user_id',Auth::user()->id)->first();
+            $currentAgent->credit_balance -= ($totalAmount - $agentAmount);
+            $currentAgent->save();
+        }
+        if(isset($margins['main_agents'])){
+            foreach($margins['main_agents'] as $agentid => $marg){
+                $agentAmount = (($totalOrgAmount/100) * $marg);
+                $agentAmount = str_replace(',','',number_format(floor($agentAmount*100)/100, 2));
+                $agentMargins[] = array(
+                    'booking_id' => $flightBookId,
+                    'agent_id'   => $agentid,
+                    'margin'     => $marg,
+                    'amount'    => $agentAmount,
+                );
+                $mainAgent = UserDetails::where('user_id',$agentid)->first();
+                $mainAgent->credit_balance += str_replace(',','',$agentAmount);
+                $mainAgent->save();
+            }
+        }
+        if(!empty($agentMargins)){
+            FlightMarginAmounts::insert($agentMargins);
+        }
        
         $passengers = $itinerary = [];
         if($CustomerInfos){
@@ -1597,30 +1249,221 @@ class FlightsController extends Controller
     }
 
     public function cancelTicket(Request $request){
-        $uniqueBookId = $request->bookId;
+        $uniqueBookId = $request->uniquebookId;
+        $book_Id = $request->id;
+        $type = $request->type;
         // echo '<pre>';
         // echo $uniqueBookId; 
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'cancel', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
-                        "UniqueID"=> $uniqueBookId
-                    ]);
 
-        $result = $response->getBody()->getContents();
-        $result = json_decode($result, true);
-        // print_r($result);
+
+        $tripDetails = $this->getTripDetails($uniqueBookId);
+        $tripDetails = json_decode($tripDetails, true);
+        // print_r($tripDetails);
         // die;
-        $CancelBookingResult = $result['CancelBookingResponse']['CancelBookingResult'];
-        if( $CancelBookingResult['Success'] == true){
-            FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1]);
-            $msg = ['status' => 'success','msg' => 'Cancel request send successfully'];
-        }else{
-            $msg =  ['status' => 'failed','msg' => (isset($CancelBookingResult['Errors']['ErrorMessage'])) ? $CancelBookingResult['Errors']['ErrorMessage'] : 'Something went wrong'];
+        if(isset($tripDetails['TripDetailsResponse'])){
+            $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
+            if($tripDetailsResult['Success'] == 'true'){
+                $TravelItinerary  = (isset($tripDetailsResult['TravelItinerary'])) ? $tripDetailsResult['TravelItinerary'] : []; 
+                if(!empty($TravelItinerary)){
+                    $TicketStatus = $TravelItinerary['TicketStatus'];
+                    if($TicketStatus == 'Ticketed' || $TicketStatus == 'OK'){
+                        if($type == 'void'){
+                            $msg = $this->voidQuoteCall($uniqueBookId,$book_Id);
+                        }elseif($type == 'refund'){
+                            $msg = $this->refundQuoteCall($uniqueBookId,$book_Id);
+                        }
+                    }else{
+                        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'cancel', [
+                            "user_id"=> config('global.api_user_id'),
+                            "user_password"=> config('global.api_user_password'),
+                            "access"=> config('global.api_access'),
+                            "ip_address"=> config('global.api_ip_address'),
+                            "UniqueID"=> $uniqueBookId
+                        ]);
+                        $result = $response->getBody()->getContents();
+                        $result = json_decode($result, true);
+                        $CancelBookingResult = $result['CancelBookingResponse']['CancelBookingResult'];
+                        if( $CancelBookingResult['Success'] == true){
+                            FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1,'is_cancelled' => 1]);
+                            $msg = ['status' => true,'type' => 'cancel','msg' => 'Cancel request send successfully'];
+                        }else{
+                            $msg =  ['status' => false,'msg' => (isset($CancelBookingResult['Errors']['ErrorMessage'])) ? $CancelBookingResult['Errors']['ErrorMessage'] : 'Something went wrong'];
+                        }
+                    }
+                }else{
+                    $msg = array('status' => false, 'data' => array(),'msg' => 'Something went wrong');
+                } 
+            }else{
+                $msg = array('status' => false, 'data' => array(),'msg' => 'Something went wrong');
+            }
+        } else{
+            $msg = array('status' => false, 'data' => array(),'msg' => 'Something went wrong');
         }
         return  json_encode($msg);
     }
+
+    // public function voidQuoteCall($uniqueBookId,$id){
+    //     $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+    //     $paxDetails = [];
+    //     foreach ($bookDetails as $key) {
+    //         $paxDetails[] =  array(
+    //                                 "type" => $key->passenger_type,
+    //                                 "title" => $key->passenger_title,
+    //                                 "firstName" => $key->passenger_first_name,
+    //                                 "lastName" => $key->passenger_last_name, 
+    //                                 "eTicket" => $key->eticket_number
+    //                         );   
+    //     }
+                
+    //     // echo '<pre>';
+    //     // print_r($paxDetails);
+    //     // echo json_encode($paxDetails);
+    //     // die;
+    //     // echo $uniqueBookId; 
+    //     $data['id'] = $id;
+    //     $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket_quote', [
+    //                     "user_id"=> config('global.api_user_id'),
+    //                     "user_password"=> config('global.api_user_password'),
+    //                     "access"=> config('global.api_access'),
+    //                     "ip_address"=> config('global.api_ip_address'),
+    //                     "UniqueID"=> $uniqueBookId,
+    //                     "paxDetails" => $paxDetails
+    //                 ]);
+
+    //     $result = $response->getBody()->getContents();
+    //     $result = json_decode($result, true);
+    //     // print_r($result);
+    //     $TotalVoidingFee = $TotalRefundAmount = 0;
+    //     if(!isset($result['Errors'])){
+    //         $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
+    //         if( $VoidQuoteResult['Success'] == true){
+    //             $data['UniqueID'] = $VoidQuoteResult['UniqueID'];
+    //             $data['ptrUniqueID'] = $VoidQuoteResult['ptrUniqueID'];
+    //             if(isset($VoidQuoteResult['VoidQuotes'])){
+    //                 foreach($VoidQuoteResult['VoidQuotes'] as $void){
+    //                     $tVoid =  $void['QuotedFares']['TotalVoidingFee'];
+    //                     $tRefund =  $void['QuotedFares']['TotalRefundAmount'];
+    //                     $TotalVoidingFee = $TotalVoidingFee + $tVoid['Amount'];
+    //                     $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
+    //                     $data['currency'] = $tRefund['CurrencyCode'];
+    //                 }
+    //             }
+    //             $serviceCharges = FlightBookings::where('id', $id)->first();
+    //             $serCrg = $serviceCharges->total_amount;
+    //             $data['voidFee'] = str_replace(',','',number_format(floor($TotalVoidingFee*100)/100, 2));
+    //             $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
+    //             $serCharge = $serCrg - ($data['voidFee'] + $data['refundAmount']);
+    //             $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
+    //             $msg = array('status' => true,'type' =>'void','data' => $data);
+    //         }else{
+    //             $msg = array('status' => false ,'data' => array(), 'msg' => (isset($VoidQuoteResult['Errors'])) ? $VoidQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
+    //         }
+    //     }else{
+    //         $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+    //     }
+    //     // print_r($data);
+    //     // die;
+        
+    //     return $msg;
+    // }
+
+    // public function refundQuoteCall($uniqueBookId,$id){
+    //     $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+    //     $paxDetails = [];
+    //     foreach ($bookDetails as $key) {
+    //         $paxDetails[] =  array(
+    //                                 "type" => $key->passenger_type,
+    //                                 "title" => $key->passenger_title,
+    //                                 "firstName" => $key->passenger_first_name,
+    //                                 "lastName" => $key->passenger_last_name, 
+    //                                 "eTicket" => $key->eticket_number
+    //                         );   
+    //     }
+                
+    //     // echo '<pre>';
+    //     // print_r($paxDetails);
+    //     // echo json_encode($paxDetails);
+    //     // die;
+    //     // echo $uniqueBookId; 
+    //     $data['id'] = $id;
+    //     $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund_quote', [
+    //                     "user_id"=> config('global.api_user_id'),
+    //                     "user_password"=> config('global.api_user_password'),
+    //                     "access"=> config('global.api_access'),
+    //                     "ip_address"=> config('global.api_ip_address'),
+    //                     "UniqueID"=> $uniqueBookId,
+    //                     "paxDetails" => $paxDetails
+    //                 ]);
+
+    //     $result = $response->getBody()->getContents();
+    //     $result = json_decode($result, true);
+    //     // print_r($result);
+    //     $ptrUniqueId = '';
+    //     $TotalRefundFee = $TotalRefundAmount = 0;
+    //     if(!isset($result['Errors'])){
+    //         $RefundQuoteResult = $result['RefundQuoteResponse']['RefundQuoteResult'];
+    //         if( $RefundQuoteResult['Success'] == true){
+    //             $ptrUniqueId = $RefundQuoteResult['ptrUniqueID'];
+    //             if($ptrUniqueId != ''){
+    //                 $responseCheck = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
+    //                     "user_id"=> config('global.api_user_id'),
+    //                     "user_password"=> config('global.api_user_password'),
+    //                     "access"=> config('global.api_access'),
+    //                     "ip_address"=> config('global.api_ip_address'),
+    //                     "UniqueID"=> $uniqueBookId,
+    //                     "ptrUniqueID" => $ptrUniqueId
+    //                 ]);
+    //                 $resultCheck = $responseCheck->getBody()->getContents();
+    //                 $resultCheck = json_decode($resultCheck, true);
+    //                 // print_r($resultCheck);
+
+    //                 if(!isset($resultCheck['Errors'])){
+    //                     $PtrResult = $resultCheck['PtrResponse']['PtrResult'];
+    //                     if( $PtrResult['Success'] == true){
+    //                         $PtrDetails = (isset($PtrResult['PtrDetails'][0])) ? $PtrResult['PtrDetails'][0] : [];
+    //                         if($PtrDetails){
+    //                             $data['UniqueID'] = $PtrDetails['UniqueID'];
+    //                             $data['ptrUniqueID'] = $PtrDetails['PtrUniqueID'];
+    //                             if(isset($PtrDetails['PaxDetails'])){
+    //                                 foreach($PtrDetails['PaxDetails'] as $refund){
+    //                                     $tFee =  $refund['QuotedFares']['TotalRefundCharges'];
+    //                                     $tRefund =  $refund['QuotedFares']['TotalRefundAmount'];
+    //                                     $TotalRefundFee = $TotalRefundFee + $tFee['Amount'];
+    //                                     $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
+    //                                     $data['currency'] = $tRefund['CurrencyCode'];
+    //                                 }
+    //                             }
+    //                             $serviceCharges = FlightBookings::where('id', $id)->first();
+    //                             $serCrg = $serviceCharges->total_amount;
+    //                             $data['refundFee'] = str_replace(',','',number_format(floor($TotalRefundFee*100)/100, 2));
+    //                             $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
+    //                             $serCharge = $serCrg - ($data['refundFee'] + $data['refundAmount']);
+    //                             $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
+    //                             $msg = array('status' => true,'type' =>'refund', 'data' => $data);
+    //                         }else{
+    //                             $msg = array('status' => false, 'data' => $data, 'msg' => 'Something went wrong');
+    //                         }
+                            
+    //                     }else{
+    //                         $msg = array('status' => false ,'data' => array(), 'msg' => (isset($PtrResult['Errors'])) ? $PtrResult['Errors']['ErrorMessage'] : 'Something went wrong');
+    //                     }
+    //                 }else{
+    //                     $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+    //                 }
+    //             }else{
+    //                 $msg = array('status' => false, 'data' => array(), 'msg' => 'Something went wrong');
+    //             }
+    //         }else{
+    //             $msg = array('status' => false ,'data' => array(), 'msg' => (isset($RefundQuoteResult['Errors'])) ? $RefundQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
+    //         }
+    //     }else{
+    //         $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+    //     }
+    //     // print_r($data);
+    //     // die;
+        
+    //     return $msg;
+    // }
 
     public function voidQuote(Request $request){
         $uniqueBookId = $request->bookId;
@@ -1670,8 +1513,12 @@ class FlightsController extends Controller
                         $data['currency'] = $tRefund['CurrencyCode'];
                     }
                 }
-                $data['voidFee'] = number_format(floor($TotalVoidingFee*100)/100, 2);
-                $data['refundAmount'] = number_format(floor($TotalRefundAmount*100)/100, 2);
+                $serviceCharges = FlightBookings::where('id', $id)->first();
+                $serCrg = $serviceCharges->total_amount;
+                $data['voidFee'] = str_replace(',','',number_format(floor($TotalVoidingFee*100)/100, 2));
+                $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
+                $serCharge = $serCrg - ($data['voidFee'] + $data['refundAmount']);
+                $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
                 $msg = array('status' => true, 'data' => $data);
             }else{
                 $msg = array('status' => false ,'data' => array(), 'msg' => (isset($VoidQuoteResult['Errors'])) ? $VoidQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
@@ -1688,6 +1535,8 @@ class FlightsController extends Controller
     public function voidAPI(Request $request){
         $uniqueBookId = $request->bookId;
         $id = $request->id;
+        $cancel_refund = $request->refund_amount;
+        $cancel_fee = $request->cancel_fee ;
         $bookDetails = FlightPassengers::where('booking_id', $id)->get();
         $paxDetails = [];
         foreach ($bookDetails as $key) {
@@ -1720,7 +1569,7 @@ class FlightsController extends Controller
         if(!isset($result['Errors'])){
             $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
             if( $VoidQuoteResult['Success'] == true){
-                FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1,'cancel_ptr' => $VoidQuoteResult['ptrUniqueID']]);
+                FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_fee' => $cancel_fee,'refund_amount' => $cancel_refund,'cancel_request' => 1,'cancel_ptr' => $VoidQuoteResult['ptrUniqueID']]);
                 $msg = ['status' => true,'msg' => 'Cancel request send successfully'];
             }else{
                 $msg = array('status' => false ,'msg' => (isset($VoidQuoteResult['Errors'])) ? $VoidQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
@@ -1840,8 +1689,12 @@ class FlightsController extends Controller
                                         $data['currency'] = $tRefund['CurrencyCode'];
                                     }
                                 }
-                                $data['refundFee'] = number_format(floor($TotalRefundFee*100)/100, 2);
-                                $data['refundAmount'] = number_format(floor($TotalRefundAmount*100)/100, 2);
+                                $serviceCharges = FlightBookings::where('id', $id)->first();
+                                $serCrg = $serviceCharges->total_amount;
+                                $data['refundFee'] = str_replace(',','',number_format(floor($TotalRefundFee*100)/100, 2));
+                                $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
+                                $serCharge = $serCrg - ($data['refundFee'] + $data['refundAmount']);
+                                $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
                                 $msg = array('status' => true, 'data' => $data);
                             }else{
                                 $msg = array('status' => false, 'data' => $data, 'msg' => 'Something went wrong');
@@ -1854,7 +1707,7 @@ class FlightsController extends Controller
                         $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
                     }
                 }else{
-                    $msg = array('status' => false, 'data' => $data, 'msg' => 'Something went wrong');
+                    $msg = array('status' => false, 'data' => array(), 'msg' => 'Something went wrong');
                 }
             }else{
                 $msg = array('status' => false ,'data' => array(), 'msg' => (isset($RefundQuoteResult['Errors'])) ? $RefundQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
@@ -1871,6 +1724,8 @@ class FlightsController extends Controller
     public function refundAPI(Request $request){
         $uniqueBookId = $request->bookId;
         $id = $request->id;
+        $cancel_refund = $request->refund_amount;
+        $cancel_fee = $request->cancel_fee ;
         $bookDetails = FlightPassengers::where('booking_id', $id)->get();
         $paxDetails = [];
         foreach ($bookDetails as $key) {
@@ -1904,7 +1759,7 @@ class FlightsController extends Controller
             // $RefundResult = $result['RefundResponse']['RefundResult'];
             $RefundResult = $result['ReissueResponse']['ReissueResult'];
             if( $RefundResult['Success'] == true){
-                FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1,'cancel_ptr' => $RefundResult['ptrUniqueID']]);
+                FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_fee' => $cancel_fee,'refund_amount' => $cancel_refund,'cancel_request' => 1,'cancel_ptr' => $RefundResult['ptrUniqueID']]);
                 $msg = ['status' => true,'msg' => (isset($RefundResult['Message']) && $RefundResult['Message'] != '') ? $RefundResult['Message'] : 'Cancel request send successfully'];
             }else{
                 $msg = array('status' => false ,'msg' => (isset($RefundResult['Errors'])) ? $RefundResult['Errors']['ErrorMessage'] : 'Something went wrong');
