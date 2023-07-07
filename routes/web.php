@@ -39,7 +39,7 @@ Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logou
 
 Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
-    Route::get('/booking-details', [HomeController::class, 'bookingDetails'])->name('booking-details');
+    Route::get('/booking-details/{type}/{id}', [HomeController::class, 'bookingDetails'])->name('booking-details');
 
     Route::get('/web-dashboard', [HomeController::class, 'dashboard'])->name('web-dashboard');
     Route::get('/cancelled', [HomeController::class, 'cancelled'])->name('cancelled');

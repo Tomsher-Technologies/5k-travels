@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Airports;
 use App\Models\Airlines;
 use App\Models\FlightBookings;
+use App\Models\FlightItineraryDetails;
+use App\Models\FlightPassengers;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\Models\Countries;
@@ -54,7 +56,7 @@ class HomeController extends Controller
     public function completed(){
         $type = "completed";
         // DB::enableQueryLog();
-        $bookings = FlightBookings::where('user_id',Auth::user()->id)
+        $bookings = FlightBookings::select('flight_bookings.*')->where('user_id',Auth::user()->id)
                                     ->where('is_cancelled',0)
                                     // ->leftJoin('flight_itinerary_details as fid','fid.booking_id','flight_bookings.id')
                                     ->leftJoin('flight_itinerary_details as fid', function ($join) {
@@ -71,7 +73,7 @@ class HomeController extends Controller
     public function upcoming(){
         $type = "upcoming";
         // DB::enableQueryLog();
-        $bookings = FlightBookings::where('user_id',Auth::user()->id)
+        $bookings = FlightBookings::select('flight_bookings.*')->where('user_id',Auth::user()->id)
                                     ->where('is_cancelled',0)
                                     // ->leftJoin('flight_itinerary_details as fid','fid.booking_id','flight_bookings.id')
                                     ->leftJoin('flight_itinerary_details as fid', function ($join) {
@@ -85,9 +87,14 @@ class HomeController extends Controller
         return  view('web.user.dashboard',compact('bookings','type'));
     }
 
-    public function bookingDetails(){
-        $bookings = [];
-        $type = "booking_details";
+    public function bookingDetails(Request $request){
+        $bookings = FlightBookings::where('id',$request->id)->get();
+        if(isset($bookings[0])){
+            $bookings[0]['flights'] = FlightItineraryDetails::where('booking_id',$request->id)->get();
+            $bookings[0]['passengers'] = FlightPassengers::where('booking_id',$request->id)->get();
+        }
+       
+        $type = $request->type;
         return  view('web.user.booking_details',compact('bookings','type'));
     }
 

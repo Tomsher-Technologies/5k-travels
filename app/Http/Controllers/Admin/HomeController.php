@@ -8,6 +8,7 @@ use App\Models\GeneralSettings;
 use App\Models\Pages;
 use App\Models\FaqCategories;
 use App\Models\FaqContents;
+use App\Models\FlightBookings;
 use Auth;
 use Validator;
 use Str;
@@ -232,6 +233,13 @@ class HomeController extends Controller
     
     public function deleteFaq(Request $request){
         FaqCategories::where('id',$request->id)->update(['is_deleted' => 1]);
+    }
+
+    public function getAllBookings(){
+        $bookings = FlightBookings::select('flight_bookings.*','ud.code','ud.first_name','ud.last_name')
+                                ->leftJoin('user_details as ud','flight_bookings.user_id','=','ud.user_id')
+                                ->orderBy('flight_bookings.id','desc')->paginate(10);
+        return  view('admin.bookings.bookings',compact('bookings'));
     }
     
 }

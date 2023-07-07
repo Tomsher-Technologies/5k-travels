@@ -6802,4 +6802,195 @@ textarea {
     .readonly{
         pointer-events: none;
     }
+
+    #tab-booking-details .flight-b-detl {
+        display: flex;
+        flex-direction: column;
+        /* padding: 15px; */
+        border-radius: 10px;
+        /* background-color: #ddd; */
+    }
+
+    #tab-booking-details .flight-idd {
+        line-height: 30px;
+        color: #41516c;
+        font-size: 15px;
+    }
+
+
+    #tab-booking-details .place-content-center {
+        place-content: center;
+    }
+
+    .fw-medium {
+        font-weight: 600 !important;
+    }
+
+    #tab-booking-details .traveler-b-detl {
+        background-color: #eee;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 10px;
+    }
+
+    #tab-booking-details .traveler-b-detl h4 {
+        padding: 0px 0px 20px;
+        font-weight: 700;
+        font-size: 15px;
+
+    }
+
+    #tab-booking-details .list {
+        --direction: column;
+        display: flex;
+        flex-direction: row;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .list-row {
+        --direction: row;
+    }
+
+    .fs-14,
+    small {
+        font-size: .875rem;
+    }
+
+    .clr-neutral-500 {
+        color: hsl(218 25% 34%);
+    }
+
+    .clr-neutral-700 {
+        color: hsl(218 41% 24%);
+    }
+
+    .list-divider-half-xs>li+li {
+        -webkit-padding-start: 0.5rem;
+        padding-inline-start: 0.5rem;
+        -webkit-margin-start: 0.5rem;
+        margin-inline-start: 0.5rem;
+        position: relative;
+        isolation: isolate;
+    }
+
+    .list-divider-half-xs>li+li::before {
+        content: "";
+        position: absolute;
+        inset-block-start: 50%;
+        inset-inline-start: 0;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 50%;
+        background-color: hsl(224 25% 34%);
+    }
+
+    .material-symbols-outlined {
+        font-family: "Material Symbols Outlined";
+        font-weight: 400;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-grid;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+    }
+
+    #tab-booking-details .accordion .accordion-item:first-of-type {
+        border-radius: 10px;
+    }
+
+    #tab-booking-details .accordion--separated {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    #tab-booking-details .accordion .accordion-item {
+        border-radius: 10px;
+    }
+
+    #tab-booking-details .accordion-item:first-of-type {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    #tab-booking-details .accordion-item {
+        color: #212529;
+
+        border: 0px solid #dee2e6;
+    }
+
+    #tab-booking-details .icon-round-bb {
+        background: #ecffd9;
+        font-size: 24px;
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 46px;
+        border-radius: 50%;
+        border: 3px solid #eee;
+        color: #1fba71;
+    }
+
+    #tab-booking-details .accordion-button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 1.25rem 1rem;
+        font-size: 1rem;
+        color: hsl(218 41% 24% / 1);
+        text-align: left;
+        background-color: #fff;
+        border: 0;
+        border-radius: 10px;
+        overflow-anchor: none;
+    }
+
+    #tab-booking-details .accordion-button:not(.collapsed) {
+        color: hsl(218 41% 24% / 1);
+        background-color: #fff;
+        box-shadow: none;
+    }
+
+    #tab-booking-details .accordion-body {
+        position: relative;
+        isolation: isolate;
+        background-color: #fff;
+        border-radius: 0 0 2rem 2rem;
+    }
+
+    #tab-booking-details .accordion-body {
+        padding: 1.5rem;
+    }
+
+    #tab-booking-details .accordion-body::after {
+        content: "";
+        position: absolute;
+        inset-block: 0;
+        inset-inline: 2.5rem;
+        height: 1px;
+        background-image: linear-gradient(to right, hsl(218 14% 49%) 33%, transparent 0);
+        background-position: bottom;
+        background-size: 0.75rem 1px;
+        background-repeat: repeat-x;
+    }
+    .total_subtotal_booking h4{
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+    }
+    .m-15{
+        margin: 15px 0px 15px;
+    }
+    .fw-600{
+        font-weight: 600;
+    }
 /* Jisha End */

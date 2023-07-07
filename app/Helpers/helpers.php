@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use App\Models\UserDetails;
 use App\Models\GeneralSettings;
 use App\Models\Airlines;
+use App\Models\Airports;
 use App\Models\User;
 
 /**
@@ -146,3 +147,24 @@ if (! function_exists('getUserDetails')) {
         return $details;
     }
 }
+
+if (! function_exists('getAirlineData')) {
+    function getAirlineData($code) {
+        $details = Airlines::select('*')->where('AirLineCode',$code)
+                        ->get()->toArray();
+                        // echo '<pre>';
+                        // print_r($details);die;
+        return $details;
+    }
+}
+
+if (! function_exists('getAirportData')) {
+    function getAirportData($code) {
+        $details = Airports::select('*')->where('AirportCode',$code)
+                        ->get()->toArray();
+                        // echo '<pre>';
+                        // print_r($details);die;
+        return $details;
+    }
+}
+

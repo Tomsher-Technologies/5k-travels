@@ -32,7 +32,7 @@
                                 <li><a href="{{ route('agent.create') }}">Create Agent</a></li>
                             </ul>
                         </li>
-
+                        <li><a href="{{ route('bookings') }}"><i class="fa fa-plane"></i> Flight Bookings </a></li>
                         <li><a><i class="fa fa-users"></i> Users <span class="fa fa-chevron-down"></span></a>
                             <ul class="nav child_menu">
                                 <li><a href="{{ route('user.index') }}">Users Listing</a></li>

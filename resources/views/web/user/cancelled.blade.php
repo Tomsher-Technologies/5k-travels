@@ -49,10 +49,10 @@
                                                 <td>{{ $book->unique_booking_id }}</td>
                                                 <td>{{ $book->origin }}</td>
                                                 <td>{{ $book->destination }}</td>
-                                                <td>AED {{ $book->total_amount }}</td>
+                                                <td>{{ $book->currency }} {{ $book->total_amount }}</td>
                                                 <td>{{ date('d-m-Y' ,strtotime($book->created_at)) }}</td>
                                                 <td>
-                                                    <a href="{{ route('booking-details') }}" class="info-icon" title="View Ticket Details"><i class="fas fa-eye"></i></a> &nbsp;
+                                                    <a href="{{ route('booking-details', ['type' => $type, 'id' => $book->id]) }}" class="info-icon" title="View Ticket Details"><i class="fas fa-eye"></i></a> &nbsp;
                                                 </td>
                                             </tr>
                                         @endforeach

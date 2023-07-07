@@ -69,12 +69,13 @@
 
                                                 </td>
                                                 <td>
+                                                   
                                                     @php   
                                                         $timeDiff = time() - strtotime($book->created_at);
                                                     @endphp
-                                                    <a href="{{ route('booking-details') }}" class="info-icon" title="View Ticket Details"><i class="fas fa-eye"></i></a> &nbsp;
+                                                    <a href="{{ route('booking-details', ['type' => $type, 'id' => $book->id] ) }}" class="info-icon" title="View Ticket Details"><i class="fas fa-eye"></i></a> &nbsp;
                                                     @if($book->is_cancelled == 0 && $book->cancel_request == 0)
-                                                        @if($timeDiff < 86400)
+                                                        <!-- @if($timeDiff < 86400)
                                                             @if(strtolower($book->fare_type) == 'webfare' )
                                                                 <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id=""  data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                             @else
@@ -94,6 +95,15 @@
                                                                     <a href="javascript:void(0)" class="cancelTicket danger-icon" data-type="refund" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                                 @endif
                                                             @endif
+                                                        @endif -->
+                                                        @if($timeDiff < 86400)
+                                                            @if(strtolower($book->fare_type) == 'webfare' )
+                                                                <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id=""  data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                            @else
+                                                                <a href="javascript:void(0)" class="voidQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
+                                                            @endif
+                                                        @elseif($timeDiff > 86400)
+                                                            <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                         @endif
                                                     @elseif($book->is_cancelled == 0 && $book->cancel_request == 1)
                                                         <a href="javascript:void(0)" class="success-icon cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $book->unique_booking_id }}" data-ptr="{{ $book->cancel_ptr }}"><i class="fas fa-refresh"></i></a> &nbsp;
