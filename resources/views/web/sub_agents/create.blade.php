@@ -190,8 +190,8 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <label for="u-name">Credit Balance <span class="required">*</span></label>
-                                                    <input type="number" id="credit_balance" name="credit_balance" placeholder="Credit Balance" value="{{ old('credit_balance') }}" class="form-control">
+                                                    <label for="u-name">Credit Balance (USD)<span class="required">*</span></label>
+                                                    <input type="number" id="credit_balance" name="credit_balance" placeholder="Credit Balance (USD)" value="{{ old('credit_balance') }}" class="form-control">
                                                     @error('credit_balance')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror

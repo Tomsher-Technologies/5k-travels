@@ -39,7 +39,7 @@
                                         <th>Sl no.</th>
                                         <th>Name</th>
                                         <th>Email</th>
-                                        <th>Credit Balance</th>
+                                        <th>Credit Balance (USD)</th>
                                         <th>Approval Status</th>
                                         <th>Active Status</th>
                                         <th>Action</th>
@@ -52,7 +52,7 @@
                                                 <td>{{ ($key+1) + ($agents->currentPage() - 1)*$agents->perPage() }}</td>
                                                 <td>{{$agent->name}}</td>
                                                 <td>{{$agent->email}}</td>
-                                                <td>{{$agent->credit_balance}}</td>
+                                                <td>USD {{$agent->credit_balance}}</td>
                                                 <td class="text-center" id="approve_{{$agent->user_id}}">
                                                     @if ($agent->is_approved == 1)
                                                         <span class="label label-success">Approved</span>

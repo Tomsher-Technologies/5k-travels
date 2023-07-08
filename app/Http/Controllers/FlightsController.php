@@ -815,6 +815,7 @@ class FlightsController extends Controller
                 $data['totalFare'] = $AirItineraryFareInfo['ItinTotalFares']['TotalFare'];
                 $data['ItinTotalFares'] = $AirItineraryFareInfo['ItinTotalFares'];
                 $data['IsPassportMandatory'] =$FareItineraries['FareItinerary']['IsPassportMandatory'];
+                $data['DirectionInd'] =$FareItineraries['FareItinerary']['DirectionInd'];
                 $baggage = [];
                 $passengers = [];
                 $adultCount = $childCount = $infantCount = 0;
@@ -1107,6 +1108,7 @@ class FlightsController extends Controller
         $bookData = [
             'user_id' => Auth::user()->id, 
             'unique_booking_id' => $travelItinerary['UniqueID'], 
+            'direction' => $data['direction'],
             'client_ref' => $data['clientRef'], 
             'fare_type' => $data['FareType'],
             'origin' => $travelItinerary['Origin'], 
@@ -1302,168 +1304,168 @@ class FlightsController extends Controller
         return  json_encode($msg);
     }
 
-    // public function voidQuoteCall($uniqueBookId,$id){
-    //     $bookDetails = FlightPassengers::where('booking_id', $id)->get();
-    //     $paxDetails = [];
-    //     foreach ($bookDetails as $key) {
-    //         $paxDetails[] =  array(
-    //                                 "type" => $key->passenger_type,
-    //                                 "title" => $key->passenger_title,
-    //                                 "firstName" => $key->passenger_first_name,
-    //                                 "lastName" => $key->passenger_last_name, 
-    //                                 "eTicket" => $key->eticket_number
-    //                         );   
-    //     }
+    public function voidQuoteCall($uniqueBookId,$id){
+        $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+        $paxDetails = [];
+        foreach ($bookDetails as $key) {
+            $paxDetails[] =  array(
+                                    "type" => $key->passenger_type,
+                                    "title" => $key->passenger_title,
+                                    "firstName" => $key->passenger_first_name,
+                                    "lastName" => $key->passenger_last_name, 
+                                    "eTicket" => $key->eticket_number
+                            );   
+        }
                 
-    //     // echo '<pre>';
-    //     // print_r($paxDetails);
-    //     // echo json_encode($paxDetails);
-    //     // die;
-    //     // echo $uniqueBookId; 
-    //     $data['id'] = $id;
-    //     $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket_quote', [
-    //                     "user_id"=> config('global.api_user_id'),
-    //                     "user_password"=> config('global.api_user_password'),
-    //                     "access"=> config('global.api_access'),
-    //                     "ip_address"=> config('global.api_ip_address'),
-    //                     "UniqueID"=> $uniqueBookId,
-    //                     "paxDetails" => $paxDetails
-    //                 ]);
+        // echo '<pre>';
+        // print_r($paxDetails);
+        // echo json_encode($paxDetails);
+        // die;
+        // echo $uniqueBookId; 
+        $data['id'] = $id;
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket_quote', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "paxDetails" => $paxDetails
+                    ]);
 
-    //     $result = $response->getBody()->getContents();
-    //     $result = json_decode($result, true);
-    //     // print_r($result);
-    //     $TotalVoidingFee = $TotalRefundAmount = 0;
-    //     if(!isset($result['Errors'])){
-    //         $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
-    //         if( $VoidQuoteResult['Success'] == true){
-    //             $data['UniqueID'] = $VoidQuoteResult['UniqueID'];
-    //             $data['ptrUniqueID'] = $VoidQuoteResult['ptrUniqueID'];
-    //             if(isset($VoidQuoteResult['VoidQuotes'])){
-    //                 foreach($VoidQuoteResult['VoidQuotes'] as $void){
-    //                     $tVoid =  $void['QuotedFares']['TotalVoidingFee'];
-    //                     $tRefund =  $void['QuotedFares']['TotalRefundAmount'];
-    //                     $TotalVoidingFee = $TotalVoidingFee + $tVoid['Amount'];
-    //                     $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
-    //                     $data['currency'] = $tRefund['CurrencyCode'];
-    //                 }
-    //             }
-    //             $serviceCharges = FlightBookings::where('id', $id)->first();
-    //             $serCrg = $serviceCharges->total_amount;
-    //             $data['voidFee'] = str_replace(',','',number_format(floor($TotalVoidingFee*100)/100, 2));
-    //             $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
-    //             $serCharge = $serCrg - ($data['voidFee'] + $data['refundAmount']);
-    //             $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
-    //             $msg = array('status' => true,'type' =>'void','data' => $data);
-    //         }else{
-    //             $msg = array('status' => false ,'data' => array(), 'msg' => (isset($VoidQuoteResult['Errors'])) ? $VoidQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
-    //         }
-    //     }else{
-    //         $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
-    //     }
-    //     // print_r($data);
-    //     // die;
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // print_r($result);
+        $TotalVoidingFee = $TotalRefundAmount = 0;
+        if(!isset($result['Errors'])){
+            $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
+            if( $VoidQuoteResult['Success'] == true){
+                $data['UniqueID'] = $VoidQuoteResult['UniqueID'];
+                $data['ptrUniqueID'] = $VoidQuoteResult['ptrUniqueID'];
+                if(isset($VoidQuoteResult['VoidQuotes'])){
+                    foreach($VoidQuoteResult['VoidQuotes'] as $void){
+                        $tVoid =  $void['QuotedFares']['TotalVoidingFee'];
+                        $tRefund =  $void['QuotedFares']['TotalRefundAmount'];
+                        $TotalVoidingFee = $TotalVoidingFee + $tVoid['Amount'];
+                        $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
+                        $data['currency'] = $tRefund['CurrencyCode'];
+                    }
+                }
+                $serviceCharges = FlightBookings::where('id', $id)->first();
+                $serCrg = $serviceCharges->total_amount;
+                $data['voidFee'] = str_replace(',','',number_format(floor($TotalVoidingFee*100)/100, 2));
+                $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
+                $serCharge = $serCrg - ($data['voidFee'] + $data['refundAmount']);
+                $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
+                $msg = array('status' => true,'type' =>'void','data' => $data);
+            }else{
+                $msg = array('status' => false ,'data' => array(), 'msg' => (isset($VoidQuoteResult['Errors'])) ? $VoidQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
+            }
+        }else{
+            $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+        }
+        // print_r($data);
+        // die;
         
-    //     return $msg;
-    // }
+        return $msg;
+    }
 
-    // public function refundQuoteCall($uniqueBookId,$id){
-    //     $bookDetails = FlightPassengers::where('booking_id', $id)->get();
-    //     $paxDetails = [];
-    //     foreach ($bookDetails as $key) {
-    //         $paxDetails[] =  array(
-    //                                 "type" => $key->passenger_type,
-    //                                 "title" => $key->passenger_title,
-    //                                 "firstName" => $key->passenger_first_name,
-    //                                 "lastName" => $key->passenger_last_name, 
-    //                                 "eTicket" => $key->eticket_number
-    //                         );   
-    //     }
+    public function refundQuoteCall($uniqueBookId,$id){
+        $bookDetails = FlightPassengers::where('booking_id', $id)->get();
+        $paxDetails = [];
+        foreach ($bookDetails as $key) {
+            $paxDetails[] =  array(
+                                    "type" => $key->passenger_type,
+                                    "title" => $key->passenger_title,
+                                    "firstName" => $key->passenger_first_name,
+                                    "lastName" => $key->passenger_last_name, 
+                                    "eTicket" => $key->eticket_number
+                            );   
+        }
                 
-    //     // echo '<pre>';
-    //     // print_r($paxDetails);
-    //     // echo json_encode($paxDetails);
-    //     // die;
-    //     // echo $uniqueBookId; 
-    //     $data['id'] = $id;
-    //     $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund_quote', [
-    //                     "user_id"=> config('global.api_user_id'),
-    //                     "user_password"=> config('global.api_user_password'),
-    //                     "access"=> config('global.api_access'),
-    //                     "ip_address"=> config('global.api_ip_address'),
-    //                     "UniqueID"=> $uniqueBookId,
-    //                     "paxDetails" => $paxDetails
-    //                 ]);
+        // echo '<pre>';
+        // print_r($paxDetails);
+        // echo json_encode($paxDetails);
+        // die;
+        // echo $uniqueBookId; 
+        $data['id'] = $id;
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund_quote', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "paxDetails" => $paxDetails
+                    ]);
 
-    //     $result = $response->getBody()->getContents();
-    //     $result = json_decode($result, true);
-    //     // print_r($result);
-    //     $ptrUniqueId = '';
-    //     $TotalRefundFee = $TotalRefundAmount = 0;
-    //     if(!isset($result['Errors'])){
-    //         $RefundQuoteResult = $result['RefundQuoteResponse']['RefundQuoteResult'];
-    //         if( $RefundQuoteResult['Success'] == true){
-    //             $ptrUniqueId = $RefundQuoteResult['ptrUniqueID'];
-    //             if($ptrUniqueId != ''){
-    //                 $responseCheck = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
-    //                     "user_id"=> config('global.api_user_id'),
-    //                     "user_password"=> config('global.api_user_password'),
-    //                     "access"=> config('global.api_access'),
-    //                     "ip_address"=> config('global.api_ip_address'),
-    //                     "UniqueID"=> $uniqueBookId,
-    //                     "ptrUniqueID" => $ptrUniqueId
-    //                 ]);
-    //                 $resultCheck = $responseCheck->getBody()->getContents();
-    //                 $resultCheck = json_decode($resultCheck, true);
-    //                 // print_r($resultCheck);
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        // print_r($result);
+        $ptrUniqueId = '';
+        $TotalRefundFee = $TotalRefundAmount = 0;
+        if(!isset($result['Errors'])){
+            $RefundQuoteResult = $result['RefundQuoteResponse']['RefundQuoteResult'];
+            if( $RefundQuoteResult['Success'] == true){
+                $ptrUniqueId = $RefundQuoteResult['ptrUniqueID'];
+                if($ptrUniqueId != ''){
+                    $responseCheck = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "ptrUniqueID" => $ptrUniqueId
+                    ]);
+                    $resultCheck = $responseCheck->getBody()->getContents();
+                    $resultCheck = json_decode($resultCheck, true);
+                    // print_r($resultCheck);
 
-    //                 if(!isset($resultCheck['Errors'])){
-    //                     $PtrResult = $resultCheck['PtrResponse']['PtrResult'];
-    //                     if( $PtrResult['Success'] == true){
-    //                         $PtrDetails = (isset($PtrResult['PtrDetails'][0])) ? $PtrResult['PtrDetails'][0] : [];
-    //                         if($PtrDetails){
-    //                             $data['UniqueID'] = $PtrDetails['UniqueID'];
-    //                             $data['ptrUniqueID'] = $PtrDetails['PtrUniqueID'];
-    //                             if(isset($PtrDetails['PaxDetails'])){
-    //                                 foreach($PtrDetails['PaxDetails'] as $refund){
-    //                                     $tFee =  $refund['QuotedFares']['TotalRefundCharges'];
-    //                                     $tRefund =  $refund['QuotedFares']['TotalRefundAmount'];
-    //                                     $TotalRefundFee = $TotalRefundFee + $tFee['Amount'];
-    //                                     $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
-    //                                     $data['currency'] = $tRefund['CurrencyCode'];
-    //                                 }
-    //                             }
-    //                             $serviceCharges = FlightBookings::where('id', $id)->first();
-    //                             $serCrg = $serviceCharges->total_amount;
-    //                             $data['refundFee'] = str_replace(',','',number_format(floor($TotalRefundFee*100)/100, 2));
-    //                             $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
-    //                             $serCharge = $serCrg - ($data['refundFee'] + $data['refundAmount']);
-    //                             $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
-    //                             $msg = array('status' => true,'type' =>'refund', 'data' => $data);
-    //                         }else{
-    //                             $msg = array('status' => false, 'data' => $data, 'msg' => 'Something went wrong');
-    //                         }
+                    if(!isset($resultCheck['Errors'])){
+                        $PtrResult = $resultCheck['PtrResponse']['PtrResult'];
+                        if( $PtrResult['Success'] == true){
+                            $PtrDetails = (isset($PtrResult['PtrDetails'][0])) ? $PtrResult['PtrDetails'][0] : [];
+                            if($PtrDetails){
+                                $data['UniqueID'] = $PtrDetails['UniqueID'];
+                                $data['ptrUniqueID'] = $PtrDetails['PtrUniqueID'];
+                                if(isset($PtrDetails['PaxDetails'])){
+                                    foreach($PtrDetails['PaxDetails'] as $refund){
+                                        $tFee =  $refund['QuotedFares']['TotalRefundCharges'];
+                                        $tRefund =  $refund['QuotedFares']['TotalRefundAmount'];
+                                        $TotalRefundFee = $TotalRefundFee + $tFee['Amount'];
+                                        $TotalRefundAmount = $TotalRefundAmount + $tRefund['Amount'];
+                                        $data['currency'] = $tRefund['CurrencyCode'];
+                                    }
+                                }
+                                $serviceCharges = FlightBookings::where('id', $id)->first();
+                                $serCrg = $serviceCharges->total_amount;
+                                $data['refundFee'] = str_replace(',','',number_format(floor($TotalRefundFee*100)/100, 2));
+                                $data['refundAmount'] = str_replace(',','',number_format(floor($TotalRefundAmount*100)/100, 2));
+                                $serCharge = $serCrg - ($data['refundFee'] + $data['refundAmount']);
+                                $data['serviceCharge'] = str_replace(',','',number_format(floor($serCharge*100)/100, 2));
+                                $msg = array('status' => true,'type' =>'refund', 'data' => $data);
+                            }else{
+                                $msg = array('status' => false, 'data' => $data, 'msg' => 'Something went wrong');
+                            }
                             
-    //                     }else{
-    //                         $msg = array('status' => false ,'data' => array(), 'msg' => (isset($PtrResult['Errors'])) ? $PtrResult['Errors']['ErrorMessage'] : 'Something went wrong');
-    //                     }
-    //                 }else{
-    //                     $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
-    //                 }
-    //             }else{
-    //                 $msg = array('status' => false, 'data' => array(), 'msg' => 'Something went wrong');
-    //             }
-    //         }else{
-    //             $msg = array('status' => false ,'data' => array(), 'msg' => (isset($RefundQuoteResult['Errors'])) ? $RefundQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
-    //         }
-    //     }else{
-    //         $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
-    //     }
-    //     // print_r($data);
-    //     // die;
+                        }else{
+                            $msg = array('status' => false ,'data' => array(), 'msg' => (isset($PtrResult['Errors'])) ? $PtrResult['Errors']['ErrorMessage'] : 'Something went wrong');
+                        }
+                    }else{
+                        $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+                    }
+                }else{
+                    $msg = array('status' => false, 'data' => array(), 'msg' => 'Something went wrong');
+                }
+            }else{
+                $msg = array('status' => false ,'data' => array(), 'msg' => (isset($RefundQuoteResult['Errors'])) ? $RefundQuoteResult['Errors']['ErrorMessage'] : 'Something went wrong');
+            }
+        }else{
+            $msg = array('status' => false ,'data' => array(), 'msg' => (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Something went wrong');
+        }
+        // print_r($data);
+        // die;
         
-    //     return $msg;
-    // }
+        return $msg;
+    }
 
     public function voidQuote(Request $request){
         $uniqueBookId = $request->bookId;

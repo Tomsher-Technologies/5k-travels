@@ -218,7 +218,7 @@
                                 </div>
 
                                 <div class="item form-group col-md-12 col-sm-12 ">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="admin_margin">Credit Balance <span class="required">*</span>
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="admin_margin">Credit Balance (USD)<span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 ">
                                         <input type="number" id="credit_balance" name="credit_balance"  value="{{ old('credit_balance',$agent->user_details->credit_balance) }}" class="form-control">

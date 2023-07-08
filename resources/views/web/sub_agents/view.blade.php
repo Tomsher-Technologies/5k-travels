@@ -158,8 +158,8 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <label for="u-name">Credit Balance </label>
-                                                    <input type="number" placeholder="Credit Balance" value="{{ $agent[0]->credit_balance }}" class="readonly form-control">
+                                                    <label for="u-name">Credit Balance (USD)</label>
+                                                    <input type="number" placeholder="Credit Balance (USD)" value="{{ $agent[0]->credit_balance }}" class="readonly form-control">
                                                   
                                                 </div>
                                             </div>

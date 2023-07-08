@@ -50,7 +50,7 @@
                                                 <td>{{ $book->unique_booking_id }}</td>
                                                 <td>{{ $book->origin }}</td>
                                                 <td>{{ $book->destination }}</td>
-                                                <td>AED {{ $book->total_amount }}</td>
+                                                <td>{{ $book->currency }} {{ $book->total_amount }}</td>
                                                 <td>{{ date('d-m-Y' ,strtotime($book->created_at)) }}</td>
                                                 
                                                 <td class="complete">
@@ -75,7 +75,7 @@
                                                     @endphp
                                                     <a href="{{ route('booking-details', ['type' => $type, 'id' => $book->id] ) }}" class="info-icon" title="View Ticket Details"><i class="fas fa-eye"></i></a> &nbsp;
                                                     @if($book->is_cancelled == 0 && $book->cancel_request == 0)
-                                                        <!-- @if($timeDiff < 86400)
+                                                        @if($timeDiff < 86400)
                                                             @if(strtolower($book->fare_type) == 'webfare' )
                                                                 <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id=""  data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                             @else
@@ -95,8 +95,8 @@
                                                                     <a href="javascript:void(0)" class="cancelTicket danger-icon" data-type="refund" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                                 @endif
                                                             @endif
-                                                        @endif -->
-                                                        @if($timeDiff < 86400)
+                                                        @endif
+                                                        <!-- @if($timeDiff < 86400)
                                                             @if(strtolower($book->fare_type) == 'webfare' )
                                                                 <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id=""  data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                             @else
@@ -104,7 +104,7 @@
                                                             @endif
                                                         @elseif($timeDiff > 86400)
                                                             <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
-                                                        @endif
+                                                        @endif -->
                                                     @elseif($book->is_cancelled == 0 && $book->cancel_request == 1)
                                                         <a href="javascript:void(0)" class="success-icon cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $book->unique_booking_id }}" data-ptr="{{ $book->cancel_ptr }}"><i class="fas fa-refresh"></i></a> &nbsp;
                                                     @endif
@@ -233,9 +233,15 @@
                         $('#unique_BookId').val(resp.data.UniqueID);
 
                         $('#refund_amount').val(resp.data.refundAmount);
-                        $('#cancel_fee').val(resp.data.voidFee);
+                        if(resp.type == 'refund'){
+                            $('#cancel_fee').val(resp.data.refundFee);
+                            $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.refundFee);
+                        }else{
+                            $('#cancel_fee').val(resp.data.voidFee);
+                            $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.voidFee);
+                        }
+                        
 
-                        $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.voidFee);
                         $('#serviceCharge').html(resp.data.currency +' '+ resp.data.serviceCharge);
                         $('#totalRefund').html(resp.data.currency +' '+ resp.data.refundAmount);
                         $('#cancelQuote').modal({backdrop: 'static', keyboard: false})  

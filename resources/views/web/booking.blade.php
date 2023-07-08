@@ -561,7 +561,7 @@
                                         @for($ad=1; $ad <= $passengers['ADT']; $ad++)
                                             <div class="tour_booking_form_box {{ ($ad!=1) ? 'mt-3' : '' }}">
                                                 <h3>Passenger {{$passCount}} (Adult)</h3>
-                                                <div class="row">
+                                                <div class="row form_area">
                                                     <div class="col-lg-4">
                                                         <label for="gender">Title</label>
                                                         <div class="form-group">
@@ -647,7 +647,7 @@
                                         @for($ch=1; $ch <= $passengers['CHD']; $ch++)
                                             <div class="tour_booking_form_box mt-3">
                                                 <h3>Passenger {{$passCount}} (Child)</h3>
-                                                <div class="row">
+                                                <div class="row form_area">
                                                     <div class="col-lg-4">
                                                         <label for="gender">Title</label>
                                                         <div class="form-group">
@@ -729,7 +729,7 @@
                                         @for($inf=1; $inf <= $passengers['INF']; $inf++)
                                             <div class="tour_booking_form_box mt-3">
                                                 <h3>Passenger {{$passCount}} (Infant)</h3>
-                                                <div class="row">
+                                                <div class="row form_area">
                                                     <div class="col-lg-4">
                                                         <label for="gender">Title</label>
                                                         <div class="form-group">
@@ -810,7 +810,7 @@
 
                                     <div class="tour_booking_form_box mt-3">
                                         <h3>Contact Details</h3>
-                                        <div class="row">
+                                        <div class="row form_area">
                                             <!-- <div class="col-lg-4">
                                                 <div class="form-group">
                                                     <label for="first_name">Country Code</label>
@@ -847,6 +847,7 @@
 
                                         <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCode']}}">
                                         <input type="hidden" name="session_id" id="session_id" value="{{ $data['session_id'] }}">
+                                        <input type="hidden" name="direction" id="direction" value="{{ $data['DirectionInd'] }}">
                                         <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
                                         <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
                                         <input type="hidden" name="adultCount" id="adultCount" value="{{$data['adultCount']}}">

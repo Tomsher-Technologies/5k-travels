@@ -41,7 +41,7 @@
                                                 <th>Agent Name</th>
                                                 <th>Email</th>
                                                 <th>Phone</th>
-                                                <th>Credit Balance</th>
+                                                <th>Credit Balance (USD)</th>
                                                 <th class="text-center">Approval Status</th>
                                                 <th class="text-center">Agent Status</th>
                                                 <th class="text-center">Actions</th>
@@ -58,7 +58,7 @@
                                                     <td>{{$agent->name}}</td>
                                                     <td>{{$agent->email}}</td>
                                                     <td>{{$agent->phone_number}}</td>
-                                                    <td>{{$agent->credit_balance}}</td>
+                                                    <td>USD {{$agent->credit_balance}}</td>
                                                     <td class="text-center" id="approve_{{$agent->user_id}}">
                                                         @if ($agent->is_approved == 1)
                                                             <span class="label label-success">Approved</span>

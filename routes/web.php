@@ -18,6 +18,8 @@ use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::get('change-currency/{currency}',[HomeController::class, 'changeCurrency'])->name('change-currency');
+
 Route::get('search-airports',[HomeController::class,'searchAirports'])->name('search-airports');
 
 Route::get('/flights/search', [FlightsController::class, 'search'])->name('flight.search');

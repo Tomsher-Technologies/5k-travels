@@ -22,6 +22,7 @@ use Storage;
 use Str;
 use File;
 use Mail;
+use Config;
 
 class HomeController extends Controller
 {
@@ -40,6 +41,10 @@ class HomeController extends Controller
     public function index(){
         $airports = $this->allAirports();
         return  view('web.index',compact('airports'));
+    }
+
+    public function changeCurrency($currency){
+        return back();
     }
 
     public function dashboard(){

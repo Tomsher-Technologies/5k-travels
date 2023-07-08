@@ -31,9 +31,9 @@
                                         <span class="lang-name"></span>
                                     </button>
                                     <div class="dropdown-menu language-dropdown-menu">
-                                        <a class="dropdown-item" href="#">USD</a>
-                                        <a class="dropdown-item" href="#">BD</a>
-                                        <a class="dropdown-item" href="#">URO</a>
+                                        <a class="dropdown-item {{ (config('global.api_requiredCurrency') == 'USD') ? 'selected' : '' }}" href="{{ route('change-currency','USD') }}">USD</a>
+                                        <a class="dropdown-item {{ (config('global.api_requiredCurrency') == 'AFN') ? 'selected' : '' }}" href="{{ route('change-currency','AFN') }}">AFN</a>
+                                        <a class="dropdown-item {{ (config('global.api_requiredCurrency') == 'IRR') ? 'selected' : '' }}" href="{{ route('change-currency','IRR') }}">IRR</a>
                                     </div>
                                 </div>
                             </li>

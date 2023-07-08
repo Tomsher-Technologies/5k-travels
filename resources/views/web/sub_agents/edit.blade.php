@@ -190,8 +190,8 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <label for="u-name">Credit Balance <span class="required">*</span></label>
-                                                    <input type="number" id="credit_balance" placeholder="Credit Balance" name="credit_balance"  value="{{ old('credit_balance',$agent->user_details->credit_balance) }}" class="form-control">
+                                                    <label for="u-name">Credit Balance (USD)<span class="required">*</span></label>
+                                                    <input type="number" id="credit_balance" placeholder="Credit Balance (USD)" name="credit_balance"  value="{{ old('credit_balance',$agent->user_details->credit_balance) }}" class="form-control">
                                                     @error('credit_balance')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror
