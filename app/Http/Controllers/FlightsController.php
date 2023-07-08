@@ -1771,6 +1771,81 @@ class FlightsController extends Controller
         }
         return json_encode($msg);
     }
+
+    public function changeDate(Request $request){
+        $data['uniqueBookId'] = $request->unique_id;
+        $data['id'] = $request->id;
+        return  view('web.user.reschedule',compact('data'));
+    }
+
+    public function rescheduleFlight(Request $request){
+echo 'uniqiue' . $uniqueBookId = $request->unique_id;
+echo '     id' . $id = $request->id;
+
+        $bookDetails = FlightBookings::where('id', $id)->get();
+       
+        $passengerDetails = FlightPassengers::where('booking_id', $id)->get();
+        $paxDetails = [];
+        foreach ($passengerDetails as $key) {
+            $paxDetails[] =  array(
+                                    "type" => $key->passenger_type,
+                                    "title" => $key->passenger_title,
+                                    "firstName" => $key->passenger_first_name,
+                                    "lastName" => $key->passenger_last_name, 
+                                    "eTicket" => $key->eticket_number
+                            );   
+        }
+
+        $itineraryDetails = FlightItineraryDetails::where('booking_id', $id)->get();
+        $OriginDestinationInfo = [];
+        foreach ($itineraryDetails as $item) {
+            $OriginDestinationInfo[] = array(
+                                        "airportOriginCode" => $item->departure_airport,
+                                        "airportDestinationCode"   => $item->arrival_airport,
+                                        "cabinPreference" => ($item->cabin_class != '') ? $item->cabin_class : 'Y',
+                                        "departureDate"   => '2023-08-02',
+                                        "flightNumber" => $item->flight_number,
+                                        "airlineCode"   => $item->marketing_airline_code,
+                                    );
+        }
+                
+        echo '<pre>';
+        print_r($paxDetails);
+        print_r($OriginDestinationInfo);
+    //    die;
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'reissue_ticket_quote', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $uniqueBookId,
+                        "paxDetails" => $paxDetails,
+                        "OriginDestinationInfo" => $OriginDestinationInfo
+                    ]);
+
+        $result = $response->getBody()->getContents();
+        $result = json_decode($result, true);
+        print_r($result);
+
+        if(isset($result['ReissueQuoteResponse']['ReissueQuoteResult'])){
+            $ReissueQuoteResult = $result['ReissueQuoteResponse']['ReissueQuoteResult'];
+            if($ReissueQuoteResult['ptrUniqueID'] != ''){
+                $responseStatus = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
+                    "user_id"=> config('global.api_user_id'),
+                    "user_password"=> config('global.api_user_password'),
+                    "access"=> config('global.api_access'),
+                    "ip_address"=> config('global.api_ip_address'),
+                    "UniqueID"=> $uniqueBookId,
+                    "ptrUniqueID" => $ReissueQuoteResult['ptrUniqueID']
+                ]);
+        
+                $resultStatus = $responseStatus->getBody()->getContents();
+                $resultStatus = json_decode($resultStatus, true);
+                print_r($resultStatus);
+            }
+        }
+        
+    }
 }
 
 

@@ -65,5 +65,6 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/flights/prtStatus', [FlightsController::class, 'ptrStatusCheck'])->name('flight.prtStatus');
     Route::get('/flights/refundQuote', [FlightsController::class, 'refundQuote'])->name('flight.refundQuote');
     Route::post('/flights/refund', [FlightsController::class, 'refundAPI'])->name('flight.refund');
+    Route::get('/reschedule-flight/{id}/{unique_id}', [FlightsController::class, 'rescheduleFlight'])->name('reschedule-flight');
 });
 

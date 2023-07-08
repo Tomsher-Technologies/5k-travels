@@ -94,13 +94,114 @@ class HomeController extends Controller
 
     public function bookingDetails(Request $request){
         $bookings = FlightBookings::where('id',$request->id)->get();
+        // echo '<pre>';
+        // echo '================================' . $bookings[0]['ticket_status'];
+        // print_r($bookings);
+        // die;
         if(isset($bookings[0])){
+            if($bookings[0]['ticket_status'] != "Ticketed"){
+                $tripDetails = $this->getTripDetails($bookings[0]['unique_booking_id']);
+                $tripDetails = json_decode($tripDetails, true);
+                if(isset($tripDetails['TripDetailsResponse'])){
+                    $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
+                    if($tripDetailsResult['Success'] == 'true'){
+                        $ticketStatus = $this->updateFlightBookingData($tripDetailsResult,$bookings[0]['id']);
+                        $bookings[0]['ticket_status'] = $ticketStatus;
+                    }
+                } 
+            }
             $bookings[0]['flights'] = FlightItineraryDetails::where('booking_id',$request->id)->get();
             $bookings[0]['passengers'] = FlightPassengers::where('booking_id',$request->id)->get();
         }
        
         $type = $request->type;
         return  view('web.user.booking_details',compact('bookings','type'));
+    }
+
+    public function updateFlightBookingData($tripDetailsResult, $flightBookId){
+        $travelItinerary = $tripDetailsResult['TravelItinerary'];
+        // echo '<pre>';
+        // print_r($data);
+        // print_r($travelItinerary);
+
+        $ItineraryInfo = $travelItinerary['ItineraryInfo'];
+        $CustomerInfos = $ItineraryInfo['CustomerInfos'];
+        $ReservationItems = $ItineraryInfo['ReservationItems'];
+            
+        $bookData = [
+            'booking_status' => $travelItinerary['BookingStatus'], 
+            'ticket_status' => $travelItinerary['TicketStatus'], 
+        ];
+       
+        $flightBook = FlightBookings::where('id',$flightBookId)->update($bookData);
+    
+        $passengers = $itinerary = [];
+        if($CustomerInfos){
+            FlightPassengers::where('booking_id',$flightBookId)->delete();
+            foreach($CustomerInfos as $custInfo){
+                $info = $custInfo['CustomerInfo'];
+                $passengers[] = [
+                    'booking_id' => $flightBookId,
+                    'passenger_type' => $info['PassengerType'],
+                    'passport_number' => $info['PassportNumber'],
+                    'passenger_first_name' => $info['PassengerFirstName'],
+                    'passenger_last_name' => $info['PassengerLastName'],
+                    'passenger_title' => $info['PassengerTitle'],
+                    'itemRPH' => $info['ItemRPH'],
+                    'eticket_number' => $info['eTicketNumber'],
+                    'date_of_birth' => $info['DateOfBirth'],
+                    'gender' => $info['Gender'],
+                    'passenger_nationality' => $info['PassengerNationality'],
+                    'created_at'=> date('Y-m-d H:i:s')
+                ];
+            }
+            // print_r($passengers);
+            FlightPassengers::insert($passengers);
+        }
+       
+        if($ReservationItems){
+            FlightItineraryDetails::where('booking_id',$flightBookId)->delete();
+            foreach($ReservationItems as $resItem){
+                $resInfo = $resItem['ReservationItem'];
+                $itinerary[] = [
+                    'booking_id' => $flightBookId,
+                    'airline_pnr' => $resInfo['AirlinePNR'],
+                    'arrival_airport' => $resInfo['ArrivalAirportLocationCode'],
+                    'arrival_date_time' => $resInfo['ArrivalDateTime'],
+                    'arrival_terminal' => $resInfo['ArrivalTerminal'],
+                    'baggage' => $resInfo['Baggage'],
+                    'cabin_class' => $resInfo['CabinClassText'],
+                    'departure_airport' => $resInfo['DepartureAirportLocationCode'],
+                    'departure_date_time' => $resInfo['DepartureDateTime'],
+                    'departure_terminal' => $resInfo['DepartureTerminal'],
+                    'flight_number' => $resInfo['FlightNumber'],
+                    'item_rph' => $resInfo['ItemRPH'],
+                    'journey_duration' => $resInfo['JourneyDuration'],
+                    'marketing_airline_code' => $resInfo['MarketingAirlineCode'],
+                    'number_in_party' => $resInfo['NumberInParty'],
+                    'operating_airline_code' => $resInfo['OperatingAirlineCode'],
+                    'res_book_desig_code' => $resInfo['ResBookDesigCode'],
+                    'stop_quantity' => $resInfo['StopQuantity'],
+                    'created_at'=> date('Y-m-d H:i:s')
+                ];
+            }
+            // print_r($itinerary);
+            FlightItineraryDetails::insert($itinerary);
+        }
+        return $travelItinerary['TicketStatus'];
+    }
+
+    public function getTripDetails($bookingId){
+        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'trip_details', [
+                        "user_id"=> config('global.api_user_id'),
+                        "user_password"=> config('global.api_user_password'),
+                        "access"=> config('global.api_access'),
+                        "ip_address"=> config('global.api_ip_address'),
+                        "UniqueID"=> $bookingId
+                    ]);
+
+        $result = $response->getBody()->getContents();
+        return $result;
     }
 
     public function search(){

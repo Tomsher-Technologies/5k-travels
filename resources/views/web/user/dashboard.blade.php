@@ -34,11 +34,12 @@
                                     <tr>
                                         <th>Sl no.</th>
                                         <th>Booking ID</th>
+                                        <th>Direction</th>
                                         <th>Origin</th>
                                         <th>Destination</th>
                                         <th>Amount</th>
                                         <th>Booking Date</th>
-                                        <th>Booking Status</th>
+                                        <th>Ticket Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -48,6 +49,7 @@
                                             <tr>
                                                 <td>{{ ($key+1) + ($bookings->currentPage() - 1)*$bookings->perPage() }}</td>
                                                 <td>{{ $book->unique_booking_id }}</td>
+                                                <td>{{ $book->direction }}</td>
                                                 <td>{{ $book->origin }}</td>
                                                 <td>{{ $book->destination }}</td>
                                                 <td>{{ $book->currency }} {{ $book->total_amount }}</td>
@@ -58,7 +60,7 @@
                                                         <span class="danger-icon"> Cancelled</span>
                                                     @else
                                                         @if($book->ticket_status == "TktInProcess")
-                                                            <span class="complete"> Ticket In Process</span>
+                                                            <span class="complete"> In Process</span>
                                                         @elseif($book->ticket_status == "BookingInProcess")
                                                             <span class="complete"> Booking In Process</span>
                                                         @else
@@ -106,11 +108,11 @@
                                                             <a href="javascript:void(0)" class="refundQuoteTicket danger-icon" title="Cancel Ticket" id="" data-bookid="{{ $book->id }}" data-id="{{ $book->unique_booking_id }}"><i class="fas fa-times"> </i></a>
                                                         @endif -->
                                                     @elseif($book->is_cancelled == 0 && $book->cancel_request == 1)
-                                                        <a href="javascript:void(0)" class="success-icon cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $book->unique_booking_id }}" data-ptr="{{ $book->cancel_ptr }}"><i class="fas fa-refresh"></i></a> &nbsp;
+                                                        <a href="javascript:void(0)" class="success-icon cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $book->unique_booking_id }}" data-ptr="{{ $book->cancel_ptr }}"><i class="fas fa-refresh"></i></a> 
                                                     @endif
 
 
-
+                                                    &nbsp;<a href="{{ route('reschedule-flight', ['id' => $book->id,'unique_id' => $book->unique_booking_id] ) }}" class="warning-icon" title="Reschedule Ticket"><i class="fas fa-calendar-alt"></i></a> &nbsp;
                                                     
                                                         
                                                    

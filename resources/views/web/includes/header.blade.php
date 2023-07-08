@@ -2,17 +2,20 @@
         <!-- Top Bar -->
         <div class="topbar-area">
             <div class="container">
+                @php
+                    $settings = getGeneralSettings();
+                @endphp
                 <div class="row align-items-center">
                     <div class="col-lg-6 col-md-6">
                         <ul class="topbar-list">
                             <li>
-                                <a href="#!"><i class="fab fa-facebook"></i></a>
-                                <a href="#!"><i class="fab fa-twitter-square"></i></a>
-                                <a href="#!"><i class="fab fa-instagram"></i></a>
-                                <a href="#!"><i class="fab fa-linkedin"></i></a>
+                                <a href="{{ $settings['facebook']['value'] }}" target="_blank"><i class="fab fa-facebook"></i></a>
+                                <a href="{{ $settings['twitter']['value'] }}" target="_blank"><i class="fab fa-twitter-square"></i></a>
+                                <a href="{{ $settings['instagram']['value'] }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                                <a href="{{ $settings['linkedin']['value'] }}" target="_blank"><i class="fab fa-linkedin"></i></a>
                             </li>
-                            <li><a href="#!"><span>+971 234 56789</span></a></li>
-                            <li><a href="#!"><span>5k@info.com</span></a></li>
+                            <li><a href="#!"><span>{{ $settings['site_phone']['value'] }}</span></a></li>
+                            <li><a href="#!"><span>{{ $settings['site_mail']['value'] }}</span></a></li>
                         </ul>
                     </div>
                     <div class="col-lg-6 col-md-6">
