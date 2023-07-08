@@ -380,7 +380,7 @@ class HomeController extends Controller
         }   
 
         $userData = User::find($request->agent_id);
-        $userData->parent_id = Auth::user()->id;
+        // $userData->parent_id = Auth::user()->id;
         $userData->name = $request->first_name.' '.$request->last_name;
         $userData->email = $request->email;
         if(isset($request->password)){
