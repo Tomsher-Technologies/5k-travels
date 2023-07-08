@@ -131,7 +131,7 @@
                             <div class="item form-group col-md-12 col-sm-12 ">
                                 <label class="col-form-label col-md-4 col-sm-4 label-align" for="country">Country : </label>
                                 <div class="col-md-6 col-sm-6 col-form-label ">
-                                {{ ($agent->user_details->country != '') ? $agent->user_details->country_name->name : ''}}
+                                {{ ($agent->user_details->country != '') ? $agent->user_details->country_name : ''}}
                                 </div>
                             </div>
                             
