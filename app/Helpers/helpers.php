@@ -168,3 +168,19 @@ if (! function_exists('getAirportData')) {
     }
 }
 
+if (! function_exists('getCurrencyValue')) {
+    function getCurrencyValue($currency) {
+        $oneCurrency = 1;
+        if(env('APP_ENV') != 'local'){
+            $oneCurrency = Currency::convert()
+                                    ->from($currency)
+                                    ->to('USD')
+                                    ->amount(1)
+                                    ->get();
+        }
+        return $oneCurrency;
+    }
+}
+
+
+
