@@ -304,15 +304,17 @@
                             $totalBase = $totalTax = 0;
 
                             $adult_amount = $child_amount = $infant_amount = 0;
-
+                          
                             if(isset($data['FareBreakdown'])){
                                 foreach($data['FareBreakdown'] as $fkey=>$fvalue){
-                                    $fareBase = $fvalue['BaseFare']['Amount'];
+                                    $fareBase = (float)$fvalue['BaseFare']['Amount'];
+                                   
                                     $fareBaseMargin = (($fareBase/100) * $totalmargin) + $fareBase;
-                                    $fareBaseMargin = number_format(floor($fareBaseMargin*100)/100, 2);
-
+                                    
+                                    $fareBaseMargin = number_format(floor($fareBaseMargin*100)/100, 2, '.', '');
+                                   
                                     $totalBase = $totalBase + $fareBaseMargin;
-
+                                    
                                     $currencyCode = $fvalue['BaseFare']['CurrencyCode'];
                                     if($fkey == 'ADT'){
                                         $passengerName = 'Adult';
@@ -326,8 +328,7 @@
                                     }
                                     $amountLi .= "<li> ".$passengerName." Price x ". $fvalue['Quantity']."  <span>".$currencyCode." ".$fareBaseMargin."</span></li>";
                                 }
-                            }
-                        
+                            }  
                       
                             $desc = array(
                                 'GROUP_PAX' => '(Entire group)', 
@@ -344,16 +345,16 @@
                             $TotalFare = $ItinTotalFares['TotalFare'];
 
                             $TotalFareMargin = (($TotalFare['Amount']/100) * $totalmargin) + $TotalFare['Amount'];
-                            $TotalFareMargin = number_format(floor($TotalFareMargin*100)/100, 2);
+                            $TotalFareMargin = number_format(floor($TotalFareMargin*100)/100, 2, '.', '');
                             
                             $BaseFare = $ItinTotalFares['BaseFare'];
                             $baseFareMargin = (($BaseFare['Amount']/100) * $totalmargin) + $BaseFare['Amount'];
-                            $baseFareMargin = number_format(floor($baseFareMargin*100)/100, 2);
+                            $baseFareMargin = number_format(floor($baseFareMargin*100)/100, 2, '.', '');
 
                             $TotalTax = $ItinTotalFares['TotalTax']['Amount'];
 
                             $taxFareMargin = (($TotalTax/100) * $totalmargin) + $TotalTax;
-                            $taxFareMargin = number_format(floor($taxFareMargin*100)/100, 2);
+                            $taxFareMargin = number_format(floor($taxFareMargin*100)/100, 2, '.', '');
                             $currencyCode = $TotalFare['CurrencyCode'];
             
                         @endphp
@@ -561,7 +562,7 @@
                                         @for($ad=1; $ad <= $passengers['ADT']; $ad++)
                                             <div class="tour_booking_form_box {{ ($ad!=1) ? 'mt-3' : '' }}">
                                                 <h3>Passenger {{$passCount}} (Adult)</h3>
-                                                <div class="row">
+                                                <div class="row form_area">
                                                     <div class="col-lg-4">
                                                         <label for="gender">Title</label>
                                                         <div class="form-group">
@@ -647,7 +648,7 @@
                                         @for($ch=1; $ch <= $passengers['CHD']; $ch++)
                                             <div class="tour_booking_form_box mt-3">
                                                 <h3>Passenger {{$passCount}} (Child)</h3>
-                                                <div class="row">
+                                                <div class="row form_area">
                                                     <div class="col-lg-4">
                                                         <label for="gender">Title</label>
                                                         <div class="form-group">
@@ -729,7 +730,7 @@
                                         @for($inf=1; $inf <= $passengers['INF']; $inf++)
                                             <div class="tour_booking_form_box mt-3">
                                                 <h3>Passenger {{$passCount}} (Infant)</h3>
-                                                <div class="row">
+                                                <div class="row form_area">
                                                     <div class="col-lg-4">
                                                         <label for="gender">Title</label>
                                                         <div class="form-group">
@@ -810,7 +811,7 @@
 
                                     <div class="tour_booking_form_box mt-3">
                                         <h3>Contact Details</h3>
-                                        <div class="row">
+                                        <div class="row form_area">
                                             <!-- <div class="col-lg-4">
                                                 <div class="form-group">
                                                     <label for="first_name">Country Code</label>
@@ -847,6 +848,7 @@
 
                                         <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCode']}}">
                                         <input type="hidden" name="session_id" id="session_id" value="{{ $data['session_id'] }}">
+                                        <input type="hidden" name="direction" id="direction" value="{{ $data['DirectionInd'] }}">
                                         <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
                                         <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
                                         <input type="hidden" name="adultCount" id="adultCount" value="{{$data['adultCount']}}">
@@ -857,7 +859,7 @@
                                     <div class="booking_btn float-right">
                                         @if(Auth::check())
                                             @php $balance = getAgentWalletBalance(Auth::user()->id);  @endphp
-                                            @if($balance >= str_replace(',','',$TotalFareMargin))
+                                            @if($balance >= $TotalFareMargin)
                                                 <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
                                             @else
                                                 <div class='alert alert-danger mt-3' style="width: 300px;text-align: center;">Insufficient balance in wallet. </div>
@@ -949,7 +951,7 @@
 <!-- /newsletter content -->
 @endsection
 @push('header')
-<link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.css') }}" />
+
 <link rel="stylesheet" href="{{ asset('assets/css/intlTelInput.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
 <style>
@@ -1039,7 +1041,7 @@
 @push('footer')
 <!-- SweetAlert -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="{{ asset('assets/js/jquery-ui.js') }}"></script>
+
 <script src="{{ asset('assets/js/intlTelInput.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
 

@@ -11,6 +11,7 @@ class FlightBookings extends Model
     protected $fillable = [
         'user_id', 
         'unique_booking_id', 
+        'direction',
         'client_ref', 
         'fare_type', 
         'origin', 

@@ -18,7 +18,11 @@ use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::get('change-currency/{currency}',[HomeController::class, 'changeCurrency'])->name('change-currency');
+
 Route::get('search-airports',[HomeController::class,'searchAirports'])->name('search-airports');
+
+Route::get('autocomplete-airports',[HomeController::class,'autocompleteAirports'])->name('autocomplete-airports');
 
 Route::get('/flights/search', [FlightsController::class, 'search'])->name('flight.search');
 
@@ -63,5 +67,8 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/flights/prtStatus', [FlightsController::class, 'ptrStatusCheck'])->name('flight.prtStatus');
     Route::get('/flights/refundQuote', [FlightsController::class, 'refundQuote'])->name('flight.refundQuote');
     Route::post('/flights/refund', [FlightsController::class, 'refundAPI'])->name('flight.refund');
+    Route::get('/changeDate/{type}/{id}/{unique_id}', [FlightsController::class, 'changeDate'])->name('change-date');
+    Route::get('/reschedule-flight', [FlightsController::class, 'rescheduleFlight'])->name('reschedule-flight');
+    Route::post('/send-reschedule-request', [FlightsController::class, 'sendRescheduleRequest'])->name('send-reschedule-request');
 });
 

@@ -29,7 +29,48 @@
 
                     <div id="tab-booking-details">
 
-                        <h3>Booking Details</h3>
+                        <div class="mt-n5 d-flex gap-3 flex-wrap align-items-end">
+                            <div>
+                                <h3>Booking Details</h3>
+                            </div>
+                               
+                            <div class="ms-md-auto">
+                                <!-- <a href="product-list.html" class="btn btn-cancel">Cancel Booking</a> -->
+                                @php   
+                                    $timeDiff = time() - strtotime($bookings[0]->created_at);
+                                @endphp
+                                @if($bookings[0]->is_cancelled == 0 && $bookings[0]->cancel_request == 0)
+                                    @if($timeDiff < 86400)
+                                        @if(strtolower($bookings[0]->fare_type) == 'webfare' )
+                                            <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id=""  data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                        @else
+                                            @if($bookings[0]->ticket_status == "Ticketed" || $bookings[0]->ticket_status == "OK")
+                                                <a href="javascript:void(0)" class="voidQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                            @else
+                                                <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" title="Cancel Ticket" data-type="void" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                            @endif
+                                        @endif
+                                    @elseif($timeDiff > 86400)
+                                        @if(strtolower($bookings[0]->fare_type) == 'webfare' )
+                                            <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                        @else
+                                            @if($bookings[0]->ticket_status == "Ticketed" || $bookings[0]->ticket_status == "OK")
+                                                <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                            @else
+                                                <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" data-type="refund" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                            @endif
+                                        @endif
+                                    @endif
+                
+                                @elseif($bookings[0]->is_cancelled == 0 && $bookings[0]->cancel_request == 1)
+                                    <a href="javascript:void(0)" class="btn btn-status cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $bookings[0]->unique_booking_id }}" data-ptr="{{ $bookings[0]->cancel_ptr }}">Check Cancel Status</a> 
+                                @endif
+
+                                <a href="{{ route('change-date',['type' => $type,'id' => $bookings[0]->id,'unique_id' => $bookings[0]->unique_booking_id] ) }}" class="btn btn-warning ">Reschedule Booking</a>
+                            </div>
+
+
+                        </div>
 
                         <div class="tab-content mt-4">
                             <div class="tab-pane fade show active" id="family-house" role="tabpanel">

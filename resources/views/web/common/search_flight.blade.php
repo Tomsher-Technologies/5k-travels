@@ -5,8 +5,8 @@
                     <div class="theme_search_form_area">
                         <div class="theme_search_form_tabbtn">
                         <!-- {{ json_encode(Session::get('flight_search_oneway')) }}
-            {{ json_encode(Session::get('flight_search_return')) }}
-            {{ json_encode(Session::get('flight_search_multi')) }} -->
+            {{ json_encode(Session::get('flight_search_return')) }}-->
+            <!-- {{ json_encode(Session::get('flight_search_multi')) }}  -->
                             <div class="flight_categories_search">
                                 <ul class="nav nav-tabs" role="tablist" id="searchTab">
                                     <li class="nav-item" role="presentation">
@@ -28,22 +28,7 @@
                             </div>
 
                         </div>
-                        @php 
-                            $airportArray =[];
-                            $airportsList ='<option value=""></option>'; 
-                        @endphp
-                        @foreach($airports as $ofromap)
-                            @php
-                            $airportArray[$loop->iteration]['AirportCode'] = $ofromap->AirportCode;
-                            $airportArray[$loop->iteration]['City'] = $ofromap->City;
-                            $airportArray[$loop->iteration]['Country'] = $ofromap->Country;
-                            $airportArray[$loop->iteration]['AirportName'] = $ofromap->AirportName;
-
-                                $airportsList .= '<option value="'.$ofromap->AirportCode.'" data-city="'.$ofromap->City.'" data-country="'.$ofromap->Country.'"
-                                data-airportCode="'.$ofromap->AirportCode.'"  data-airportName="'.$ofromap->AirportName.'" data-title="'.$ofromap->City.', '.$ofromap->Country.'">
-                                    '.$ofromap->City.', '.$ofromap->Country.', '.$ofromap->AirportCode.', '.$ofromap->AirportName.' </option>';
-                            @endphp
-                        @endforeach
+                        
 
                         @php
                             $oAdult = $rAdult =  $mAdult = 1;
@@ -107,12 +92,9 @@
                                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>From</p>
-                                                                   
-                                                                    <select name="oFrom" class="selectAirportFrom col-sm-12 " id="oFrom">
-                                                                        
-                                                                        {!! $airportsList !!}
-                                                                    </select>
-                                                                    <span class="place-label from_airport" id="oFrom_label"></span>
+                                                                   <input type="text" name="oFrom" placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="oFrom">
+                                                                   <input type="hidden" class="airport" name="oFrom_label"  id="oFrom_label">
+                                                                    <span class="place-label from_airport" id="oFrom_labels"></span>
                                                                     <div class="plan_icon_posation">
                                                                         <i class="fas fa-plane-departure"></i>
                                                                     </div>
@@ -122,11 +104,9 @@
                                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>To </p>
-                                                                    <select name="oTo" class="selectAirportTo col-sm-12 " id="oTo">
-                                                                       
-                                                                        {!! $airportsList !!}
-                                                                    </select>
-                                                                    <span  class="place-label to_airport" id="oTo_label"></span>
+                                                                    <input type="text" name="oTo" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="oTo">
+                                                                    <input type="hidden"  class="airport"  name="oTo_label"  id="oTo_label">
+                                                                    <span  class="place-label to_airport" id="oTo_labels"></span>
                                                                     <div class="plan_icon_posation">
                                                                         <i class="fas fa-plane-arrival"></i>
                                                                     </div>
@@ -262,10 +242,10 @@
                                                             <div class="col-lg-3  col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>From</p>
-                                                                    <select name="rFrom" class="selectAirportFrom col-sm-12 " id="rFrom">
-                                                                    {!! $airportsList !!}
-                                                                    </select>
-                                                                    <span class="place-label from_airport" id="rFrom_label"></span>
+                                                                    
+                                                                    <input type="text" name="rFrom" placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="rFrom">
+                                                                    <input type="hidden"  class="airport" name="rFrom_label"  id="rFrom_label">
+                                                                    <span class="place-label from_airport" id="rFrom_labels"></span>
                                                                     <div class="plan_icon_posation">
                                                                         <i class="fas fa-plane-departure"></i>
                                                                     </div>
@@ -274,10 +254,10 @@
                                                             <div class="col-lg-3  col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>To</p>
-                                                                    <select name="rTo" class="selectAirportTo col-sm-12 " id="rTo">
-                                                                    {!! $airportsList !!}
-                                                                    </select>
-                                                                    <span  class="place-label to_airport" id="rTo_label"></span>
+                                                                   
+                                                                    <input type="text" name="rTo" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="rTo">
+                                                                    <input type="hidden"  class="airport" name="rTo_label"  id="rTo_label">
+                                                                    <span  class="place-label to_airport" id="rTo_labels"></span>
                                                                     <div class="plan_icon_posation">
                                                                         <i class="fas fa-plane-arrival"></i>
                                                                     </div>
@@ -414,10 +394,10 @@
                                                                     <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                         <div class="flight_Search_boxed">
                                                                             <p>From</p>
-                                                                            <select name="mFrom[]" class="selectAirportFrom col-sm-12 " id="mFrom0">
-                                                                            {!! $airportsList !!}
-                                                                            </select>
-                                                                            <span class="place-label from_airport" id="mFrom_label"></span>
+                                                                            
+                                                                            <input type="text" name="mFrom[]" placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="mFrom0">
+                                                                            <input type="hidden"  class="airport" name="mFrom_label0"  id="mFrom_label0">
+                                                                            <span class="place-label from_airport" id="mFrom_labels0"  ></span>
                                                                             <div class="plan_icon_posation">
                                                                                 <i class="fas fa-plane-departure"></i>
                                                                             </div>
@@ -426,10 +406,10 @@
                                                                     <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                         <div class="flight_Search_boxed">
                                                                             <p>To</p>
-                                                                            <select name="mTo[]" class="selectAirportTo col-sm-12 " id="mTo0">
-                                                                            {!! $airportsList !!}
-                                                                            </select>
-                                                                            <span class="place-label to_airport" id="mTo_label"></span>
+                                                                           
+                                                                            <input type="text" name="mTo[]" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="mTo0">
+                                                                            <input type="hidden"  class="airport" name="mTo_label0"  id="mTo_label0">
+                                                                            <span class="place-label to_airport" id="mTo_labels0"></span>
                                                                             <div class="plan_icon_posation">
                                                                                 <i class="fas fa-plane-departure"></i>
                                                                             </div>
@@ -542,10 +522,10 @@
                                                                     <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                         <div class="flight_Search_boxed">
                                                                             <p>From</p>
-                                                                            <select name="mFrom[]" class="selectAirportFrom col-sm-12 " id="mFrom1">
-                                                                            {!! $airportsList !!}
-                                                                            </select>
-                                                                            <span class="place-label from_airport" id="mFrom_label"></span>
+                                                                           
+                                                                            <input type="text" name="mFrom[]" placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="mFrom1">
+                                                                            <input type="hidden"  class="airport" name="mFrom_label1"  id="mFrom_label1">
+                                                                            <span class="place-label from_airport" id="mFrom_labels1"></span>
                                                                             <div class="plan_icon_posation">
                                                                                 <i class="fas fa-plane-departure"></i>
                                                                             </div>
@@ -554,10 +534,10 @@
                                                                     <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                         <div class="flight_Search_boxed">
                                                                             <p>To</p>
-                                                                            <select name="mTo[]" class="selectAirportTo col-sm-12 " id="mTo1">
-                                                                            {!! $airportsList !!}
-                                                                            </select>
-                                                                            <span class="place-label to_airport" id="mTo_label"></span>
+                                                                            
+                                                                            <input type="text" name="mTo[]" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="mTo1">
+                                                                            <input type="hidden"  class="airport" name="mTo_label1"  id="mTo_label1">
+                                                                            <span class="place-label to_airport" id="mTo_labels1"></span>
                                                                             <div class="plan_icon_posation">
                                                                                 <i class="fas fa-plane-departure"></i>
                                                                             </div>
@@ -604,6 +584,6 @@
     </div>
     @push('footer')
     <script>
-        let airportsList = @json($airportArray);
+        
     </script>
     @endpush

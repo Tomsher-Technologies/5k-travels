@@ -34,6 +34,7 @@
                                     <tr>
                                         <th>Sl no.</th>
                                         <th>Booking ID</th>
+                                        <th>Direction</th>
                                         <th>Origin</th>
                                         <th>Destination</th>
                                         <th>Amount</th>
@@ -47,6 +48,7 @@
                                             <tr>
                                                 <td>{{ ($key+1) + ($bookings->currentPage() - 1)*$bookings->perPage() }}</td>
                                                 <td>{{ $book->unique_booking_id }}</td>
+                                                <td>{{ $book->direction }}</td>
                                                 <td>{{ $book->origin }}</td>
                                                 <td>{{ $book->destination }}</td>
                                                 <td>{{ $book->currency }} {{ $book->total_amount }}</td>

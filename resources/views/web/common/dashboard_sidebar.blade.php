@@ -12,7 +12,7 @@
         <h3>{{ Auth::user()->name }}</h3>
         <!-- <p><a href="javascript::void(0)">{{ Auth::user()->name }}</a></p> -->
         <p><a href="mailto:{{ Auth::user()->email }}">{{ Auth::user()->email }}</a></p>
-        <p>Wallet Balance : {{ $userDetails[0]->credit_balance }}</p>
+        <p>Wallet Balance : USD {{ $userDetails[0]->credit_balance }}</p>
     </div>
     <div class="dashboard_menu_area">
         <ul>

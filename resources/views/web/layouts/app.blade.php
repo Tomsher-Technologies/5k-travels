@@ -26,9 +26,37 @@
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
     <!-- Responsive css -->
     <link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" />
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
     @stack('header')
+    <style>
+        .ui-menu .ui-menu-item-wrapper {
+            position: relative;
+            padding: 0 !important;
+        }
+        ul.ui-menu{
+            width: 350px !important;
+            max-height: 500px;
+            overflow: auto;
+        }
+        .ui-menu-item{
+            height: 55px;
+        }
+        .ui-state-active:hover{
+            background:transparent;
+            color: black;
+            border:transparent;
+        }
+        .ui-menu-item-wrapper> .row{
+            margin-left:0;
+            margin-right:0
+        }
+        .ui-state-active>.row:hover div{
+            background: #1fba71;
+        }
+    </style>
 </head>
 
 
@@ -241,12 +269,15 @@
     <!-- Custom js -->
     <script src="{{ asset('assets/js/custom.js') }}"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" ></script>
+
+    
     <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
 
     <script>
     window.ROUTES = {
         search_airports: '{{ route("search-airports") }}',
-
+        autocomplete_airports: "{{ route('autocomplete-airports') }}",
     };
 
     $.ajaxSetup({
