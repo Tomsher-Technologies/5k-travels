@@ -335,7 +335,7 @@ ul li {
     box-shadow: none;
     overflow: hidden;
     white-space: nowrap;
-    position: relative;
+    /* position: relative; */
     z-index: 0;
 }
 
@@ -345,47 +345,60 @@ ul li {
 
 .btn_theme {
     color: var(--white-color);
-    background-color: var(--main-color);
+    background-color: #198754;
     transition: var(--transition);
     box-shadow: none;
     overflow: hidden;
     white-space: nowrap;
-    position: relative;
+    /* position: relative; */
     z-index: 0;
-    border: none
-}
-
-.btn_theme:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 580px;
-    height: 550px;
-    margin: auto;
-    background: var(--black-color);
-    border-radius: 50%;
-    z-index: -1;
-    -webkit-transform-origin: top center;
-    transform-origin: top center;
-    -webkit-transform: translateX(-50%) translateY(-5%) scale(.4);
-    transform: translateX(-50%) translateY(-5%) scale(.4);
-    transition: var(--transition);
-
-}
-
-.btn_theme:hover:before {
-    -webkit-transition: -webkit-transform 1s;
-    transition: -webkit-transform 1s;
-    transition: transform 1s;
-    transition: transform 1s, -webkit-transform 1s;
-    -webkit-transform: translateX(-45%) translateY(0) scale(1);
-    transform: translateX(-50%) translateY(0) scale(1);
-    -webkit-transform-origin: bottom center;
-    transform-origin: bottom center;
     border: none;
+    color: #fff;
+    border: 3px solid var(--main-color);
+    background-image: -webkit-linear-gradient(30deg, #1fba71 50%, transparent 50%);
+    background-image: linear-gradient(30deg, #1fba71 50%, transparent 50%);
+    background-size: 1000px;
+    background-repeat: no-repeat;
+    background-position: 0%;
+    -webkit-transition: background 300ms ease-in-out;
+    transition: background 600ms ease-in-out;
 }
+.btn_theme:hover{
+    background-position: 100%;
+    color: #fff;
+}
+/*.btn_theme:before {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    bottom: 0;*/
+/*    left: 50%;*/
+/*    width: 580px;*/
+/*    height: 550px;*/
+/*    margin: auto;*/
+/*    background: var(--black-color);*/
+/*    border-radius: 50%;*/
+/*    z-index: -1;*/
+/*    -webkit-transform-origin: top center;*/
+/*    transform-origin: top center;*/
+/*    -webkit-transform: translateX(-50%) translateY(-5%) scale(.4);*/
+/*    transform: translateX(-50%) translateY(-5%) scale(.4);*/
+/*    transition: var(--transition);*/
+
+/*}*/
+
+/*.btn_theme:hover:before {*/
+/*    -webkit-transition: -webkit-transform 1s;*/
+/*    transition: -webkit-transform 1s;*/
+/*    transition: transform 1s;*/
+/*    transition: transform 1s, -webkit-transform 1s;*/
+/*    -webkit-transform: translateX(-45%) translateY(0) scale(1);*/
+/*    transform: translateX(-50%) translateY(0) scale(1);*/
+/*    -webkit-transform-origin: bottom center;*/
+/*    transform-origin: bottom center;*/
+/*    border: none;*/
+/*}*/
+
 
 .btn_theme_white {
     color: var(--black-color);
