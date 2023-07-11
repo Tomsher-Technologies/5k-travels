@@ -11,6 +11,6 @@ return [
 
     'api_ip_address' => '86.98.11.143',
 
-    'api_requiredCurrency' => 'USD'
+    'api_requiredCurrency' => 'AED'
 
 ];

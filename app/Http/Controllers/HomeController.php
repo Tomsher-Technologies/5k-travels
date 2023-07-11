@@ -75,13 +75,6 @@ class HomeController extends Controller
     }
 
     public function dashboard(){
-        $oneCurrency = Currency::convert()
-                                    ->from('AED')
-                                    ->to('USD')
-                                    ->amount(1)
-                                    ->get();
-                                    dd($oneCurrency);
-        echo '*************************'.$oneCurrency;die;
         $type = "my_bookings";
         $bookings = FlightBookings::where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(10);
         return  view('web.user.dashboard',compact('bookings','type'));

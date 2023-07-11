@@ -1142,11 +1142,7 @@ class FlightsController extends Controller
         $flightBook = FlightBookings::create($bookData);
         $flightBookId = $flightBook->id;
         if($currency != 'USD'){
-            $oneCurrency = Currency::convert()
-                                    ->from($currency)
-                                    ->to('USD')
-                                    ->amount(1)
-                                    ->get();
+            $oneCurrency = getCurrencyValue($currency);
         }else{
             $oneCurrency=1 ;
         }
