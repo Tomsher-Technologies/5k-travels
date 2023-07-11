@@ -1158,13 +1158,13 @@ class FlightsController extends Controller
                 'amount'    => $agentAmount,
                 'total_amount' => $totalOrgAmount,
                 'currency' => $currency,
-                'usd_amount' => number_format(($agentAmount*$oneCurrency), 2),
+                'usd_amount' => number_format(($agentAmount*$oneCurrency), 2, '.', ''),
                 'usd_rate' => $oneCurrency,
                 'transaction_type' => 'cr',
                 'created_at' => date('Y-m-d H:i:s')
             );
             $deductAmount = ($totalAmount - $agentAmount);
-            $deductUsd = number_format(($deductAmount*$oneCurrency), 2);
+            $deductUsd = number_format(($deductAmount*$oneCurrency), 2, '.', '');
             $agentMargins[] = array(
                 'booking_id' => $flightBookId,
                 'agent_id'   => Auth::user()->id,
@@ -1192,13 +1192,13 @@ class FlightsController extends Controller
                     'amount'    => $agentAmount,
                     'total_amount' => $totalOrgAmount,
                     'currency' => $currency,
-                    'usd_amount' => number_format(($agentAmount*$oneCurrency), 2),
+                    'usd_amount' => number_format(($agentAmount*$oneCurrency), 2, '.', ''),
                     'usd_rate' => $oneCurrency,
                     'transaction_type' => 'cr',
                     'created_at' => date('Y-m-d H:i:s')
                 );
                 $creditAmount = $agentAmount;
-                $creditUsd = number_format(($creditAmount*$oneCurrency), 2);
+                $creditUsd = number_format(($creditAmount*$oneCurrency), 2, '.', '');
                 $mainAgent = UserDetails::where('user_id',$agentid)->first();
                 $mainAgent->credit_balance += $creditUsd;
                 $mainAgent->save();
