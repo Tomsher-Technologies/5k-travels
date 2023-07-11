@@ -174,7 +174,7 @@
                                                 $OriginDestinationOptionsOutbound   = $fdata['OriginDestinationOptionsOutbound'];  
                                                 $totalFares = $fdata['TotalFares']['TotalFare'];
                                                 $totalFareMargin = (($totalFares['Amount']/100) * $totalmargin) + $totalFares['Amount'];
-                                                $totalFareMargin = number_format(floor($totalFareMargin*100)/100, 2);
+                                                $totalFareMargin = number_format(floor($totalFareMargin*100)/100, 2, '.', '');
 
                                                 $firstFlight = head($OriginDestinationOptionsOutbound);
                                                 $lastFlight = last($OriginDestinationOptionsOutbound);
@@ -517,10 +517,10 @@
                                                                 $fareTax = $fareTotal['TotalTax'];
                                                                 
                                                                 $totalBaseMargin = (($fareBase['Amount']/100) * $totalmargin) + $fareBase['Amount'];
-                                                                $totalBaseMargin = number_format(floor($totalBaseMargin*100)/100, 2);
+                                                                $totalBaseMargin = number_format(floor($totalBaseMargin*100)/100, 2, '.', '');
 
                                                                 $totalTaxMargin = (($fareTax['Amount']/100) * $totalmargin) + $fareTax['Amount'];
-                                                                $totalTaxMargin = number_format(floor($totalTaxMargin*100)/100, 2);
+                                                                $totalTaxMargin = number_format(floor($totalTaxMargin*100)/100, 2, '.', '');
                                                             @endphp
                                                             <div class="flightDetailsInfo">
                                                                 <p class="appendBottom8 fontSize12">

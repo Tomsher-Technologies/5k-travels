@@ -11,8 +11,13 @@ class FlightMarginAmounts extends Model
     protected $fillable = [
         'booking_id', 
         'agent_id', 
+        'transaction_type', 
+        'currency', 
+        'total_amount', 
         'margin', 
         'amount', 
+        'usd_rate', 
+        'usd_amount', 
         'created_at'
     ];
 }

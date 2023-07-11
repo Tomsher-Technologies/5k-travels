@@ -27,8 +27,16 @@
                 <div class="col-lg-9">
               
                     <div class="dashboard_common_table">
+                        <div class="mt-n5 d-flex gap-3 flex-wrap align-items-end">
+                            <div>
+                                <h3>Create New Sub-agent</h3>
+                            </div>
+                               
+                            <div class="ms-md-auto">
+                                <a href="{{ route('sub-agents') }}" class="btn back-btn"><i class="fa fa-arrow-left"></i>&nbsp; Back</a>
+                            </div>
+                        </div>
                         
-                        <h3>Create New Sub-agent</h3>
                         
                         <div class="profile_update_form">
                             @if(session()->has('status'))

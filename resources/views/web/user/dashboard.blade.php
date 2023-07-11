@@ -111,10 +111,6 @@
                                                         <a href="javascript:void(0)" class="success-icon cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $book->unique_booking_id }}" data-ptr="{{ $book->cancel_ptr }}"><i class="fas fa-refresh"></i></a> 
                                                     @endif
 
-
-                                                    &nbsp;<a href="{{ route('reschedule-flight', ['id' => $book->id,'unique_id' => $book->unique_booking_id] ) }}" class="warning-icon" title="Reschedule Ticket"><i class="fas fa-calendar-alt"></i></a> &nbsp;
-                                                    
-                                                        
                                                    
                                                 </td>
                                             </tr>

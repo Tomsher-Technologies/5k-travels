@@ -27,9 +27,14 @@
                 <div class="col-lg-9">
               
                     <div class="dashboard_common_table">
-                        <div class="d-flex">
-                            <h3 style="width:780px;">Sub-agents Listing</h3>
-                            <a href="{{ route('subagent.create') }}" class="btn btn-success">Create New Sub-agent</a>
+                        <div class="mt-n5 d-flex gap-3 flex-wrap align-items-end">
+                            <div>
+                                <h3>Sub-agents Listing</h3>
+                            </div>
+                               
+                            <div class="ms-md-auto">
+                                <a href="{{ route('subagent.create') }}" class="btn btn-success">Create New Sub-agent</a>
+                            </div>
                         </div>
                         
                         <div class="table-responsive-lg table_common_area">

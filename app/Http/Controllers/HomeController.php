@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use AmrShawky\LaravelCurrency\Facade\Currency;
 use Illuminate\Support\Facades\Http;
 use App\Models\Airports;
 use App\Models\Airlines;
@@ -39,8 +40,34 @@ class HomeController extends Controller
         }
     }
     public function index(){
-        $airports = $this->allAirports();
-        return  view('web.index',compact('airports'));
+        // $airports = $this->allAirports();
+        return  view('web.index');
+    }
+
+    public function autocompleteAirports(Request $request)
+    {
+        $search = $request->term;
+        $query = Airports::select("AirportCode","AirportName","Country","City");
+        if($search){  
+            $query->Where(function ($query) use ($search) {
+                $query->orWhere('AirportCode', 'LIKE', "%$search%")
+                ->orWhere('AirportName', 'LIKE', "$search%")
+                ->orWhere('City', 'LIKE', "$search%")
+                ->orWhere('Country', 'LIKE', "$search%");
+            });                    
+        }
+        $airports = $query->orderBy('City','ASC')
+                            ->get();
+        $response = array();
+        foreach($airports as $air){
+            $label ='<div class="row" ><div class="col-sm-12"><i class="fa fa-plane"></i> &nbsp;'.
+                    '<b>'.$air->City.', '.$air->Country.'</b>'.
+                    '<span class="float-end">'.$air->AirportCode.'</span>'.
+                    '</div><div class="col-sm-12">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>'.$air->AirportName.'</small></div></div>';
+            $response[] = array("value"=>$air->AirportCode,"label"=>$label,"airport" => $air->AirportName);
+        }
+    
+        return response()->json($response); 
     }
 
     public function changeCurrency($currency){
@@ -48,6 +75,13 @@ class HomeController extends Controller
     }
 
     public function dashboard(){
+        $oneCurrency = Currency::convert()
+                                    ->from('AED')
+                                    ->to('USD')
+                                    ->amount(1)
+                                    ->get();
+                                    dd($oneCurrency);
+        echo '*************************'.$oneCurrency;die;
         $type = "my_bookings";
         $bookings = FlightBookings::where('user_id',Auth::user()->id)->orderBy('id','desc')->paginate(10);
         return  view('web.user.dashboard',compact('bookings','type'));

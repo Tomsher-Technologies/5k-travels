@@ -304,15 +304,17 @@
                             $totalBase = $totalTax = 0;
 
                             $adult_amount = $child_amount = $infant_amount = 0;
-
+                          
                             if(isset($data['FareBreakdown'])){
                                 foreach($data['FareBreakdown'] as $fkey=>$fvalue){
-                                    $fareBase = $fvalue['BaseFare']['Amount'];
+                                    $fareBase = (float)$fvalue['BaseFare']['Amount'];
+                                   
                                     $fareBaseMargin = (($fareBase/100) * $totalmargin) + $fareBase;
-                                    $fareBaseMargin = number_format(floor($fareBaseMargin*100)/100, 2);
-
+                                    
+                                    $fareBaseMargin = number_format(floor($fareBaseMargin*100)/100, 2, '.', '');
+                                   
                                     $totalBase = $totalBase + $fareBaseMargin;
-
+                                    
                                     $currencyCode = $fvalue['BaseFare']['CurrencyCode'];
                                     if($fkey == 'ADT'){
                                         $passengerName = 'Adult';
@@ -326,8 +328,7 @@
                                     }
                                     $amountLi .= "<li> ".$passengerName." Price x ". $fvalue['Quantity']."  <span>".$currencyCode." ".$fareBaseMargin."</span></li>";
                                 }
-                            }
-                        
+                            }  
                       
                             $desc = array(
                                 'GROUP_PAX' => '(Entire group)', 
@@ -344,16 +345,16 @@
                             $TotalFare = $ItinTotalFares['TotalFare'];
 
                             $TotalFareMargin = (($TotalFare['Amount']/100) * $totalmargin) + $TotalFare['Amount'];
-                            $TotalFareMargin = number_format(floor($TotalFareMargin*100)/100, 2);
+                            $TotalFareMargin = number_format(floor($TotalFareMargin*100)/100, 2, '.', '');
                             
                             $BaseFare = $ItinTotalFares['BaseFare'];
                             $baseFareMargin = (($BaseFare['Amount']/100) * $totalmargin) + $BaseFare['Amount'];
-                            $baseFareMargin = number_format(floor($baseFareMargin*100)/100, 2);
+                            $baseFareMargin = number_format(floor($baseFareMargin*100)/100, 2, '.', '');
 
                             $TotalTax = $ItinTotalFares['TotalTax']['Amount'];
 
                             $taxFareMargin = (($TotalTax/100) * $totalmargin) + $TotalTax;
-                            $taxFareMargin = number_format(floor($taxFareMargin*100)/100, 2);
+                            $taxFareMargin = number_format(floor($taxFareMargin*100)/100, 2, '.', '');
                             $currencyCode = $TotalFare['CurrencyCode'];
             
                         @endphp
@@ -858,7 +859,7 @@
                                     <div class="booking_btn float-right">
                                         @if(Auth::check())
                                             @php $balance = getAgentWalletBalance(Auth::user()->id);  @endphp
-                                            @if($balance >= str_replace(',','',$TotalFareMargin))
+                                            @if($balance >= $TotalFareMargin)
                                                 <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
                                             @else
                                                 <div class='alert alert-danger mt-3' style="width: 300px;text-align: center;">Insufficient balance in wallet. </div>
@@ -950,7 +951,7 @@
 <!-- /newsletter content -->
 @endsection
 @push('header')
-<link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.css') }}" />
+
 <link rel="stylesheet" href="{{ asset('assets/css/intlTelInput.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
 <style>
@@ -1040,7 +1041,7 @@
 @push('footer')
 <!-- SweetAlert -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="{{ asset('assets/js/jquery-ui.js') }}"></script>
+
 <script src="{{ asset('assets/js/intlTelInput.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
 

@@ -333,14 +333,17 @@
 @push('header')
 <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
+
 <style>
 
 </style>
 @endpush
 @push('footer')
+
 <script src="{{ asset('assets/js/select2.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
 <script src="{{ asset('assets/js/search_flights.js') }}"></script>
+
 <script  type="text/javascript">
     let one_way_session = '{!! json_encode(Session::get("flight_search_oneway")) !!}';
     one_way_session = JSON.parse(one_way_session);
@@ -351,7 +354,7 @@
     let multi_session = '{!! json_encode(Session::get("flight_search_multi")) !!}';
     multi_session = JSON.parse(multi_session);
 
- 
+    let airport_searchUrl = "{{ route('autocomplete-airports') }}";
 </script>
 
 @endpush

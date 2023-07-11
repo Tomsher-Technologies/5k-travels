@@ -3,8 +3,7 @@ $(document).on('select2:open', () => {
 });
 
 $(document).ready(function () {
-    initailizeSelect2(); 
-
+    
     // on load of the page: switch to the currently selected tab
     // var hash = window.location.hash;
     var currentUrl = window.location.href;
@@ -21,26 +20,50 @@ $(document).ready(function () {
     
     
     if(one_way_session){
-        $('#oFrom').val(one_way_session.oFrom).trigger('change');
-        $('#oTo').val(one_way_session.oTo).trigger('change');
-        $('#oDate').val(one_way_session.oDate).trigger('change');
+        $('#oFrom').val(one_way_session.oFrom);
+        $('#oTo').val(one_way_session.oTo);
+
+        $('#oFrom_label').val(one_way_session.oFrom_label);
+        $('#oTo_label').val(one_way_session.oTo_label);
+
+        $('#oFrom_labels').html(one_way_session.oFrom_label);
+        $('#oTo_labels').html(one_way_session.oTo_label);
+
+        $('#oDate').val(one_way_session.oDate).trigger('change');;
     }
     if(return_session){
-        $('#rFrom').val(return_session.rFrom).trigger('change');
-        $('#rTo').val(return_session.rTo).trigger('change');
-        $('#rDate').val(return_session.rDate).trigger('change');
-        $('#rReturnDate').val(return_session.rReturnDate).trigger('change');
+        $('#rFrom').val(return_session.rFrom);
+        $('#rTo').val(return_session.rTo);
+
+        $('#rFrom_label').val(return_session.rFrom_label);
+        $('#rTo_label').val(return_session.rTo_label);
+
+        $('#rFrom_labels').html(return_session.rFrom_label);
+        $('#rTo_labels').html(return_session.rTo_label);
+
+        $('#rDate').val(return_session.rDate).trigger('change');;
+        $('#rReturnDate').val(return_session.rReturnDate).trigger('change');;
     }
 
     if(multi_session){
         let fromPlacesCount = (multi_session.mFrom).length;
+        
         for (let step = 0; step < fromPlacesCount; step++) {
             if(step >=2){
                 generateMultiFields(step);
             }
-            
-            $('#mFrom'+step).val(multi_session.mFrom[step]).trigger('change');
-            $('#mTo'+step).val(multi_session.mTo[step]).trigger('change');
+            var mFrom_label = 'mFrom_label'+step;
+            var mTo_label ='mTo_label'+step;
+            console.log(multi_session+mFrom_label);
+            $('#mFrom'+step).val(multi_session.mFrom[step]);
+            $('#mTo'+step).val(multi_session.mTo[step]);
+
+            $('#mFrom_label'+step).val(eval(`multi_session.${mFrom_label}`));
+            $('#mTo_label'+step).val(eval(`multi_session.${mTo_label}`));
+
+            $('#mFrom_labels'+step).html(eval(`multi_session.${mFrom_label}`));
+            $('#mTo_labels'+step).html(eval(`multi_session.${mTo_label}`));
+
             $('#mDate'+step).val(multi_session.mDate[step]).trigger('change');
         }
 
@@ -95,54 +118,51 @@ function getDay(value){
     var a = new Date(value);
     return weekday[a.getDay()];
 }
-
-
-function initailizeSelect2(){
-    $('.selectAirportFrom').select2({
-        placeholder: 'From',
-        selectOnClose: true,
-        templateResult: templateResults,
-        templateSelection: formatState
+loadAutocomplete();
+function loadAutocomplete(){
+    $(".load_airports").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+            url: ROUTES.autocomplete_airports,
+            data: {
+                    term : request.term
+             },
+            dataType: "json",
+            success: function(data){
+               response(data);
+            }
+        });
+        },
+        select: function (event, ui) {
+            // Set selection
+            $(this).val(ui.item.value); // display the selected text
+            $(this).parent().find('span').text(ui.item.airport);
+            $(this).parent().find('.airport').val(ui.item.airport);
+            return false;
+        },
+        minLength: 1,
+        change: function( event, ui ) {
+            if($(this).val() == ''){
+                $(this).parent().find('span').text('');
+                $(this).parent().find('.airport').val('');
+            }
+           
+        }
+        // open: function() {
+        //     $("ul.ui-menu").width('300px');
+        // }
     });
 
-    $('.selectAirportTo').select2({
-        placeholder: 'To',
-        selectOnClose: true,
-        templateResult: templateResults,
-        templateSelection: formatState
+    $('.load_airports').each(function() {
+        $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
+            return $("<li></li>")
+            .data("item.autocomplete", item)
+            .append("<a>" + item.label + "</a>")
+            .appendTo(ul);
+        };
     });
-
-    function templateResults(state) {
-        if (!state.id) {
-          return state.text;
-        }
-        var html = '<div class="row"><div class="col-sm-1">'+
-        '<i class="fa fa-plane"></i>'+
-        '</div><div class="col-sm-10">'+
-        '<b>'+$(state.element).attr('data-city')+', '+$(state.element).attr('data-country')+'</b>'+
-        '<span class="float-end">'+$(state.element).attr('data-airportCode')+'</span>'+
-        '</div><div class="col-sm-10 offset-sm-1"><small>'+$(state.element).attr('data-airportName')+'</small></div></div>';
-        return $(html);
-    };
-
-    function formatState(state) {
-        if (!state.id) {
-          return state.text;
-        }
-        return $(state.element).attr('data-title');
-    };
-
 }
-
-
-$('.selectAirportFrom').on("change", function(e) { 
-   $(this).parent().find('span.from_airport').text($(this).find(':selected').attr('data-airportCode')+' - '+$(this).find(':selected').attr('data-airportName'));
- });
-
-$('.selectAirportTo').on("change", function(e) { 
-    $(this).parent().find('span.to_airport').text($(this).find(':selected').attr('data-airportCode')+' - '+$(this).find(':selected').attr('data-airportName'));
- });
-
+   
 
 $("#oFromForm").validate({
     rules: {
@@ -334,9 +354,7 @@ $("#rForm").validate({
 });
 
 var list = '<option value=""></option>'; 
-$.each(airportsList , function(index, val) { 
-    list += '<option value="'+val.AirportCode+'" data-city="'+val.City+'" data-country="'+val.Country+'" data-airportCode="'+val.AirportCode+'"  data-airportName="'+val.AirportName+'" data-title="'+val.City+', '+val.Country+'">'+val.City+', '+val.Country+', '+val.AirportCode+', '+val.AirportName+' </option>';
-});
+
 // For Add or Remove Flight Multi City Option Start
 let mCity = 2;
 $("#addMulticityRow").on('click', (function () {
@@ -357,10 +375,11 @@ function generateMultiFields(mCount){
                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                 <div class="flight_Search_boxed">
                                                     <p>From</p>
-                                                    <select name="mFrom[]" class="selectAirportFrom col-sm-12 " id="mFrom`+mCount+`">
-                                                    `+list+`
-                                                    </select>
-                                                    <span class="place-label from_airport" id="mFrom_label"></span>
+                                                   
+                                                    <input type="text" name="mFrom[]"  placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="mFrom`+mCount+`">
+                                                    <input type="hidden"  class="airport" name="mFrom_label`+mCount+`"  id="mFrom_label`+mCount+`">
+
+                                                    <span class="place-label from_airport" id="mFrom_labels`+mCount+`"></span>
                                                     <div class="plan_icon_posation">
                                                         <i class="fas fa-plane-departure"></i>
                                                     </div>
@@ -369,10 +388,10 @@ function generateMultiFields(mCount){
                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                 <div class="flight_Search_boxed">
                                                     <p>To</p>
-                                                    <select name="mTo[]" class="selectAirportTo col-sm-12 " id="mTo`+mCount+`">
-                                                    `+list+`
-                                                    </select>
-                                                    <span class="place-label to_airport" id="mTo_label"></span>
+                                    
+                                                    <input type="text" name="mTo[]" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="mTo`+mCount+`">
+                                                    <input type="hidden"  class="airport" name="mTo_label`+mCount+`"  id="mTo_label`+mCount+`">
+                                                    <span class="place-label to_airport" id="mTo_labels`+mCount+`"></span>
                                                     <div class="plan_icon_posation">
                                                         <i class="fas fa-plane-departure"></i>
                                                     </div>
@@ -384,7 +403,7 @@ function generateMultiFields(mCount){
                                                         <div class="Journey_date">
                                                             <p>Journey date</p>
                                                             <input type="date" value="" class="travel_date" id="mDate`+mCount+`" name="mDate[]">
-                                                            <span class="place-label day_label mDate_label`+mCount+`" id=""></span>
+                                                            <span class="place-label day_label mDate_labels`+mCount+`" id=""></span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -397,8 +416,7 @@ function generateMultiFields(mCount){
                                             </div>
                                         </div>
                                     </div>`);
-        initailizeSelect2();
-
+        loadAutocomplete();
 }
 // Remove Button Click 
 $(document).on('click', (function (e) {
@@ -497,7 +515,7 @@ function submitSearch(str){
 }
 
 $('#searchTab a').click(function(e) {
-    e.preventDefault();
+    // e.preventDefault();
     $(this).tab('show');
 });
 
