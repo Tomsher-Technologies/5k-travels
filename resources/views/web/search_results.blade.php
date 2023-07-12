@@ -301,10 +301,13 @@
                                         </div>
                                         <div class="flight_search_right">
                                             <!-- <h5><del>AED 1260</del></h5> -->
-                                            <h2>{{ $totalFares['CurrencyCode'] }}
-                                                <!-- {{ $totalFares['Amount'] }} -->
+                                            <h2>
+                                            {{ $totalFares['Amount'] }}
+                                            =====
+                                            {{ $totalFares['CurrencyCode'] }}
+                                              
                                                 <!-- <sup>*20% OFF</sup> -->
-                                                <!-- ===== -->
+                                               
                                                 {{ $totalFareMargin }}
                                             </h2>
                                             <a href="{{ route('flight.booking',['search_type' => $data['search_type'], 'session_id' => $data['session_id'],'FareSourceCode' => $fdata['FareSourceCode']]) }}" target="_blank" class="btn btn_theme btn_sm">Book now</a>

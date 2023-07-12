@@ -1108,6 +1108,12 @@ class FlightsController extends Controller
         $ReservationItems = $ItineraryInfo['ReservationItems'];
         $totalAmount = str_replace(',','',$data['total_amount']);     
         $currency = $data['currency'];  
+
+        if($currency != 'USD'){
+            $oneCurrency = getCurrencyValue($currency);
+        }else{
+            $oneCurrency=1 ;
+        }
         $bookData = [
             'user_id' => Auth::user()->id, 
             'unique_booking_id' => $travelItinerary['UniqueID'], 
@@ -1135,18 +1141,13 @@ class FlightsController extends Controller
             'total_amount_actual' => $totalOrgAmount, 
             'total_tax_actual' => $data['total_tax_org'], 
             'admin_margin' => $adminMargin, 
-            'admin_amount' => $adminMarginAmount, 
-            'agents_amount' => $agentsMarginAmount, 
+            'admin_amount' => number_format(($adminMarginAmount*$oneCurrency), 2, '.', ''), 
+            'agents_amount' => number_format(($agentsMarginAmount*$oneCurrency), 2, '.', ''), 
         ];
        
         $flightBook = FlightBookings::create($bookData);
         $flightBookId = $flightBook->id;
-        if($currency != 'USD'){
-            $oneCurrency = getCurrencyValue($currency);
-        }else{
-            $oneCurrency=1 ;
-        }
-        
+
         if(isset($margins['agent_margin'])){
             $currentAgentMargin = $margins['agent_margin'];
             $agentAmount = (($totalOrgAmount/100) * $currentAgentMargin);
