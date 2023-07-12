@@ -59,7 +59,7 @@ class LoginController extends Controller
                 ]);
         } else {
             if (Auth::attempt($request->only(["email", "password"]))) {
-                if(Auth::user()->user_type == "user" || Auth::user()->user_type == "admin" || (Auth::user()->user_type == "agent" && Auth::user()->is_approved == 1)){
+                if(Auth::user()->user_type == "user" || Auth::user()->user_type == "admin" || (Auth::user()->user_type == "agent" && Auth::user()->is_approved == 1 && Auth::user()->is_active == 1)){
                     return response()->json([
                         "status" => true, 
                         "redirect" => url("web-dashboard"),
@@ -69,6 +69,12 @@ class LoginController extends Controller
                     return response()->json([
                         "status" => false,
                         "errors" => ["Your account is waiting for our administrator approval. Please check back later."],
+                        "token" => csrf_token()
+                    ]);
+                } elseif(Auth::user()->user_type == "agent" && Auth::user()->is_approved == 1 && Auth::user()->is_active == 0 ){
+                    return response()->json([
+                        "status" => false,
+                        "errors" => ["Your account is Disabled."],
                         "token" => csrf_token()
                     ]);
                 }    

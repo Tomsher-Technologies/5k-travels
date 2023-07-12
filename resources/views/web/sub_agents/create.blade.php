@@ -44,6 +44,11 @@
                                     {{ session()->get('status') }}
                                 </div>
                             @endif
+                            @if(session()->has('error'))
+                                <div class="alert alert-danger">
+                                    {!! session('error')['walletError'] !!}
+                                </div>
+                            @endif
                             <form id="storeAgent" class="form_area" action="{{ route('subagent.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
@@ -190,7 +195,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="u-name">Agent Margin (%)<span class="required">*</span></label>
-                                                    <input type="number" id="agent_margin" name="agent_margin" class="form-control" placeholder="Agent Margin (%)" value="{{ old('agent_margin') }}">
+                                                    <input type="number"  step='any' id="agent_margin" name="agent_margin" class="form-control" placeholder="Agent Margin (%)" value="{{ old('agent_margin') }}">
                                                     @error('agent_margin')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror
@@ -199,7 +204,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="u-name">Credit Balance (USD)<span class="required">*</span></label>
-                                                    <input type="number" id="credit_balance" name="credit_balance" placeholder="Credit Balance (USD)" value="{{ old('credit_balance') }}" class="form-control">
+                                                    <input type="number"  step='any' id="credit_balance" name="credit_balance" placeholder="Credit Balance (USD)" value="{{ old('credit_balance') }}" class="form-control">
                                                     @error('credit_balance')
                                                         <div class="alert alert-danger">{{ $message }}</div>
                                                     @enderror

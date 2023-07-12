@@ -11,6 +11,7 @@ use App\Models\Airlines;
 use App\Models\FlightBookings;
 use App\Models\FlightItineraryDetails;
 use App\Models\FlightPassengers;
+use App\Models\FlightMarginAmounts;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\Models\Countries;
@@ -329,6 +330,79 @@ class HomeController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
+        $agentMargins = [];
+        $currentUser = UserDetails::where('user_id', Auth::user()->id)->first();
+        $currentUserCredit = $currentUser->credit_balance;
+
+        $userData = User::find($request->agent_id);
+        $oldCredit = $userData->user_details->credit_balance;
+        if( $oldCredit != $request->credit_balance){
+            
+            if($oldCredit <  $request->credit_balance){
+                $diffCredit = $request->credit_balance - $oldCredit;
+                if($diffCredit > $currentUserCredit){
+                    return back()->withError(['walletError'=>'Insufficient Wallet Balance. You can add upto <b> USD '.$currentUserCredit.'</b>'])->withInput();
+                }
+                $agentMargins[] = array(
+                    'booking_id' => NULL,
+                    'agent_id'   => $userData->id,
+                    'from_agent_id' => Auth::user()->id,
+                    'currency' => 'USD',
+                    'usd_amount' => $diffCredit,
+                    'transaction_type' => 'cr',
+                    'credit_balance' => $request->credit_balance,
+                    'created_at' => date('Y-m-d H:i:s')
+                );
+                
+                $currentUser->credit_balance -= $diffCredit;
+                $currentUser->save();
+                
+                $agentMargins[] = array(
+                    'booking_id' => NULL,
+                    'agent_id'   => Auth::user()->id,
+                    'from_agent_id' => $userData->id,
+                    'currency' => 'USD',
+                    'usd_amount' => $diffCredit,
+                    'transaction_type' => 'dr',
+                    'credit_balance' => $currentUser->credit_balance,
+                    'created_at' => date('Y-m-d H:i:s')
+                );
+            }else if($oldCredit >  $request->credit_balance){
+                $diffCredit = $oldCredit - $request->credit_balance;
+               
+                $agentMargins[] = array(
+                    'booking_id' => NULL,
+                    'agent_id'   => $userData->id,
+                    'from_agent_id' => Auth::user()->id,
+                    'currency' => 'USD',
+                    'usd_amount' => $diffCredit,
+                    'transaction_type' => 'dr',
+                    'credit_balance' => $request->credit_balance,
+                    'created_at' => date('Y-m-d H:i:s')
+                );
+                
+                $currentUser->credit_balance += $diffCredit;
+                $currentUser->save();
+                
+                $agentMargins[] = array(
+                    'booking_id' => NULL,
+                    'agent_id'   => Auth::user()->id,
+                    'from_agent_id' => $userData->id,
+                    'currency' => 'USD',
+                    'usd_amount' => $diffCredit,
+                    'transaction_type' => 'cr',
+                    'credit_balance' => $currentUser->credit_balance,
+                    'created_at' => date('Y-m-d H:i:s')
+                );
+            } 
+            if(!empty($agentMargins)){
+                FlightMarginAmounts::insert($agentMargins); 
+            }
+            
+        }
+
+        
+        
         $imageUrl = '';
         $presentImage = $request->image_url;
         if ($request->hasFile('logo')) {
@@ -345,7 +419,7 @@ class HomeController extends Controller
             }
         }   
 
-        $userData = User::find($request->agent_id);
+        
         $userData->parent_id = Auth::user()->id;
         $userData->name = $request->first_name.' '.$request->last_name;
         $userData->email = $request->email;
@@ -410,10 +484,17 @@ class HomeController extends Controller
             'agent_margin' => 'required',
             'credit_balance' => 'required'
         ]);
-        
+        // echo '<pre>';
+        // print_r($validator);die;
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
+        $currentUser = UserDetails::where('user_id', Auth::user()->id)->get();
+        $currentUserCredit = $currentUser[0]->credit_balance;
+        if($request->credit_balance > $currentUserCredit){
+            return back()->withError(['walletError'=>'Insufficient Wallet Balance. You can add upto <b> USD '.$currentUserCredit.'</b>'])->withInput();
+        }
+        
 
         $user = User::create([
             'user_type' => 'agent',
@@ -458,6 +539,33 @@ class HomeController extends Controller
                 'agent_margin' => $request->agent_margin,
                 'credit_balance' => $request->credit_balance,
             ]);
+
+            $agentMargins[] = array(
+                'booking_id' => NULL,
+                'agent_id'   => $user->id,
+                'from_agent_id' => Auth::user()->id,
+                'currency' => 'USD',
+                'usd_amount' => $request->credit_balance,
+                'transaction_type' => 'cr',
+                'credit_balance' => $request->credit_balance,
+                'created_at' => date('Y-m-d H:i:s')
+            );
+            $mainAgent = UserDetails::where('user_id', Auth::user()->id)->first();
+            $mainAgent->credit_balance -= $request->credit_balance;
+            $mainAgent->save();
+
+            $agentMargins[] = array(
+                'booking_id' => NULL,
+                'agent_id'   => Auth::user()->id,
+                'from_agent_id' => $user->id,
+                'currency' => 'USD',
+                'usd_amount' => $request->credit_balance,
+                'transaction_type' => 'dr',
+                'credit_balance' => $mainAgent->credit_balance,
+                'created_at' => date('Y-m-d H:i:s')
+            );
+
+            FlightMarginAmounts::insert($agentMargins); 
         }
 
         return redirect()->route('subagent.create')->with('status', 'Sub Agent created successfully!');
