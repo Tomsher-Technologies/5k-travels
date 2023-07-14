@@ -368,6 +368,7 @@
 }(jQuery));
 
 $(document).ready(function () {
+    jQuery(".preloader").fadeOut(200);
     $('#dashboard_dropdowns').on('click', (function () {
         $('#show_dropdown_item').slideToggle("slow");
     })
@@ -388,4 +389,4 @@ function backSp(backKey) {
     }
 }
 
-jQuery(window).on('load', function () { jQuery(".preloader").fadeOut(200); });
+jQuery(window).on('load', function () {  });
