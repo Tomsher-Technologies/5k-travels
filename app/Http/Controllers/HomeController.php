@@ -86,11 +86,18 @@ class HomeController extends Controller
         $bookings = FlightBookings::where('user_id',Auth::user()->id)->where('is_cancelled',1)->orderBy('id','desc')->paginate(10);
         return  view('web.user.cancelled',compact('bookings','type'));
     }
+
+    public function rescheduled(){
+        $type = "rescheduled";
+        $bookings = FlightBookings::where('user_id',Auth::user()->id)->where('is_reissued',1)->orderBy('id','desc')->paginate(10);
+        return  view('web.user.cancelled',compact('bookings','type'));
+    }
     public function completed(){
         $type = "completed";
         // DB::enableQueryLog();
         $bookings = FlightBookings::select('flight_bookings.*')->where('user_id',Auth::user()->id)
                                     ->where('is_cancelled',0)
+                                    ->where('is_reissued',0)
                                     // ->leftJoin('flight_itinerary_details as fid','fid.booking_id','flight_bookings.id')
                                     ->leftJoin('flight_itinerary_details as fid', function ($join) {
                                         $join->on('fid.booking_id', '=', 'flight_bookings.id')
@@ -108,6 +115,7 @@ class HomeController extends Controller
         // DB::enableQueryLog();
         $bookings = FlightBookings::select('flight_bookings.*')->where('user_id',Auth::user()->id)
                                     ->where('is_cancelled',0)
+                                    ->where('is_reissued',0)
                                     // ->leftJoin('flight_itinerary_details as fid','fid.booking_id','flight_bookings.id')
                                     ->leftJoin('flight_itinerary_details as fid', function ($join) {
                                         $join->on('fid.booking_id', '=', 'flight_bookings.id')
@@ -127,6 +135,9 @@ class HomeController extends Controller
         // print_r($bookings);
         // die;
         if(isset($bookings[0])){
+            $itineraries = FlightItineraryDetails::where('booking_id',$request->id)->get();
+            $passengers = FlightPassengers::where('booking_id',$request->id)->get();
+           
             if($bookings[0]['ticket_status'] != "Ticketed"){
                 $tripDetails = $this->getTripDetails($bookings[0]['unique_booking_id']);
                 $tripDetails = json_decode($tripDetails, true);
@@ -137,9 +148,28 @@ class HomeController extends Controller
                         $bookings[0]['ticket_status'] = $ticketStatus;
                     }
                 } 
+            }else{
+                if(isset($itineraries[0]) && isset($passengers[0])){
+
+                }else{
+                    $tripDetails = $this->getTripDetails($bookings[0]['unique_booking_id']);
+                    $tripDetails = json_decode($tripDetails, true);
+                    if(isset($tripDetails['TripDetailsResponse'])){
+                        $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
+                        if($tripDetailsResult['Success'] == 'true'){
+                            $ticketStatus = $this->updateFlightBookingData($tripDetailsResult,$bookings[0]['id']);
+                            $bookings[0]['ticket_status'] = $ticketStatus;
+                        }
+                    } 
+                }
             }
-            $bookings[0]['flights'] = FlightItineraryDetails::where('booking_id',$request->id)->get();
-            $bookings[0]['passengers'] = FlightPassengers::where('booking_id',$request->id)->get();
+            if(isset($itineraries[0]) && isset($passengers[0])){
+                $bookings[0]['flights'] = $itineraries;
+                $bookings[0]['passengers'] = $passengers;
+            }else{
+                $bookings[0]['flights'] = FlightItineraryDetails::where('booking_id',$request->id)->get();
+                $bookings[0]['passengers'] = FlightPassengers::where('booking_id',$request->id)->get();
+            }  
         }
        
         $type = $request->type;

@@ -35,38 +35,58 @@
                             </div>
                                
                             <div class="ms-md-auto">
-                                <!-- <a href="product-list.html" class="btn btn-cancel">Cancel Booking</a> -->
-                                @php   
-                                    $timeDiff = time() - strtotime($bookings[0]->created_at);
-                                @endphp
-                                @if($bookings[0]->is_cancelled == 0 && $bookings[0]->cancel_request == 0)
-                                    @if($timeDiff < 86400)
-                                        @if(strtolower($bookings[0]->fare_type) == 'webfare' )
-                                            <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id=""  data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
-                                        @else
-                                            @if($bookings[0]->ticket_status == "Ticketed" || $bookings[0]->ticket_status == "OK")
-                                                <a href="javascript:void(0)" class="voidQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
-                                            @else
-                                                <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" title="Cancel Ticket" data-type="void" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                @if($type == 'my_bookings' || $type == 'upcoming')
+                                    <!-- <a href="product-list.html" class="btn btn-cancel">Cancel Booking</a> -->
+                                    @php   
+                                        $timeDiff = time() - strtotime($bookings[0]->created_at);
+                                    @endphp
+                                    @if($bookings[0]->reissue_request == 0)
+                                        @if($bookings[0]->is_cancelled == 0 && $bookings[0]->cancel_request == 0)
+                                            @if($timeDiff < 86400)
+                                                @if(strtolower($bookings[0]->fare_type) == 'webfare' )
+                                                    <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id=""  data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                @else
+                                                    @if($bookings[0]->ticket_status == "Ticketed" || $bookings[0]->ticket_status == "OK")
+                                                        <a href="javascript:void(0)" class="voidQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                    @else
+                                                        <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" title="Cancel Ticket" data-type="void" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                    @endif
+                                                @endif
+                                            @elseif($timeDiff > 86400)
+                                                @if(strtolower($bookings[0]->fare_type) == 'webfare' )
+                                                    <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                @else
+                                                    @if($bookings[0]->ticket_status == "Ticketed" || $bookings[0]->ticket_status == "OK")
+                                                        <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                    @else
+                                                        <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" data-type="refund" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                    @endif
+                                                @endif
                                             @endif
-                                        @endif
-                                    @elseif($timeDiff > 86400)
-                                        @if(strtolower($bookings[0]->fare_type) == 'webfare' )
-                                            <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
-                                        @else
-                                            @if($bookings[0]->ticket_status == "Ticketed" || $bookings[0]->ticket_status == "OK")
-                                                <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
-                                            @else
-                                                <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" data-type="refund" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
-                                            @endif
+                                        @elseif($bookings[0]->is_cancelled == 0 && $bookings[0]->cancel_request == 1)
+                                            <a href="javascript:void(0)" class="btn btn-info cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $bookings[0]->unique_booking_id }}" data-ptr="{{ $bookings[0]->cancel_ptr }}">Check Cancel Status</a> 
+                                        @elseif($bookings[0]->is_cancelled == 1)
+                                            <span class="badge bg-danger line-height-badge"> Cancelled </span>
                                         @endif
                                     @endif
-                
-                                @elseif($bookings[0]->is_cancelled == 0 && $bookings[0]->cancel_request == 1)
-                                    <a href="javascript:void(0)" class="btn btn-status cancelPTRStatusCheck" title="Check Cancel Status" data-id="{{ $bookings[0]->unique_booking_id }}" data-ptr="{{ $bookings[0]->cancel_ptr }}">Check Cancel Status</a> 
-                                @endif
 
-                                <a href="{{ route('change-date',['type' => $type,'id' => $bookings[0]->id,'unique_id' => $bookings[0]->unique_booking_id] ) }}" class="btn btn-warning ">Reschedule Booking</a>
+                                    @if($bookings[0]->cancel_request == 0)
+                                        @if($bookings[0]->is_reissued == 0 && $bookings[0]->reissue_request == 1)
+                                            <a href="javascript:void(0)" class="btn btn-info reissuePTRStatusCheck" title="Check Cancel Status" data-id="{{ $bookings[0]->id }}" data-uniqueid="{{ $bookings[0]->unique_booking_id }}"  data-ptr="{{ $bookings[0]->reissue_ptr }}">Check Reissue Status</a> 
+                                        @elseif($bookings[0]->is_reissued == 1)
+                                            <span class="badge bg-info line-height-badge"> Rescheduled </span>
+                                        @else
+                                            <a href="{{ route('change-date',['type' => $type,'id' => $bookings[0]->id,'unique_id' => $bookings[0]->unique_booking_id] ) }}" class="btn btn-warning ">Reschedule Booking</a>
+                                        @endif
+                                    @endif
+                                @else
+                                    @if($bookings[0]->is_cancelled == 1)
+                                        <span class="badge bg-danger line-height-badge"> Cancelled </span>
+                                    @elseif($bookings[0]->is_reissued == 1)
+                                        <span class="badge bg-info line-height-badge"> Rescheduled </span>
+                                    @endif
+
+                                @endif
                             </div>
 
 
@@ -295,12 +315,68 @@
                         </div>
                     </div>
 
+                <!-- The Modal -->
+                <div class="modal " id="cancelQuote" data-backdrop="static" data-keyboard="false">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <!-- Modal Header -->
+                                            <div class="modal-header">
+                                                <h4 class="modal-title">Cancellation Charges</h4>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <!-- Modal body -->
+                                            <div class="modal-body">
+                                                <!-- Form Area -->
+                                                <section id="theme_search_form_tour">
+                                                    <div class="container">
+                                                        <div class="row">
+                                                            <div class="col-sm-12 d-flex padding-1rem">
+                                                                <div class="col-sm-6">
+                                                                    Cancellation Fee :
+                                                                </div>
+                                                                <div class="col-sm-6" id="totalCancelFee">
+                                                                
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12 d-flex padding-1rem">
+                                                                <div class="col-sm-6">
+                                                                    Service Charge :
+                                                                </div>
+                                                                <div class="col-sm-6" id="serviceCharge">
+                                                                
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12 d-flex padding-1rem">
+                                                                <div class="col-sm-6">
+                                                                    Total Refund Amount :
+                                                                </div>
+                                                                <div class="col-sm-6" id="totalRefund">
+                                                                
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </div>
 
+                                            <!-- Modal footer -->
+                                            <div class="modal-footer">
+                                                <input type="hidden" id="book_Id" name="book_Id" value="">
+                                                <input type="hidden" id="unique_BookId" name="unique_BookId" value="">
+                                                <input type="hidden" id="cancel_fee" name="cancel_fee" value="">
+                                                <input type="hidden" id="refund_amount" name="refund_amount" value="">
+                                                <input type="hidden" id="request_type" name="request_type" value="">
+                                                <button type="button" class="btn btn-success" id="requestCancel">Send Cancel Request</button>
+                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
 </section>
 <!-- newsletter content -->
 @include('web.includes.newsletter')
@@ -313,5 +389,252 @@
 </style>
 @endpush
 @push('footer')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+$('.reissuePTRStatusCheck').on('click', function () {
+        $('.ajaxloader').css('display','block');
+        var id = $(this).attr('data-id');
+        var ptr = $(this).attr('data-ptr');
+        var uniqueid = $(this).attr('data-uniqueid');
+        $.ajax({
+            url: "{{ route('flight.reissue_prtStatus')}}",
+            type: "GET",
+            data: { "_token": "{{ csrf_token() }}", "ptr" : ptr, "id" : id, "uniqueid" : uniqueid},
+            success: function( response ) {
+                $('.ajaxloader').css('display','none');
+                swal({
+                    title: "", 
+                    text: response, 
+                    icon: "info",
+                    closeOnClickOutside: false,
+                }).then(function() {
+                    location.reload();
+                });
+                // setTimeout(() => {
+                //     history.go(-1);
+                //     location.reload(); 
+                // }, 2000);
+            }
+        });
+    }) 
+    $('.cancelTicket').on('click', function () {
+        $('.ajaxloader').css('display','block');
+        var uniquebookId = $(this).attr('data-id');
+        var id = $(this).attr('data-bookid');
+        var type = $(this).attr('data-type');
+        $.ajax({
+            url: "{{ route('flight.cancel')}}",
+            type: "GET",
+            data: { "_token": "{{ csrf_token() }}", "uniquebookId" : uniquebookId, "id" : id, "type" : type},
+            success: function( response ) {
+                $('.ajaxloader').css('display','none');
+                console.log(response);
+                var resp = JSON.parse(response);
+                if(resp.status == true){
+                    if(resp.type == 'cancel'){
+                        swal({
+                            title: "Success!", 
+                            text: resp.msg, 
+                            icon: "success",
+                            closeOnClickOutside: false,
+                        }).then(function() {
+                            location.reload();
+                        });
+                    }else{
+                        $('#book_Id').val(resp.data.id);
+                        $('#request_type').val(resp.type);
+                        $('#unique_BookId').val(resp.data.UniqueID);
 
+                        $('#refund_amount').val(resp.data.refundAmount);
+                        if(resp.type == 'refund'){
+                            $('#cancel_fee').val(resp.data.refundFee);
+                            $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.refundFee);
+                        }else{
+                            $('#cancel_fee').val(resp.data.voidFee);
+                            $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.voidFee);
+                        }
+                        
+
+                        $('#serviceCharge').html(resp.data.currency +' '+ resp.data.serviceCharge);
+                        $('#totalRefund').html(resp.data.currency +' '+ resp.data.refundAmount);
+                        $('#cancelQuote').modal({backdrop: 'static', keyboard: false})  
+                        $('#cancelQuote').modal('show');
+                    }
+                }else{
+                    $('#cancelQuote').modal('hide');
+                    swal({
+                        title: "Cancellation Failed!", 
+                        text: resp.msg, 
+                        icon: "error",
+                        closeOnClickOutside: false,
+                    }).then(function() {
+                        location.reload();
+                    });
+                }
+            }
+        });
+    })   
+
+    $('.voidQuoteTicket').on('click', function () {
+        $('.ajaxloader').css('display','block');
+        $('#totalCancelFee').html('');
+        $('#serviceCharge').html('');
+        $('#totalRefund').html('');
+        $('#bookId').val('');
+        $('#uniqueBookId').val('');
+        var bookId = $(this).attr('data-id');
+        var id = $(this).attr('data-bookid');
+        $.ajax({
+            url: "{{ route('flight.voidQuote')}}",
+            type: "GET",
+            data: { "_token": "{{ csrf_token() }}", "bookId" : bookId, "id" : id},
+            success: function( response ) {
+                $('.ajaxloader').css('display','none');
+                console.log(response);
+                var resp = JSON.parse(response);
+                if(resp.status == true){
+                    $('#book_Id').val(resp.data.id);
+                    $('#request_type').val('void');
+                    $('#unique_BookId').val(resp.data.UniqueID);
+
+                    $('#refund_amount').val(resp.data.refundAmount);
+                    $('#cancel_fee').val(resp.data.voidFee);
+
+                    $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.voidFee);
+                    $('#serviceCharge').html(resp.data.currency +' '+ resp.data.serviceCharge);
+                    $('#totalRefund').html(resp.data.currency +' '+ resp.data.refundAmount);
+                    $('#cancelQuote').modal({backdrop: 'static', keyboard: false})  
+                    $('#cancelQuote').modal('show');
+                }else{
+                    $('#cancelQuote').modal('hide');
+                    swal({
+                        title: "Cancellation Failed!",  
+                        text: resp.msg, 
+                        icon: "error",
+                        closeOnClickOutside: false,
+                    }).then(function() {
+                        location.reload();
+                    });
+                }
+                
+            }
+        });
+    })  
+    
+    $('#requestCancel').on('click', function () {
+        $('.ajaxloader').css('display','block');
+       
+        var request_type = $('#request_type').val();
+
+         var data ={'id' : $('#book_Id').val(),
+                    'bookId' : $('#unique_BookId').val(),
+                    'refund_amount' : $('#refund_amount').val(),
+                    'cancel_fee'    :  $('#cancel_fee').val(),
+                    '_token' : "{{ csrf_token() }}"
+                    };
+        var requesturl = '';
+        if(request_type == 'void'){
+            requesturl = "{{ route('flight.void')}}";
+        }else{
+            requesturl = "{{ route('flight.refund')}}";
+        }
+        $.ajax({
+            url: requesturl,
+            type: "POST",
+            data: data,
+            success: function( response ) {
+                $('.ajaxloader').css('display','none');
+                var resp = JSON.parse(response);
+                if(resp.status == true){
+                    $('#cancelQuote').modal('hide');
+                    swal({
+                        title: "Success!", 
+                        text: resp.msg, 
+                        icon: "success",
+                        closeOnClickOutside: false,
+                    }).then(function() {
+                        location.reload();
+                    });
+                }else{
+                    $('#cancelQuote').modal('hide');
+                    swal({
+                        title: "Cancellation Failed!", 
+                        text: resp.msg, 
+                        icon: "error",
+                        closeOnClickOutside: false,
+                    }).then(function() {
+                        location.reload();
+                    });
+                }
+            }
+        });
+    })   
+
+    $('.cancelPTRStatusCheck').on('click', function () {
+        $('.ajaxloader').css('display','block');
+        var id = $(this).attr('data-id');
+        var ptr = $(this).attr('data-ptr');
+        $.ajax({
+            url: "{{ route('flight.prtStatus')}}",
+            type: "GET",
+            data: { "_token": "{{ csrf_token() }}", "ptr" : ptr, "id" : id},
+            success: function( response ) {
+                $('.ajaxloader').css('display','none');
+                swal({
+                    title: "", 
+                    text: response, 
+                    icon: "info",
+                    closeOnClickOutside: false,
+                }).then(function() {
+                        location.reload();
+                    });
+            }
+        });
+    })   
+
+    $('.refundQuoteTicket').on('click', function () {
+        $('.ajaxloader').css('display','block');
+        $('#totalCancelFee').html('');
+        $('#serviceCharge').html('');
+        $('#totalRefund').html('');
+        $('#bookId').val('');
+        $('#uniqueBookId').val('');
+        var bookId = $(this).attr('data-id');
+        var id = $(this).attr('data-bookid');
+        $.ajax({
+            url: "{{ route('flight.refundQuote')}}",
+            type: "GET",
+            data: { "_token": "{{ csrf_token() }}", "bookId" : bookId, "id" : id},
+            success: function( response ) {
+                $('.ajaxloader').css('display','none');
+                console.log(response);
+                var resp = JSON.parse(response);
+                if(resp.status == true){
+                    $('#book_Id').val(resp.data.id);
+                    $('#unique_BookId').val(resp.data.UniqueID);
+                    $('#refund_amount').val(resp.data.refundAmount);
+                    $('#cancel_fee').val(resp.data.refundFee);
+                    $('#request_type').val('refund');
+                    $('#totalCancelFee').html(resp.data.currency +' '+ resp.data.refundFee);
+                    $('#serviceCharge').html(resp.data.currency +' '+ resp.data.serviceCharge);
+                    $('#totalRefund').html(resp.data.currency +' '+ resp.data.refundAmount);
+                    $('#cancelQuote').modal({backdrop: 'static', keyboard: false})  
+                    $('#cancelQuote').modal('show');
+                }else{
+                    $('#cancelQuote').modal('hide');
+                    swal({
+                        title: "Cancellation Failed!",  
+                        text: resp.msg, 
+                        icon: "error",
+                        closeOnClickOutside: false,
+                    }).then(function() {
+                        location.reload();
+                    });
+                }
+                
+            }
+        });
+    })   
+  
+</script>
 @endpush

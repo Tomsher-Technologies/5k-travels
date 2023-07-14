@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/cancelled', [HomeController::class, 'cancelled'])->name('cancelled');
     Route::get('/completed', [HomeController::class, 'completed'])->name('completed');
     Route::get('/upcoming', [HomeController::class, 'upcoming'])->name('upcoming');
+    Route::get('/rescheduled', [HomeController::class, 'rescheduled'])->name('rescheduled');
     Route::get('/sub-agents', [HomeController::class, 'subAgents'])->name('sub-agents');
 
     Route::post('/change-agent-status', [HomeController::class, 'statusChange'])->name('change.agent.status');
@@ -70,5 +71,6 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/changeDate/{type}/{id}/{unique_id}', [FlightsController::class, 'changeDate'])->name('change-date');
     Route::get('/reschedule-flight', [FlightsController::class, 'rescheduleFlight'])->name('reschedule-flight');
     Route::post('/send-reschedule-request', [FlightsController::class, 'sendRescheduleRequest'])->name('send-reschedule-request');
+    Route::get('/flights/reissue_prtStatus', [FlightsController::class, 'reissuePtrStatusCheck'])->name('flight.reissue_prtStatus');
 });
 

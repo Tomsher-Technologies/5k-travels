@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="common_bannner_text">
-                        <h2>{{ ($type == 'cancelled') ? 'Cancelled' : 'Completed' }} Bookings </h2>
+                        <h2>{{ ($type == 'cancelled') ? 'Cancelled' : (($type == 'rescheduled') ? 'Rescheduled' : 'Completed') }} Bookings </h2>
                         
                     </div>
                 </div>
@@ -27,14 +27,14 @@
                 <div class="col-lg-9">
               
                     <div class="dashboard_common_table">
-                        <h3>{{ ($type == 'cancelled') ? 'Cancelled' : 'Completed' }} Bookings</h3>
+                        <h3>{{ ($type == 'cancelled') ? 'Cancelled' : (($type == 'rescheduled') ? 'Rescheduled' : 'Completed') }} Bookings</h3>
                         <div class="table-responsive-lg table_common_area">
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th>Sl no.</th>
                                         <th>Booking ID</th>
-                                        <th>Direction</th>
+                                        <th>Customer Name</th>
                                         <th>Origin</th>
                                         <th>Destination</th>
                                         <th>Amount</th>
@@ -48,7 +48,7 @@
                                             <tr>
                                                 <td>{{ ($key+1) + ($bookings->currentPage() - 1)*$bookings->perPage() }}</td>
                                                 <td>{{ $book->unique_booking_id }}</td>
-                                                <td>{{ $book->direction }}</td>
+                                                <td>{{ $book->customer_name }}</td>
                                                 <td>{{ $book->origin }}</td>
                                                 <td>{{ $book->destination }}</td>
                                                 <td>{{ $book->currency }} {{ $book->total_amount }}</td>

@@ -309,6 +309,8 @@
                                                 <!-- <sup>*20% OFF</sup> -->
                                                
                                                 {{ $totalFareMargin }}
+
+                                                {{ $fdata['FareType'] }}
                                             </h2>
                                             <a href="{{ route('flight.booking',['search_type' => $data['search_type'], 'session_id' => $data['session_id'],'FareSourceCode' => $fdata['FareSourceCode']]) }}" target="_blank" class="btn btn_theme btn_sm">Book now</a>
                                             <!-- <p>*Discount applicable on some conditions</p> -->

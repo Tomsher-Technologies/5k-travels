@@ -601,7 +601,7 @@
                                                 
                                                     <div class="col-lg-4">
                                                         <label for="date">Date Of Birth<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input datepickerAdult" readonly placeholder="DD-MM-YYYY" name="adult_dob[]" id="datepickerAdult{{$passCount}}" />
+                                                        <input type="text" class="form-control bg_input datepickerAdult" readonly placeholder="YYYY-MM-DD" name="adult_dob[]" id="datepickerAdult{{$passCount}}" />
                                                         <div class="error-div" id="adult_date_error{{$passCount}}" ></div>
                                                     </div>
                                                     <div class="col-lg-4">
@@ -635,7 +635,7 @@
                                                     
                                                     <div class="col-lg-4">
                                                         <label for="date">Passport Expiry<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="DD-MM-YYYY" name="adult_passport_expiry[]" id="passportExpiry{{$passCount}}" />
+                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="adult_passport_expiry[]" id="passportExpiry{{$passCount}}" />
                                                         <div class="error-div"></div>
                                                     </div>
                                                 </div>
@@ -685,7 +685,7 @@
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <label for="date">Date Of Birth<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input datepickerChild" readonly placeholder="DD-MM-YYYY" name="child_dob[]" id="datepickerChild{{$passCount}}" />
+                                                        <input type="text" class="form-control bg_input datepickerChild" readonly placeholder="YYYY-MM-DD" name="child_dob[]" id="datepickerChild{{$passCount}}" />
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
@@ -718,7 +718,7 @@
 
                                                     <div class="col-lg-4">
                                                         <label for="date">Passport Expiry<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="DD-MM-YYYY" name="child_passport_expiry[]" id="passportExpiry{{$passCount}}" />
+                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="child_passport_expiry[]" id="passportExpiry{{$passCount}}" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -767,7 +767,7 @@
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <label for="date">Date Of Birth<span class="required">*</span></label>
-                                                        <input type="text" id="datepickerInfant{{$passCount}}" readonly placeholder="DD-MM-YYYY" class="form-control bg_input datepickerInfant" name="infant_dob[]" />
+                                                        <input type="text" id="datepickerInfant{{$passCount}}" readonly placeholder="YYYY-MM-DD" class="form-control bg_input datepickerInfant" name="infant_dob[]" />
                                                         <div class="error-div"></div>
                                                     </div>
                                                     <div class="col-lg-4">
@@ -801,7 +801,7 @@
 
                                                     <div class="col-lg-4">
                                                         <label for="date">Passport Expiry<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="DD-MM-YYYY" name="infant_passport_expiry[]" id="passportExpiry{{$passCount}}" />
+                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="infant_passport_expiry[]" id="passportExpiry{{$passCount}}" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -1150,7 +1150,7 @@
        	 minDate: "-12y"
     });
      $(".datepickerInfant").datepicker({
-        dateFormat: "dd-mm-yy",
+        dateFormat: "yy-mm-dd",
         changeYear: true,
         changeMonth: true,
          maxDate: "y",

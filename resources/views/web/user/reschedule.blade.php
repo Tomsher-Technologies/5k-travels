@@ -155,11 +155,26 @@
                     data: details,
                     success: function( response ) {
                         $('.ajaxloader').css('display','none');
-                        Swal.fire(
-                            'Approved successfully',
-                            '',
-                            'success'
-                        );
+                        var resp = JSON.parse(response);
+                        if(resp.status == true){
+                            swal({
+                                title: "Success!", 
+                                text: resp.msg, 
+                                icon: "success",
+                                closeOnClickOutside: false,
+                            });
+                            setTimeout(() => {
+                                history.go(-1);
+                                location.reload(); 
+                            }, 2000);
+                        }else{
+                            swal({
+                                title: "Failed", 
+                                text: resp.msg, 
+                                icon: "error",
+                                closeOnClickOutside: false,
+                            });
+                        }
                     }
                 });
             }
@@ -167,6 +182,7 @@
 
     }); 
 
+    
     
 
 </script>
