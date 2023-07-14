@@ -3285,14 +3285,16 @@ ul li {
 =========================*/
 /* --Common Banner-- */
 #common_banner {
-    background-image: url('../img/search-bg.gif');
+    /* background-image: url('../img/search-bg.gif'); */
+    background-image: url('../img/searchBg.png');
     padding: 200px 0 100px 0;
     background-repeat: no-repeat;
     background-size: cover;
 }
 
 #common_banner-2 {
-    background-image: url('../img/search-bg.gif');
+    /* background-image: url('../img/search-bg.gif'); */
+    background-image: url('../img/searchBg.png');
     padding: 100px 0 100px 0;
 
 }
