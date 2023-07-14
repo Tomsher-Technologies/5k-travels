@@ -7037,4 +7037,13 @@ textarea {
     .warning{
         color: orange;
     }
+    .width-10{
+        width: 10% !important;
+    }
+    .width-15{
+        width: 15% !important;
+    }
+    .width-40{
+        width: 40% !important;
+    }
 /* Jisha End */

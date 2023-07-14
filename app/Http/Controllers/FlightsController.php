@@ -1207,6 +1207,7 @@ class FlightsController extends Controller
                 $agentMargins[] = array(
                     'booking_id' => $flightBookId,
                     'agent_id'   =>  $agentid,
+                    'from_agent_id' => Auth::user()->id,
                     'margin'     => $marg,
                     'amount'    => $agentAmount,
                     'total_amount' => $totalOrgAmount,

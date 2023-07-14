@@ -48,6 +48,9 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::group(['middleware' => ['auth','admin']], function () {
         
         Route::get('/dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
+        Route::get('/dashboard-counts', [HomeController::class, 'dashboardCounts'])->name('dashboard-counts');
+        Route::get('/allusers-counts', [HomeController::class, 'allUsersCounts'])->name('allusers-counts');
+        Route::get('/flightbooking-counts', [HomeController::class, 'flightbookingCounts'])->name('flightbooking-counts');
 
         /* ------------------- Agents -----------------*/
         Route::get('/agent/', [AgentsController::class, 'index'])->name('agent.index');

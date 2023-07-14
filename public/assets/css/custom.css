@@ -163,7 +163,39 @@ label{
     -ms-transform: translateX(26px);
     transform: translateX(26px);
   }
-  
+  .count{
+    color:#039c0d!important ;
+  }
+
+  .tile-stats .icon i {
+        margin: 9px;
+        font-size: 38px;
+    }
+
+    .daterangepicker .ranges li.active {
+        background-color: #1fba71 !important;
+        color: #fff;
+    }
+    .daterangepicker .ranges li:hover {
+        background-color:#43de95 !important;
+    }
+  .ml-10{
+    margin-left: 10px;
+  }
+
+  .drp-buttons .btn-primary{
+    background-color: #1fba71 !important;
+    border-color: #1fba71 !important;
+  }
+  .daterangepicker td.active, .daterangepicker td.active:hover {
+    background-color: #1fba71 !important;
+  }
+  .readonly{
+    pointer-events: none;
+  }
+  .pointer{
+    cursor: pointer;
+  }
   /* Rounded sliders */
   .slider.round {
     border-radius: 34px;
@@ -185,4 +217,13 @@ label{
  .no-padding-left{
     padding-left: 0;
  }
- 
+ .mb-15{
+    margin-bottom: 15px;
+ }
+  .highcharts-credits{
+    display: none;
+  }
+.input-right{
+    float: right;
+    clear: both;
+}

@@ -9,11 +9,13 @@ use App\Models\Pages;
 use App\Models\FaqCategories;
 use App\Models\FaqContents;
 use App\Models\FlightBookings;
+use App\Models\User;
 use Auth;
 use Validator;
 use Str;
 use Storage;
 use File;
+use DB;
 
 class HomeController extends Controller
 {
@@ -35,8 +37,69 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return 
-        view('admin.home');
+        $agents = User::where('user_type','agent')->where('is_deleted',0)->where('is_approved',1)->get();
+        return  view('admin.home',compact('agents'));
+    }
+
+    public function dashboardCounts(Request $request)
+    {
+        $startDate = $request->start;
+        $endDate = $request->end;
+        $data['bookings'] = FlightBookings::whereDate('created_at', '>=', $startDate)->whereDate('created_at', '<=', $endDate)->count();
+        $data['users'] = User::whereDate('created_at', '>=', $startDate)
+                                ->whereDate('created_at', '<=', $endDate)
+                                ->where('user_type','user')
+                                ->count();
+        $data['agents'] = User::whereDate('created_at', '>=', $startDate)
+                                ->whereDate('created_at', '<=', $endDate)
+                                ->where('user_type','agent')
+                                ->count();
+        return json_encode(array('status' => true, 'data' => $data));
+    }
+
+    public function allUsersCounts(Request $request){
+        $users = User::select(DB::raw('COUNT(CASE user_type WHEN "agent" THEN 1 END) AS agent,COUNT(CASE user_type WHEN "user" THEN 2 END) AS user'))
+                        ->where('is_deleted',0)
+                        ->get();
+
+        return json_encode(array('status' => true, 'data' => $users));
+    }
+
+
+    public function flightbookingCounts(Request $request)
+    {
+        $year = $request->year;
+        $agent = $request->agentId;
+        $monthlyArray =  ['January' => 0,
+                            'February' => 0,
+                            'March' => 0,
+                            'April' => 0,
+                            'May' => 0,
+                            'June' => 0,
+                            'July' => 0,
+                            'August' => 0,
+                            'September' => 0,
+                            'October' => 0,
+                            'November' => 0,
+                            'December' => 0
+                        ];
+
+        $query = FlightBookings::select(DB::raw('count(id) as count'), DB::raw("MONTHNAME(created_at)  as month")) 
+                                ->whereYear('created_at', $year);
+        if(trim($agent) != ''){
+            $query->where('user_id',$agent);
+        }
+        $dataTotal = $query->groupBy('month')
+                    ->orderBy('month')// you don't really need this one 
+                    ->get()
+                    ->toArray();//fetch the results
+                 
+        foreach($dataTotal as $key => $array){//add the results to the default array
+            $monthlyArray[$array['month']] = $array['count'];
+        }
+        $array_keys = array_keys($monthlyArray);
+        $array_values = array_values($monthlyArray);
+        return json_encode(array('status' => true, 'categories' => $array_keys, 'series' => $array_values));
     }
 
     public function generalSettings(){

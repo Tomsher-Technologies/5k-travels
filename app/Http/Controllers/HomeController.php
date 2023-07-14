@@ -87,6 +87,19 @@ class HomeController extends Controller
         return  view('web.user.cancelled',compact('bookings','type'));
     }
 
+    public function creditUsage(){
+        $type = "credit_usage";
+       
+        $usage = FlightMarginAmounts::select('flight_margin_amounts.*','u.name','fb.unique_booking_id')
+                                    ->leftJoin('flight_bookings as fb','fb.id','flight_margin_amounts.booking_id')
+                                    ->leftJoin('users as u','u.id','flight_margin_amounts.from_agent_id')
+                                    ->where('flight_margin_amounts.agent_id',Auth::user()->id)
+                                    ->orderBy('flight_margin_amounts.id','desc')
+                                    ->paginate(10);
+
+        return  view('web.user.credit_usage',compact('usage','type'));
+    }
+
     public function rescheduled(){
         $type = "rescheduled";
         $bookings = FlightBookings::where('user_id',Auth::user()->id)->where('is_reissued',1)->orderBy('id','desc')->paginate(10);
