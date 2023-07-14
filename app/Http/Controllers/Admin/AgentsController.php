@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\Models\Countries;
+use App\Models\FlightMarginAmounts;
 use Helper;
 use Validator;
 use Hash;
@@ -126,6 +127,16 @@ class AgentsController extends Controller
                 'agent_margin' => $request->agent_margin,
                 'credit_balance' => $request->credit_balance,
             ]);
+
+            $agentMargins = FlightMarginAmounts::create([
+                'booking_id' => NULL,
+                'agent_id'   => $user->id,
+                'currency' => 'USD',
+                'usd_amount' => $request->credit_balance,
+                'transaction_type' => 'cr',
+                'credit_balance' => $request->credit_balance,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
         }
 
         return redirect()->route('agent.create')->with('status', 'Agent created successfully!');
@@ -217,6 +228,40 @@ class AgentsController extends Controller
                 'credit_balance' => $request->credit_balance,
         ];
 
+        $currentCredit = $userData->user_details->credit_balance;
+        if($request->credit_balance != $currentCredit){
+            if($request->credit_balance > $currentCredit){
+                FlightMarginAmounts::create([
+                        'booking_id' => NULL,
+                        'agent_id'   => $userData->id,
+                        'currency' => 'USD',
+                        'usd_amount' => number_format(($request->credit_balance - $currentCredit), 2, '.', ''),
+                        'transaction_type' => 'cr',
+                        'credit_balance' => $request->credit_balance,
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]);
+            }else{
+                FlightMarginAmounts::create([
+                    'booking_id' => NULL,
+                    'agent_id'   => $userData->id,
+                    'currency' => 'USD',
+                    'usd_amount' => number_format(($currentCredit - $request->credit_balance), 2, '.', ''),
+                    'transaction_type' => 'dr',
+                    'credit_balance' => $request->credit_balance,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+
+        // $agentMargins = FlightMarginAmounts::create([
+        //     'booking_id' => NULL,
+        //     'agent_id'   => $user->id,
+        //     'currency' => 'USD',
+        //     'usd_amount' => $request->credit_balance,
+        //     'transaction_type' => 'cr',
+        //     'created_at' => date('Y-m-d H:i:s')
+        // ]);
+
         UserDetails::where('user_id',$request->agent_id)->update($data);
         return back()->with('status', 'Agent Details Updated!');
     }
@@ -255,5 +300,6 @@ class AgentsController extends Controller
     public function destroy(string $id)
     {
         //
+       
     }
 }

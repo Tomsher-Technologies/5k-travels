@@ -7027,4 +7027,12 @@ textarea {
         background-color: #1fba71;
         border-color: #1fba71;
     }
+    .line-height-badge{
+        line-height: 1.5;
+        height: 38px;
+        font-size: 16px;
+    }
+    .warning{
+        color: orange;
+    }
 /* Jisha End */

@@ -18,8 +18,9 @@
         <ul>
             <li><a href="{{ route('web-dashboard')}}" class="{{ ($type == 'my_bookings') ? 'active' : '' }}"><i class="fas fa-arrow-right"></i>My Bookings</a></li>
             <li><a href="{{ route('upcoming')}}"  class="{{ ($type == 'upcoming') ? 'active' : '' }}"><i class="fas fa-arrow-right"></i>Upcoming</a></li>
-            <li><a href="{{ route('cancelled')}}"  class="{{ ($type == 'cancelled') ? 'active' : '' }}"><i class="fas fa-arrow-right"></i>Cancelled</a></li>
             <li><a href="{{ route('completed')}}" class="{{ ($type == 'completed') ? 'active' : '' }}"><i class="fas fa-arrow-right"></i>Completed</a></li>
+            <li><a href="{{ route('cancelled')}}"  class="{{ ($type == 'cancelled') ? 'active' : '' }}"><i class="fas fa-arrow-right"></i>Cancelled</a></li>
+            <li><a href="{{ route('rescheduled')}}" class="{{ ($type == 'rescheduled') ? 'active' : '' }}"><i class="fas fa-arrow-right"></i>Rescheduled</a></li>
             <li><a href="{{ route('sub-agents')}}" class="{{ ($type == 'sub_agents') ? 'active' : '' }}"><i class="fas fa-arrow-right"></i>Sub-agents</a></li>
             <li><a href="{{ route('agent.profile')}}" class="{{ ($type == 'profile') ? 'active' : '' }}"><i class="fas fa-user-circle"></i>My profile</a></li>
             <!-- <li><a href="#"><i class="fas fa-bell"></i>Notifications</a></li> -->

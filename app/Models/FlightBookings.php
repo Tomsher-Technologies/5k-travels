@@ -38,6 +38,10 @@ class FlightBookings extends Model
         'total_tax_actual', 
         'admin_margin', 
         'admin_amount', 
-        'agents_amount'
+        'agents_amount',
+        'cancel_request',
+        'is_reissued',
+        'parent_id',
+        'customer_name'
     ];
 }

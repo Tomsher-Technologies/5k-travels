@@ -206,7 +206,7 @@
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="agent_margin">Agent Margin (%) <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 ">
-                                        <input type="number" id="agent_margin" name="agent_margin" class="form-control"  value="{{ old('agent_margin') }}">
+                                        <input type="number" id="agent_margin" step='any' name="agent_margin" class="form-control"  value="{{ old('agent_margin') }}">
                                         @error('agent_margin')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -217,7 +217,7 @@
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="admin_margin">Admin Margin (%) <span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 ">
-                                        <input type="number" id="admin_margin" name="admin_margin"  value="{{ old('admin_margin') }}" class="form-control">
+                                        <input type="number" id="admin_margin" step='any' name="admin_margin"  value="{{ old('admin_margin') }}" class="form-control">
                                         @error('admin_margin')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
@@ -228,7 +228,7 @@
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="admin_margin">Credit Balance (USD)<span class="required">*</span>
                                     </label>
                                     <div class="col-md-6 col-sm-6 ">
-                                        <input type="number" id="credit_balance" name="credit_balance"  value="{{ old('credit_balance') }}" class="form-control">
+                                        <input type="number" id="credit_balance"  step='any' name="credit_balance"  value="{{ old('credit_balance') }}" class="form-control">
                                         @error('credit_balance')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror

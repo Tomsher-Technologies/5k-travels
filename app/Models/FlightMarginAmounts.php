@@ -18,6 +18,7 @@ class FlightMarginAmounts extends Model
         'amount', 
         'usd_rate', 
         'usd_amount', 
+        'credit_balance',
         'created_at'
     ];
 }
