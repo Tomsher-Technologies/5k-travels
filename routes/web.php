@@ -51,6 +51,7 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/upcoming', [HomeController::class, 'upcoming'])->name('upcoming');
     Route::get('/rescheduled', [HomeController::class, 'rescheduled'])->name('rescheduled');
     Route::get('/sub-agents', [HomeController::class, 'subAgents'])->name('sub-agents');
+    Route::get('/credit-usage', [HomeController::class, 'creditUsage'])->name('credit-usage');
 
     Route::post('/change-agent-status', [HomeController::class, 'statusChange'])->name('change.agent.status');
     Route::get('/subagent-create', [HomeController::class, 'createSubAgent'])->name('subagent.create');

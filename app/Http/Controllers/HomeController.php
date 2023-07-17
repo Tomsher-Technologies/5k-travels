@@ -10,6 +10,7 @@ use App\Models\Airports;
 use App\Models\Airlines;
 use App\Models\FlightBookings;
 use App\Models\FlightItineraryDetails;
+use App\Models\FlightExtraServices;
 use App\Models\FlightPassengers;
 use App\Models\FlightMarginAmounts;
 use App\Models\User;
@@ -85,6 +86,19 @@ class HomeController extends Controller
         $type = "cancelled";
         $bookings = FlightBookings::where('user_id',Auth::user()->id)->where('is_cancelled',1)->orderBy('id','desc')->paginate(10);
         return  view('web.user.cancelled',compact('bookings','type'));
+    }
+
+    public function creditUsage(){
+        $type = "credit_usage";
+       
+        $usage = FlightMarginAmounts::select('flight_margin_amounts.*','u.name','fb.unique_booking_id')
+                                    ->leftJoin('flight_bookings as fb','fb.id','flight_margin_amounts.booking_id')
+                                    ->leftJoin('users as u','u.id','flight_margin_amounts.from_agent_id')
+                                    ->where('flight_margin_amounts.agent_id',Auth::user()->id)
+                                    ->orderBy('flight_margin_amounts.id','desc')
+                                    ->paginate(10);
+
+        return  view('web.user.credit_usage',compact('usage','type'));
     }
 
     public function rescheduled(){
@@ -170,6 +184,7 @@ class HomeController extends Controller
                 $bookings[0]['flights'] = FlightItineraryDetails::where('booking_id',$request->id)->get();
                 $bookings[0]['passengers'] = FlightPassengers::where('booking_id',$request->id)->get();
             }  
+            $bookings[0]['extraServices'] = FlightExtraServices::where('booking_id',$request->id)->get();
         }
        
         $type = $request->type;
@@ -185,6 +200,7 @@ class HomeController extends Controller
         $ItineraryInfo = $travelItinerary['ItineraryInfo'];
         $CustomerInfos = $ItineraryInfo['CustomerInfos'];
         $ReservationItems = $ItineraryInfo['ReservationItems'];
+        $extraServices = (isset($ItineraryInfo['ExtraServices'])) ? $ItineraryInfo['ExtraServices'] : [];
             
         $bookData = [
             'booking_status' => $travelItinerary['BookingStatus'], 
@@ -193,7 +209,7 @@ class HomeController extends Controller
        
         $flightBook = FlightBookings::where('id',$flightBookId)->update($bookData);
     
-        $passengers = $itinerary = [];
+        $passengers = $itinerary = $extras=  [];
         if($CustomerInfos){
             FlightPassengers::where('booking_id',$flightBookId)->delete();
             foreach($CustomerInfos as $custInfo){
@@ -245,6 +261,26 @@ class HomeController extends Controller
             }
             // print_r($itinerary);
             FlightItineraryDetails::insert($itinerary);
+        }
+        if(isset($extraServices['Services'])){
+            FlightExtraServices::where('booking_id',$flightBookId)->delete();
+            foreach($extraServices['Services'] as $keye => $extra){
+                $service = $extra['Service'];
+                $serviceCost = $service['ServiceCost'];
+                $extras[] = [
+                    'booking_id' => $flightBookId,
+                    'service_id' => $service['ServiceId'],
+                    'type' => $service['Type'],
+                    'behavior' => $service['Behavior'],
+                    'description' => $service['Description'],
+                    'checkin_type' => $service['CheckInType'],
+                    'currency' => $serviceCost['CurrencyCode'],
+                    'service_amount' => $serviceCost['Amount'],
+                    'created_at'=> date('Y-m-d H:i:s')
+                ];
+            }
+            // print_r($passengers);
+            FlightExtraServices::insert($extras);
         }
         return $travelItinerary['TicketStatus'];
     }
