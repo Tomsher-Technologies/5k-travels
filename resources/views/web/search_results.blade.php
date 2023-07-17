@@ -302,8 +302,8 @@
                                         <div class="flight_search_right">
                                             <!-- <h5><del>AED 1260</del></h5> -->
                                             <h2>
-                                            {{ $totalFares['Amount'] }}
-                                            ==
+                                            <!-- {{ $totalFares['Amount'] }}
+                                            == -->
                                             {{ $totalFares['CurrencyCode'] }}
                                               
                                                 <!-- <sup>*20% OFF</sup> -->
