@@ -13,6 +13,7 @@ use App\Models\FlightBookings;
 use App\Models\FlightPassengers;
 use App\Models\FlightItineraryDetails;
 use App\Models\FlightMarginAmounts;
+use App\Models\FlightExtraServices;
 use App\Models\UserDetails;
 use App\Models\User;
 
@@ -156,7 +157,7 @@ class FlightsController extends Controller
         $flights = $flightsIn = [];
         $flightDetails = isset($result['AirSearchResponse']['AirSearchResult']['FareItineraries']) ? $result['AirSearchResponse']['AirSearchResult']['FareItineraries'] : array();
         /*================================================  One Way =============================================================*/
-        if($request->search_type == 'OneWay'){
+        if($request->search_type == 'OneWay' || $request->search_type == 'Circle'){
             if($flightDetails){
                 $loop = 0;
                 $unsetLoops = array();
@@ -486,8 +487,8 @@ class FlightsController extends Controller
                             $destinationCodeIn = $flightSegmentIn[$j]['FlightSegment']['ArrivalAirportLocationCode'];
                             
                             foreach($baggage as $keyIn=>$valueIn){
-                                $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['baggage'] = $valueIn['Baggage'][$bagCountIn];
-                                $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['cabin_baggage'] = $valueIn['CabinBaggage'][$bagCountIn];
+                                $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['baggage'] = (isset($valueIn['Baggage'][$bagCountIn])) ? $valueIn['Baggage'][$bagCountIn] : '';
+                                $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['cabin_baggage'] = (isset($valueIn['CabinBaggage'][$bagCountIn])) ? $valueIn['CabinBaggage'][$bagCountIn] : '';
                             }
                             $bagCountIn = $bagCountIn + 1;
                             if(!empty($airlineFilters) && in_array($airlineCodeIn, $airlineFilters)){
@@ -957,7 +958,7 @@ class FlightsController extends Controller
         $adultArray = $childArray = $infantArray = $adultServiceOut = $childServiceOut = $infantServiceOut = $adultServiceIn = $childServiceIn = $infantServiceIn = [];
         $details = $request->all();
         // echo '<pre>';
-        // print_r($request->baggageOut);
+        // print_r($details);die;
         // print_r($request->baggageIn);
         $adultCount = $request->adultCount;
         $childCount = $request->childCount;
@@ -967,7 +968,7 @@ class FlightsController extends Controller
             $adultExtra = $childExtra = $infantExtra = 0;
             if(isset($request->baggageOut)){
                 foreach($request->baggageOut as $okey=>$obag){
-                    if(isset($obag[0]) && $obag[0]){
+                    if(isset($obag[0]) && $obag[0] != 0){
                         for($i=1; $i<= $obag[0];$i++){
                             if($adultExtra != $adultCount){
                                 $adultServiceOut[] = array($okey);
@@ -986,7 +987,7 @@ class FlightsController extends Controller
             $adultExtraIn = $childExtraIn = $infantExtraIn = 0;
             if(isset($request->baggageIn)){
                 foreach($request->baggageIn as $ikey=>$ibag){
-                    if(isset($ibag[0]) && $ibag[0]){
+                    if(isset($ibag[0]) && $ibag[0] != 0){
                         for($i=1; $i<= $ibag[0];$i++){
                             if($adultExtraIn != $adultCount){
                                 $adultServiceIn[] = array($ikey);
@@ -1039,6 +1040,14 @@ class FlightsController extends Controller
             $adultArray["passportNo"] =   $request->adult_passport;
             $adultArray["passportIssueCountry"] =   $request->adult_passport_country;
             $adultArray["passportExpiryDate"] =   $request->adult_passport_expiry;
+            // if($request->FareType == 'WebFare'){
+            //     if(!empty($adultServiceOut)){
+            //         $adultArray["ExtraServiceOutbound"] = $adultServiceOut;
+            //     }
+            //     if(!empty($adultServiceIn)){
+            //         $adultArray["ExtraServiceInbound"] = $adultServiceIn;
+            //     }
+            // }
             $adultArray["ExtraServiceOutbound"] = $adultServiceOut;
             $adultArray["ExtraServiceInbound"] = $adultServiceIn;
             $paxDetails["adult"] = $adultArray;
@@ -1052,8 +1061,17 @@ class FlightsController extends Controller
             $childArray["passportNo"] =   $request->child_passport;
             $childArray["passportIssueCountry"] =   $request->child_passport_country;
             $childArray["passportExpiryDate"] =   $request->child_passport_expiry;
+            // if($request->FareType == 'WebFare'){
+            //     if(!empty($childServiceOut)){
+            //         $childArray["ExtraServiceOutbound"] = $childServiceOut;
+            //     }
+            //     if(!empty($childServiceIn)){
+            //         $childArray["ExtraServiceInbound"] = $childServiceIn;
+            //     }
+            // }
             $childArray["ExtraServiceOutbound"] = $childServiceOut;
             $childArray["ExtraServiceInbound"] = $childServiceIn;
+        
             $paxDetails["child"] = $childArray;
         }
         if($infantCount != 0){
@@ -1070,6 +1088,7 @@ class FlightsController extends Controller
             $paxDetails["infant"] = $infantArray;
         }
         $data["paxInfo"]["paxDetails"][] = $paxDetails;
+        // echo json_encode($data["paxInfo"]["paxDetails"]);
         // echo '<pre>';
         // print_r($paxDetails);
         // die;
@@ -1112,7 +1131,8 @@ class FlightsController extends Controller
                 }
                 $msg = 'success';
             }else{
-                $msg =  $bookResult['Errors']['Errors']['ErrorMessage'];
+                // print_r($bookResult);
+                $msg =  (isset($bookResult['Errors']['Error'])) ? $bookResult['Errors']['Error']['ErrorMessage'] : ((isset($bookResult['Errors']['Errors'])) ? $bookResult['Errors']['Errors']['ErrorMessage'] : 'Something went wrong');
             }
         }else{
             $msg =  (isset($result['status']['errors'][0])) ? $result['status']['errors'][0]['errorMessage'] : 'Something went wrong';
@@ -1149,7 +1169,7 @@ class FlightsController extends Controller
     public function saveFlightBookingData($tripDetailsResult, $data){
         $travelItinerary = $tripDetailsResult['TravelItinerary'];
         // echo '<pre>';
-        // print_r($data);
+        // // print_r($data);
         // print_r($travelItinerary);
         $agentMargins = [];
         $totalOrgAmount = $data['total_amount_org'];
@@ -1164,6 +1184,7 @@ class FlightsController extends Controller
 
         $ItineraryInfo = $travelItinerary['ItineraryInfo'];
         $CustomerInfos = $ItineraryInfo['CustomerInfos'];
+        $extraServices = (isset($ItineraryInfo['ExtraServices'])) ? $ItineraryInfo['ExtraServices'] : [];;
         $ReservationItems = $ItineraryInfo['ReservationItems'];
         $totalAmount = str_replace(',','',$data['total_amount']);     
         $currency = $data['currency'];  
@@ -1222,6 +1243,7 @@ class FlightsController extends Controller
             $agentMargins[] = array(
                 'booking_id' => $flightBookId,
                 'agent_id'   => Auth::user()->id,
+                'from_agent_id' => NULL,
                 'margin'     => $currentAgentMargin,
                 'amount'    => $totalAmount,
                 'total_amount' => $totalOrgAmount,
@@ -1236,6 +1258,7 @@ class FlightsController extends Controller
             $agentMargins[] = array(
                 'booking_id' => $flightBookId,
                 'agent_id'   => Auth::user()->id,
+                'from_agent_id' => NULL,
                 'margin'     => $currentAgentMargin,
                 'amount'    => $agentAmount,
                 'total_amount' => $totalOrgAmount,
@@ -1284,8 +1307,9 @@ class FlightsController extends Controller
         if(!empty($agentMargins)){
             FlightMarginAmounts::insert($agentMargins);
         }
+
         $customerName = '';
-        $passengers = $itinerary = [];
+        $passengers = $extras = $itinerary = [];
         if($CustomerInfos){
             foreach($CustomerInfos as $keyP => $custInfo){
                 $info = $custInfo['CustomerInfo'];
@@ -1342,6 +1366,27 @@ class FlightsController extends Controller
             // print_r($itinerary);
             FlightItineraryDetails::insert($itinerary);
         }
+
+        if(isset($extraServices['Services'])){
+            foreach($extraServices['Services'] as $keye => $extra){
+                $service = $extra['Service'];
+                $serviceCost = $service['ServiceCost'];
+                $extras[] = [
+                    'booking_id' => $flightBookId,
+                    'service_id' => $service['ServiceId'],
+                    'type' => $service['Type'],
+                    'behavior' => $service['Behavior'],
+                    'description' => $service['Description'],
+                    'checkin_type' => $service['CheckInType'],
+                    'currency' => $serviceCost['CurrencyCode'],
+                    'service_amount' => $serviceCost['Amount'],
+                    'created_at'=> date('Y-m-d H:i:s')
+                ];
+            }
+            // print_r($passengers);
+            FlightExtraServices::insert($extras);
+        }
+
         // die;
     }
 
@@ -2178,6 +2223,7 @@ class FlightsController extends Controller
         $ItineraryInfo = $travelItinerary['ItineraryInfo'];
         $CustomerInfos = $ItineraryInfo['CustomerInfos'];
         $ReservationItems = $ItineraryInfo['ReservationItems'];
+        $extraServices = (isset($ItineraryInfo['ExtraServices'])) ? $ItineraryInfo['ExtraServices'] : [];;
         $ItineraryPricing = $ItineraryInfo['ItineraryPricing'];
         $totalItineraryPrice = $ItineraryPricing['TotalFare'];
         $totalItineraryTax = $ItineraryPricing['Tax'];
@@ -2272,7 +2318,7 @@ class FlightsController extends Controller
         $currentAgent->credit_balance = $currentCreditNew;
         $currentAgent->save();
         FlightMarginAmounts::insert($agentMargins);
-        $passengers = $itinerary = [];
+        $passengers = $itinerary = $extras = [];
         if($CustomerInfos){
             foreach($CustomerInfos as $custInfo){
                 $info = $custInfo['CustomerInfo'];
@@ -2323,6 +2369,27 @@ class FlightsController extends Controller
             // print_r($itinerary);
             FlightItineraryDetails::insert($itinerary);
         }
+
+        if(isset($extraServices['Services'])){
+            foreach($extraServices['Services'] as $keye => $extra){
+                $service = $extra['Service'];
+                $serviceCost = $service['ServiceCost'];
+                $extras[] = [
+                    'booking_id' => $flightBookId,
+                    'service_id' => $service['ServiceId'],
+                    'type' => $service['Type'],
+                    'behavior' => $service['Behavior'],
+                    'description' => $service['Description'],
+                    'checkin_type' => $service['CheckInType'],
+                    'currency' => $serviceCost['CurrencyCode'],
+                    'service_amount' => $serviceCost['Amount'],
+                    'created_at'=> date('Y-m-d H:i:s')
+                ];
+            }
+            // print_r($passengers);
+            FlightExtraServices::insert($extras);
+        }
+
         // die;
     }
 }
