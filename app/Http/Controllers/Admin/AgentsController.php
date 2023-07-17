@@ -24,9 +24,12 @@ class AgentsController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search = null;
+        $sort_search = $agent_search = null;
         if ($request->has('search')) {
             $sort_search = $request->search;
+        }
+        if ($request->has('agent')) {
+            $agent_search = $request->agent;
         }
       
         $query = User::leftJoin('user_details as ud','ud.user_id','=','users.id')
@@ -45,11 +48,42 @@ class AgentsController extends Controller
                 }); 
             }               
         }
+        if($agent_search){
+            $query->where('users.parent_id',$agent_search);
+        }
 
         $agents = $query->orderBy('users.id','DESC')->paginate(10);
-        return view('admin.agents.index', compact('agents', 'sort_search'));
+        $mainAgents = User::where('user_type','agent')->whereNull('parent_id')->where('is_deleted',0)->where('is_approved',1)->get();
+        return view('admin.agents.index', compact('agents', 'sort_search','mainAgents'));
     }
 
+
+    public function agentGraph(){
+        $data = [];
+        $agents = User::select('users.*')->leftJoin('user_details as ud','ud.user_id','=','users.id')
+                            ->where('users.user_type','agent')
+                            // ->where('is_approved',1)
+                            ->where('users.is_deleted',0)
+                            ->orderBy('parent_id','ASC')
+                            ->get();
+        $data[] = array(
+            'id' => "0",
+            'parent' => '',
+            'name' => 'Admin'
+        );
+        if($agents){
+            foreach($agents as $agt){
+                $data[] = array(
+                    'id' => "$agt->id",
+                    'parent' => ( $agt->parent_id != '') ? "$agt->parent_id" : "0",
+                    'name' => "$agt->name"
+                );
+            }
+        }
+        $graph = json_encode($data);
+
+        return view('admin.agents.graph', compact('graph'));
+    }
     /**
      * Show the form for creating a new resource.
      */

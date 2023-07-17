@@ -30,6 +30,7 @@
                             <ul class="nav child_menu">
                                 <li><a href="{{ route('agent.index') }}">Agents Listing</a></li>
                                 <li><a href="{{ route('agent.create') }}">Create Agent</a></li>
+                                <li><a href="{{ route('agent.graph') }}">Agent Graph View</a></li>
                             </ul>
                         </li>
                         <li><a href="{{ route('bookings') }}"><i class="fa fa-plane"></i> Flight Bookings </a></li>

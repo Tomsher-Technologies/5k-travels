@@ -954,10 +954,62 @@ class FlightsController extends Controller
 
     public function createBooking(Request $request){
         
-        $adultArray = $childArray = $infantArray = [];
+        $adultArray = $childArray = $infantArray = $adultServiceOut = $childServiceOut = $infantServiceOut = $adultServiceIn = $childServiceIn = $infantServiceIn = [];
         $details = $request->all();
         // echo '<pre>';
-        // // print_r($details);
+        // print_r($request->baggageOut);
+        // print_r($request->baggageIn);
+        $adultCount = $request->adultCount;
+        $childCount = $request->childCount;
+        $infantCount = $request->infantCount;
+        $totalAddons = $request->total_addons;
+        if($totalAddons != 0 && $totalAddons != ''){
+            $adultExtra = $childExtra = $infantExtra = 0;
+            if(isset($request->baggageOut)){
+                foreach($request->baggageOut as $okey=>$obag){
+                    if(isset($obag[0]) && $obag[0]){
+                        for($i=1; $i<= $obag[0];$i++){
+                            if($adultExtra != $adultCount){
+                                $adultServiceOut[] = array($okey);
+                                $adultExtra++;
+                            }elseif($childExtra != $childCount){
+                                $childServiceOut[] = array($okey);
+                                $childExtra++;
+                            }elseif($infantExtra != $infantCount){
+                                $infantServiceOut[] = array($okey);
+                                $infantExtra++;
+                            }
+                        }
+                    }
+                }
+            }
+            $adultExtraIn = $childExtraIn = $infantExtraIn = 0;
+            if(isset($request->baggageIn)){
+                foreach($request->baggageIn as $ikey=>$ibag){
+                    if(isset($ibag[0]) && $ibag[0]){
+                        for($i=1; $i<= $ibag[0];$i++){
+                            if($adultExtraIn != $adultCount){
+                                $adultServiceIn[] = array($ikey);
+                                $adultExtraIn++;
+                            }elseif($childExtraIn != $childCount){
+                                $childServiceIn[] = array($ikey);
+                                $childExtraIn++;
+                            }elseif($infantExtraIn != $infantCount){
+                                $infantServiceIn[] = array($ikey);
+                                $infantExtraIn++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // print_r($adultServiceOut);
+        // print_r($childServiceOut);
+        // print_r($infantServiceOut);
+        // print_r($adultServiceIn);
+        // print_r($childServiceIn);
+        // print_r($infantServiceIn);
         // $agentMargins = [] ;
         // echo '<br>'. $details['total_amount_org'];
         
@@ -978,7 +1030,7 @@ class FlightsController extends Controller
         $data["paxInfo"]["customerEmail"] = $request->email;
         $data["paxInfo"]["customerPhone"] = $request->mobile_no;
 
-        if($request->adultCount != 0){
+        if($adultCount != 0){
             $adultArray["title"] =  $request->adult_title;
             $adultArray["firstName"] =  $request->adult_first_name;
             $adultArray["lastName"] =   $request->adult_last_name;
@@ -987,9 +1039,11 @@ class FlightsController extends Controller
             $adultArray["passportNo"] =   $request->adult_passport;
             $adultArray["passportIssueCountry"] =   $request->adult_passport_country;
             $adultArray["passportExpiryDate"] =   $request->adult_passport_expiry;
+            $adultArray["ExtraServiceOutbound"] = $adultServiceOut;
+            $adultArray["ExtraServiceInbound"] = $adultServiceIn;
             $paxDetails["adult"] = $adultArray;
         }
-        if($request->childCount != 0){
+        if($childCount != 0){
             $childArray["title"] =  $request->child_title;
             $childArray["firstName"] =  $request->child_first_name;
             $childArray["lastName"] =   $request->child_last_name;
@@ -998,9 +1052,11 @@ class FlightsController extends Controller
             $childArray["passportNo"] =   $request->child_passport;
             $childArray["passportIssueCountry"] =   $request->child_passport_country;
             $childArray["passportExpiryDate"] =   $request->child_passport_expiry;
+            $childArray["ExtraServiceOutbound"] = $childServiceOut;
+            $childArray["ExtraServiceInbound"] = $childServiceIn;
             $paxDetails["child"] = $childArray;
         }
-        if($request->infantCount != 0){
+        if($infantCount != 0){
             $infantArray["title"] =  $request->infant_title;
             $infantArray["firstName"] =  $request->infant_first_name;
             $infantArray["lastName"] =   $request->infant_last_name;
@@ -1009,6 +1065,8 @@ class FlightsController extends Controller
             $infantArray["passportNo"] =   $request->infant_passport;
             $infantArray["passportIssueCountry"] =   $request->infant_passport_country;
             $infantArray["passportExpiryDate"] =   $request->infant_passport_expiry;
+            $infantArray["ExtraServiceOutbound"] = $infantServiceOut;
+            $infantArray["ExtraServiceInbound"] = $infantServiceIn;
             $paxDetails["infant"] = $infantArray;
         }
         $data["paxInfo"]["paxDetails"][] = $paxDetails;

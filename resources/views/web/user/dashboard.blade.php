@@ -66,9 +66,11 @@
                                                         <span class="warning"> Reschedule Requested</span>
                                                     @else
                                                         @if($book->ticket_status == "TktInProcess")
-                                                            <span class="complete"> In Process</span>
+                                                            <span class="complete">Ticketing In Process</span>
                                                         @elseif($book->ticket_status == "BookingInProcess")
                                                             <span class="complete"> Booking In Process</span>
+                                                        @elseif($book->ticket_status == "Ticketed" || $book->ticket_status == "OK")
+                                                            <span class="complete"> Ticketed</span>
                                                         @else
                                                             @if($book->ticket_status != '')
                                                             <span class="complete">{{ ucfirst(strtolower($book->ticket_status)) }}</span>
