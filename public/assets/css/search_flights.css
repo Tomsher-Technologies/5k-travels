@@ -39,6 +39,7 @@
     padding: 12px 10px;
     color: #000;
     font-weight: 700;
+    border-top: 1px solid #dfdfdf;
 }
 .flightDetailsInfo {
     padding: 12px;

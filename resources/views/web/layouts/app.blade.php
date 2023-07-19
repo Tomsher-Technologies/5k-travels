@@ -269,15 +269,15 @@
     <!-- Custom js -->
     <script src="{{ asset('assets/js/custom.js') }}"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" ></script>
-
-    
+    <script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sweetalert.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
     window.ROUTES = {
         search_airports: '{{ route("search-airports") }}',
         autocomplete_airports: "{{ route('autocomplete-airports') }}",
+        flight_view_details: "{{ route('flight-view-details') }}",
     };
 
     $.ajaxSetup({

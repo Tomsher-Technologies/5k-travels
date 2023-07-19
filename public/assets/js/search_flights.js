@@ -123,15 +123,15 @@ function loadAutocomplete(){
     $(".load_airports").autocomplete({
         source: function(request, response) {
             $.ajax({
-            url: ROUTES.autocomplete_airports,
-            data: {
-                    term : request.term
-             },
-            dataType: "json",
-            success: function(data){
-               response(data);
-            }
-        });
+                url: ROUTES.autocomplete_airports,
+                data: {
+                        term : request.term
+                },
+                dataType: "json",
+                success: function(data){
+                response(data);
+                }
+            });
         },
         select: function (event, ui) {
             // Set selection
@@ -166,14 +166,15 @@ function loadAutocomplete(){
 
 $("#oFromForm").validate({
     rules: {
-        oFrom: 'required',
-        oTo: 'required',
+        oFrom: {
+            required : true,
+            minlength:3
+        },
+        oTo:{
+            required : true,
+            minlength:3
+        },
         oDate: 'required'
-    },
-    messages: {
-        oFrom: 'This field is required',
-        oTo: 'This field is required',
-        oDate: 'This field is required',
     },
     errorPlacement: function (error, element) {
         if(element.hasClass('select2')) {
@@ -330,17 +331,18 @@ $('.mInfant').on('click touchstart', function (event) {
 
 $("#rForm").validate({
     rules: {
-        rFrom: 'required',
-        rTo: 'required',
+        rFrom: {
+            required : true,
+            minlength:3
+        },
+        rTo: {
+            required : true,
+            minlength:3
+        },
         rDate: 'required',
         rReturnDate: 'required'
     },
-    messages: {
-        rFrom: 'This field is required',
-        rTo: 'This field is required',
-        rDate: 'This field is required',
-        rReturnDate: 'This field is required',
-    },
+   
     errorPlacement: function (error, element) {
         if(element.hasClass('select2')) {
             error.insertAfter(element.next('.select2-container'));
@@ -427,14 +429,15 @@ $(document).on('click', (function (e) {
 
 $("#mForm").validate({
     rules: {
-        'mFrom[]': 'required',
-        'mTo[]': 'required',
+        'mFrom[]': {
+            required : true,
+            minlength:3
+        },
+        'mTo[]': {
+            required : true,
+            minlength:3
+        },
         'mDate[]': 'required',
-    },
-    messages: {
-        'mFrom[]': 'This field is required',
-        'mTo[]': 'This field is required',
-        'mDate[]': 'This field is required',
     },
     errorPlacement: function (error, element) {
         if(element.hasClass('select2')) {
@@ -542,3 +545,42 @@ function multiCheckFilter(){
     $('#mrefund_filter').val('');
     return true;
 }
+
+$(document).on('click','.viewFlightDetails',function(){
+    var id = $(this).attr('data-id');
+    if($('#detialsView_'+id).hasClass('show')){
+        $('#detialsView_'+id).removeClass('show');
+    }else{
+        $('.ajaxloader').css('display','block');
+        var viewdata = { "_token": "{{ csrf_token() }}",
+                        id : $(this).attr('data-id'),
+                        session_id : $(this).attr('data-session_id'),
+                        search_type : $(this).attr('data-search_type'),
+                        fareCode : $(this).attr('data-fareCode')
+                    }   
+        $.ajax({
+            url: ROUTES.flight_view_details,
+            data: viewdata,
+            success: function(response) {
+                $('.ajaxloader').css('display','none');
+                var resp = JSON.parse(response);
+                if(resp.status == true){
+                    $('#detialsView_'+id).html(resp.data);
+                    $('#detialsView_'+id).addClass('show');
+                    $('html, body').animate({
+                        scrollTop: $('#detialsView_'+id).offset().top
+                    }, 1000);
+                }else{
+                    swal({
+                        title: "Not Available", 
+                        text: "Flights fare may have changed. Please refresh the page.", 
+                        icon: "warning"
+                    }).then(function() {
+                        window.location.reload();
+                    });
+                }
+               
+            }
+        });
+    }
+});
