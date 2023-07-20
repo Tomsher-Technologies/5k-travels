@@ -5889,7 +5889,7 @@ textarea {
 .flight_show_down_wrapper {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #cdcdcd;
+    /* border-bottom: 1px solid #cdcdcd; */
     padding: 25px 0px 25px 0px;
     
 }

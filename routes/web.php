@@ -33,6 +33,7 @@ Route::get('/flights/booking', [FlightsController::class, 'booking'])->name('fli
 Route::post('/flights/create-booking', [FlightsController::class, 'createBooking'])->name('flight.create-booking');
 
 Route::get('/flights/revalidate', [FlightsController::class, 'revalidate'])->name('flight.revalidate');
+Route::get('/flight-view-details', [FlightsController::class, 'fightViewDetails'])->name('flight-view-details');
 
 Route::post('web-post-login', [LoginController::class, 'postLogin'])->name('web.login.post');
 Route::post('post-registration', [LoginController::class, 'postRegistration'])->name('register.post'); 

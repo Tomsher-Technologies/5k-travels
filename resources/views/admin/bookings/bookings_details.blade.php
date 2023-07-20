@@ -38,10 +38,8 @@
                                                                         @php
                                                                         $airlineData =
                                                                         getAirlineData($flights->marketing_airline_code);
-                                                                        $deptAirportData =
-                                                                        getAirportData($flights->departure_airport);
-                                                                        $arrAirportData =
-                                                                        getAirportData($flights->arrival_airport);
+                                                                        $deptAirportData = getAirportData($flights->departure_airport);
+                                                                        $arrAirportData = getAirportData($flights->arrival_airport);
                                                                         $airlinePNR = $flights->airline_pnr;
                                                                         @endphp
                                                                         <div class="row y-gap-10 justify-between">

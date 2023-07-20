@@ -17,7 +17,6 @@
         </div>
     </div>
     @php  
-        $data['flightData'] = getAirlines(); 
         $marginData = $data['margins'];
         $totalmargin = $marginData['totalmargin'];
     @endphp
@@ -42,181 +41,334 @@
                                         $out =1;
                                       
                                     @endphp
-                                    @foreach($data['flightsOutgoing'] as $outGoing)
-                                        @php  
-                                            $outGoingFLightSegment =  $outGoing['FlightSegment'];
-                                            if($out ==1){
-                                                $outFrom = $outGoingFLightSegment['DepartureAirportLocationCode'];
-                                            }elseif($out == $countOut){
-                                                $outTo = $outGoingFLightSegment['ArrivalAirportLocationCode'];
-                                            }
+                                    @if($data['search_type'] != 'Circle')
+                                        @foreach($data['flightsOutgoing'] as $outGoing)
+                                            @php  
+                                                $outGoingFLightSegment =  $outGoing['FlightSegment'];
+                                                if($out ==1){
+                                                    $outFrom = $outGoingFLightSegment['DepartureAirportLocationCode'];
+                                                }elseif($out == $countOut){
+                                                    $outTo = $outGoingFLightSegment['ArrivalAirportLocationCode'];
+                                                }
 
-                                            if($countOut == 1){
-                                                $outTo = $outGoingFLightSegment['ArrivalAirportLocationCode'];
-                                            }
-                                            
-                                        @endphp
+                                                if($countOut == 1){
+                                                    $outTo = $outGoingFLightSegment['ArrivalAirportLocationCode'];
+                                                }
+                                                $CabinClassCode = $outGoingFLightSegment['CabinClassCode'];
+                                            @endphp
 
-                                        <div class="py-20 px-30">
-                                            <div class="row justify-between items-center">
-                                                <div class="col-auto">
-                                                    <div class="fw-500 text-dark-1">Depart • {{ date('d M, Y', strtotime($outGoingFLightSegment['DepartureDateTime'])) }}</div>
-                                                </div>
-                                                <div class="col-auto">
-                                                    <div class="text-14 text-light-1">Duration: {{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
-                                                </div>
-                                                @if($outGoingFLightSegment['CabinClassCode'] == 'Y')
-                                                    @php $cabinClass = "Economy"; @endphp
-                                                @elseif($outGoingFLightSegment['CabinClassCode'] == 'S')
-                                                    @php $cabinClass = "Premium Economy"; @endphp
-                                                @elseif($outGoingFLightSegment['CabinClassCode'] == 'C')
-                                                    @php $cabinClass = "Business"; @endphp
-                                                @elseif($outGoingFLightSegment['CabinClassCode'] == 'F')
-                                                    @php $cabinClass = "First"; @endphp
-                                                @else
-                                                    @php $cabinClass = $outGoingFLightSegment['CabinClassCode']; @endphp
-                                                @endif
-                                                <div class="col-auto">
-                                                    <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}}</div>
+                                            <div class="py-20 px-30">
+                                                <div class="row justify-between items-center">
+                                                    <div class="col-auto">
+                                                        <div class="fw-500 text-dark-1">Depart • {{ date('d M, Y', strtotime($outGoingFLightSegment['DepartureDateTime'])) }}</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <div class="text-14 text-light-1">Duration: {{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
+                                                    </div>
+                                                    @if($CabinClassCode == 'Y')
+                                                        @php $cabinClass = "Economy"; @endphp
+                                                    @elseif($CabinClassCode == 'S')
+                                                        @php $cabinClass = "Premium Economy"; @endphp
+                                                    @elseif($CabinClassCode == 'C')
+                                                        @php $cabinClass = "Business"; @endphp
+                                                    @elseif($CabinClassCode == 'F')
+                                                        @php $cabinClass = "First"; @endphp
+                                                    @else
+                                                        @php $cabinClass = $CabinClassCode; @endphp
+                                                    @endif
+                                                    <div class="col-auto">
+                                                        <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}}</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="py-30 px-30 border-top-light">
-                                            <div class="row y-gap-10 justify-between">
-                                                <div class="col-auto col-sm-8">
-                                                    <div class="d-flex items-center mb-15">
-                                                        <div class="w-28 d-flex justify-center mr-15"><img
-                                                                src="{{ $data['flightData'][$outGoingFLightSegment['MarketingAirlineCode']]['AirLineLogo'] }}" alt="image"></div>
-                                                        <div class="text-14 text-light-1">{{ $outGoingFLightSegment['MarketingAirlineName'] }} {{ $outGoingFLightSegment['MarketingAirlineCode'] }} | {{ $outGoingFLightSegment['FlightNumber']}}</div>
-                                                    </div>
-                                                    <div class="relative z-0">
-                                                        <div class="border-line-2"></div>
-                                                        <div class="d-flex items-center">
-                                                            <div class="w-28 d-flex justify-center mr-15">
-                                                                <div class="size-10 border-light rounded-full bg-white"></div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-auto">
-                                                                    <div class="lh-14 fw-500">{{ date('H:i', strtotime($outGoingFLightSegment['DepartureDateTime'])) }}</div>
-                                                                </div>
-                                                                <div class="col-auto">
-                                                                    <div class="lh-14 fw-500">{{$data['airports'][$outGoingFLightSegment['DepartureAirportLocationCode']]['AirportName'] }} ({{$outGoingFLightSegment['DepartureAirportLocationCode']}})</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex items-center mt-15">
-                                                            <div class="w-28 d-flex justify-center mr-15"><img
-                                                                    src="{{ asset('assets/img/icon/plane.svg') }}" alt="image">
-                                                            </div>
-                                                            <div class="text-14 text-light-1">{{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
-                                                        </div>
-                                                        <div class="d-flex items-center mt-15">
-                                                            <div class="w-28 d-flex justify-center mr-15">
-                                                                <div class="size-10 border-light rounded-full bg-border"></div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-auto">
-                                                                    <div class="lh-14 fw-500">{{ date('H:i', strtotime($outGoingFLightSegment['ArrivalDateTime'])) }}</div>
-                                                                </div>
-                                                                <div class="col-auto">
-                                                                    <div class="lh-14 fw-500">{{$data['airports'][$outGoingFLightSegment['ArrivalAirportLocationCode']]['AirportName'] }} ({{$outGoingFLightSegment['ArrivalAirportLocationCode']}})</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="col-sm-4">
-                                                    <div class="makeFlex spaceBetween appendBottom3 fontSize14">
-                                                        <span class=" col-sm-4 baggageInfoText blackFont">BAGGAGE : </span>
-                                                        <span class=" col-sm-4 baggageInfoText blackFont text-center">CHECK IN</span>
-                                                        <span class=" col-sm-4 baggageInfoText blackFont text-center">CABIN</span>
-                                                    </div>
+                                            @php
+                                                $outDepAirCode = $outGoingFLightSegment['DepartureAirportLocationCode'];
+                                                $deptAirportData = getAirportData($outDepAirCode);
 
-                                                    @php  
-                                                        $bagKey = $outGoingFLightSegment['MarketingAirlineCode'].'_'.$outGoingFLightSegment['DepartureAirportLocationCode'].'_'.$outGoingFLightSegment['ArrivalAirportLocationCode'];
-                                                    @endphp
-                                                    @if(array_key_exists($bagKey, $data['flightBaggageOut']))
-                                                        @php   $flightBagOutKey = $data['flightBaggageOut'][$bagKey]; @endphp
-                                                        @foreach($flightBagOutKey as $bagKeys=>$bagData)
-                                                            <div class="makeFlex spaceBetween appendBottom3 fontSize14">
-                                                                <span class="baggageInfoText darkText col-sm-4"> {{ ($bagKeys=='ADT') ? "Adult" : (($bagKeys=="CHD") ? "Child" : "Infant") }} </span>
-                                                                <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['baggage'] != '') ? $bagData['baggage'] : '-' }}</span>
-                                                                <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['cabin_baggage'] != '') ? $bagData['cabin_baggage'] : '-' }}</span>
+                                                $outArrAirCode = $outGoingFLightSegment['ArrivalAirportLocationCode'];
+                                                $arrAirportData = getAirportData($outArrAirCode);
+
+                                                $airlineCode = $outGoingFLightSegment['MarketingAirlineCode'];
+                                                $airlineData = getAirlineData($airlineCode);
+                                            @endphp
+                                            <div class="py-30 px-30 border-top-light">
+                                                <div class="row y-gap-10 justify-between">
+                                                    <div class="col-auto col-sm-8">
+                                                        <div class="d-flex items-center mb-15">
+                                                            <div class="w-28 d-flex justify-center mr-15"><img
+                                                                    src="{{ $airlineData[0]['AirLineLogo'] }}" alt="image"></div>
+                                                            <div class="text-14 text-light-1">{{ $outGoingFLightSegment['MarketingAirlineName'] }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}</div>
+                                                        </div>
+                                                        <div class="relative z-0">
+                                                            <div class="border-line-2"></div>
+                                                            <div class="d-flex items-center">
+                                                                <div class="w-28 d-flex justify-center mr-15">
+                                                                    <div class="size-10 border-light rounded-full bg-white"></div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-auto">
+                                                                        <div class="lh-14 fw-500">{{ date('H:i', strtotime($outGoingFLightSegment['DepartureDateTime'])) }}</div>
+                                                                    </div>
+                                                                    <div class="col-auto">
+                                                                        <div class="lh-14 fw-500">{{$deptAirportData[0]['AirportName'] }} ({{$outDepAirCode}})</div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        @endforeach
+                                                            <div class="d-flex items-center mt-15">
+                                                                <div class="w-28 d-flex justify-center mr-15"><img
+                                                                        src="{{ asset('assets/img/icon/plane.svg') }}" alt="image">
+                                                                </div>
+                                                                <div class="text-14 text-light-1">{{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
+                                                            </div>
+                                                            <div class="d-flex items-center mt-15">
+                                                                <div class="w-28 d-flex justify-center mr-15">
+                                                                    <div class="size-10 border-light rounded-full bg-border"></div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-auto">
+                                                                        <div class="lh-14 fw-500">{{ date('H:i', strtotime($outGoingFLightSegment['ArrivalDateTime'])) }}</div>
+                                                                    </div>
+                                                                    <div class="col-auto">
+                                                                        <div class="lh-14 fw-500">{{$arrAirportData[0]['AirportName'] }} ({{$outArrAirCode}})</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="col-sm-4">
+                                                        <div class="makeFlex spaceBetween appendBottom3 fontSize14">
+                                                            <span class=" col-sm-4 baggageInfoText blackFont">BAGGAGE : </span>
+                                                            <span class=" col-sm-4 baggageInfoText blackFont text-center">CHECK IN</span>
+                                                            <span class=" col-sm-4 baggageInfoText blackFont text-center">CABIN</span>
+                                                        </div>
+
+                                                        @php  
+                                                            $bagKey = $airlineCode.'_'.$outDepAirCode.'_'.$outArrAirCode;
+                                                        @endphp
+                                                        @if(array_key_exists($bagKey, $data['flightBaggageOut']))
+                                                            @php   $flightBagOutKey = $data['flightBaggageOut'][$bagKey]; @endphp
+                                                            @foreach($flightBagOutKey as $bagKeys=>$bagData)
+                                                                <div class="makeFlex spaceBetween appendBottom3 fontSize14">
+                                                                    <span class="baggageInfoText darkText col-sm-4"> {{ ($bagKeys=='ADT') ? "Adult" : (($bagKeys=="CHD") ? "Child" : "Infant") }} </span>
+                                                                    <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['baggage'] != '') ? $bagData['baggage'] : '-' }}</span>
+                                                                    <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['cabin_baggage'] != '') ? $bagData['cabin_baggage'] : '-' }}</span>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                    @if(array_key_exists($outArrAirCode, $data['layovers']))
+                                                        <div class="flightLayoverOuter">
+                                                            <div class="flightLayover mmtConnectLayover">
+                                                                <div class="makeFlex fontSize14">
+                                                                    <p> <span style="color: #5d8f3a;">Change of planes</span> <b>{{ convertToHoursMins($data['layovers'][$outArrAirCode]) }}</b> Layover in {{ $data['airports'][$outArrAirCode]['City'] }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                     @endif
                                                 </div>
-                                                @if(array_key_exists($outGoingFLightSegment['ArrivalAirportLocationCode'], $data['layovers']))
-                                                    <div class="flightLayoverOuter">
-                                                        <div class="flightLayover mmtConnectLayover">
-                                                            <div class="makeFlex fontSize14">
-                                                                <p> <span style="color: #5d8f3a;">Change of planes</span> <b>{{ convertToHoursMins($data['layovers'][$outGoingFLightSegment['ArrivalAirportLocationCode']]) }}</b> Layover in {{ $data['airports'][$outGoingFLightSegment['ArrivalAirportLocationCode']]['City'] }}</p>
+                                            </div>
+                                            @php  $out++;  @endphp
+                                        @endforeach
+                                        @if($data['search_type'] == 'Return')
+                                            @if(isset($data['flightsIncoming']))
+                                                <hr>
+                                                <div class="return-title fs-20">
+                                                    Return Trip 
+                                                </div>
+                                                <hr>
+                                                @php  
+                                                    $flightsIncoming = $data['flightsIncoming'];
+                                                    $inFrom = $inTo = '';
+                                                    $countIn = count($flightsIncoming);
+                                                    $inn = 1;
+                                                @endphp
+                                                @foreach($flightsIncoming as $inComing)
+
+                                                    @php
+                                                        $incomingFlightSegment = $inComing['FlightSegment'];
+                                                        $inDepAirCode = $incomingFlightSegment['DepartureAirportLocationCode'];
+                                                        $deptAirportDataIn = getAirportData($inDepAirCode);
+
+                                                        $inArrAirCode = $incomingFlightSegment['ArrivalAirportLocationCode'];
+                                                        $arrAirportDataIn = getAirportData($inArrAirCode);
+
+                                                        $airlineCodeIn = $incomingFlightSegment['MarketingAirlineCode'];
+                                                        $airlineDataIn = getAirlineData($airlineCodeIn);
+                                                   
+                                                        if($inn ==1){
+                                                            $inFrom = $inDepAirCode;
+                                                        }elseif($inn == $countIn){
+                                                            $inTo = $inArrAirCode;
+                                                        }
+
+                                                        if($countIn == 1){
+                                                            $inTo = $inArrAirCode;
+                                                        }
+
+                                                        $cabinClassIn = $incomingFlightSegment['CabinClassCode']; 
+                                                    @endphp
+                                                    <div class="py-20 px-30">
+                                                        <div class="row justify-between items-center">
+                                                            <div class="col-auto">
+                                                                <div class="fw-500 text-dark-1">Depart • {{ date('d M, Y', strtotime($incomingFlightSegment['DepartureDateTime'])) }}</div>
+                                                            </div>
+                                                            <div class="col-auto">
+                                                                <div class="text-14 text-light-1">Duration: {{ convertToHoursMins($incomingFlightSegment['JourneyDuration']) }}</div>
+                                                            </div>
+                                                            @if($cabinClassIn == 'Y')
+                                                                @php $cabinClass = "Economy"; @endphp
+                                                            @elseif($cabinClassIn == 'S')
+                                                                @php $cabinClass = "Premium Economy"; @endphp
+                                                            @elseif($cabinClassIn == 'C')
+                                                                @php $cabinClass = "Business"; @endphp
+                                                            @elseif($cabinClassIn == 'F')
+                                                                @php $cabinClass = "First"; @endphp
+                                                            @else
+                                                                @php $cabinClass = $cabinClassIn; @endphp
+                                                            @endif
+                                                            <div class="col-auto">
+                                                                <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}}</div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    
+                                                    <div class="py-30 px-30 border-top-light">
+                                                        <div class="row y-gap-10 justify-between">
+                                                            <div class="col-auto col-sm-8">
+                                                                <div class="d-flex items-center mb-15">
+                                                                    <div class="w-28 d-flex justify-center mr-15"><img
+                                                                            src="{{ $airlineDataIn[0]['AirLineLogo'] }}" alt="image"></div>
+                                                                    <div class="text-14 text-light-1">{{ $incomingFlightSegment['MarketingAirlineName'] }} {{ $airlineCodeIn }} | {{ $incomingFlightSegment['FlightNumber']}}</div>
+                                                                </div>
+                                                                <div class="relative z-0">
+                                                                    <div class="border-line-2"></div>
+                                                                    <div class="d-flex items-center">
+                                                                        <div class="w-28 d-flex justify-center mr-15">
+                                                                            <div class="size-10 border-light rounded-full bg-white"></div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-auto">
+                                                                                <div class="lh-14 fw-500">{{ date('H:i', strtotime($incomingFlightSegment['DepartureDateTime'])) }}</div>
+                                                                            </div>
+                                                                            <div class="col-auto">
+                                                                                <div class="lh-14 fw-500">{{$deptAirportDataIn[0]['AirportName'] }} ({{$inDepAirCode}})</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="d-flex items-center mt-15">
+                                                                        <div class="w-28 d-flex justify-center mr-15"><img
+                                                                                src="{{ asset('assets/img/icon/plane.svg') }}" alt="image">
+                                                                        </div>
+                                                                        <div class="text-14 text-light-1">{{ convertToHoursMins($incomingFlightSegment['JourneyDuration']) }}</div>
+                                                                    </div>
+                                                                    <div class="d-flex items-center mt-15">
+                                                                        <div class="w-28 d-flex justify-center mr-15">
+                                                                            <div class="size-10 border-light rounded-full bg-border"></div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-auto">
+                                                                                <div class="lh-14 fw-500">{{ date('H:i', strtotime($incomingFlightSegment['ArrivalDateTime'])) }}</div>
+                                                                            </div>
+                                                                            <div class="col-auto">
+                                                                                <div class="lh-14 fw-500">{{$arrAirportDataIn[0]['AirportName'] }} ({{$inArrAirCode}})</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="col-sm-4">
+                                                                <div class="makeFlex spaceBetween appendBottom3 fontSize14">
+                                                                    <span class=" col-sm-4 baggageInfoText blackFont">BAGGAGE : </span>
+                                                                    <span class=" col-sm-4 baggageInfoText blackFont text-center">CHECK IN</span>
+                                                                    <span class=" col-sm-4 baggageInfoText blackFont text-center">CABIN</span>
+                                                                </div>
 
-                                                @endif
-                                            </div>
-                                        </div>
-                                        @php  $out++;  @endphp
-                                    @endforeach
-                                    @if($data['search_type'] == 'Return')
-                                        @if(isset($data['flightsIncoming']))
-                                            <hr>
-                                            <div class="return-title fs-20">
-                                                Return Trip 
-                                            </div>
-                                            <hr>
+                                                                @php  
+                                                                    $bagKey = $airlineCodeIn.'_'.$inDepAirCode.'_'.$inArrAirCode;
+                                                                @endphp
+                                                                @if(array_key_exists($bagKey, $data['flightBaggageIn']))
+                                                                    @php   $flightBagInKey = $data['flightBaggageIn'][$bagKey]; @endphp
+                                                                    @foreach($flightBagInKey as $bagKey2=>$bagData)
+                                                                        <div class="makeFlex spaceBetween appendBottom3 fontSize14">
+                                                                            <span class="baggageInfoText darkText col-sm-4"> {{ ($bagKey2=='ADT') ? "Adult" : (($bagKey2=="CHD") ? "Child" : "Infant") }} </span>
+                                                                            <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['baggage'] != '') ? $bagData['baggage'] : '-' }}</span>
+                                                                            <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['cabin_baggage'] != '') ? $bagData['cabin_baggage'] : '-' }}</span>
+                                                                        </div>
+                                                                    @endforeach
+                                                                @endif
+                                                            </div>
+                                                            @if(array_key_exists($inArrAirCode, $data['layoversIn']))
+                                                                <div class="flightLayoverOuter">
+                                                                    <div class="flightLayover mmtConnectLayover">
+                                                                        <div class="makeFlex fontSize14">
+                                                                            <p> <span style="color: #5d8f3a;">Change of planes</span> <b>{{ convertToHoursMins($data['layoversIn'][$inArrAirCode]) }}</b> Layover in {{ $arrAirportDataIn[0]['City'] }}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    @php  $inn++;  @endphp
+                                                @endforeach
+                                            @else
+                                                <hr>
+                                                <div class="return-title fs-20" style="color:red;">
+                                                    <h5>No Return Flight Found. </h5>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    @else
+                                        @foreach($data['flightsOutgoing'] as $outGoing)
                                             @php  
-                                                $inFrom = $inTo = '';
-                                                $countIn = count($data['flightsIncoming']);
-                                                $inn = 1;
+                                                $outGoingFLightSegment =  $outGoing['FlightSegment'];
+                                                $CabinClassCode = $outGoingFLightSegment['CabinClassCode'];
                                             @endphp
-                                            @foreach($data['flightsIncoming'] as $inComing)
-                                                @php  
-                                                    $incomingFlightSegment = $inComing['FlightSegment'];
-                                                    if($inn ==1){
-                                                        $inFrom = $incomingFlightSegment['DepartureAirportLocationCode'];
-                                                    }elseif($inn == $countIn){
-                                                        $inTo = $incomingFlightSegment['ArrivalAirportLocationCode'];
-                                                    }
-
-                                                    if($countIn == 1){
-                                                        $inTo = $incomingFlightSegment['ArrivalAirportLocationCode'];
-                                                    }
-                                                @endphp
+                                            <div class="py-10">
                                                 <div class="py-20 px-30">
                                                     <div class="row justify-between items-center">
                                                         <div class="col-auto">
-                                                            <div class="fw-500 text-dark-1">Depart • {{ date('d M, Y', strtotime($incomingFlightSegment['DepartureDateTime'])) }}</div>
+                                                            <div class="fw-500 text-dark-1">Depart • {{ date('d M, Y', strtotime($outGoingFLightSegment['DepartureDateTime'])) }}</div>
                                                         </div>
                                                         <div class="col-auto">
-                                                            <div class="text-14 text-light-1">Duration: {{ convertToHoursMins($incomingFlightSegment['JourneyDuration']) }}</div>
+                                                            <div class="text-14 text-light-1">Duration: {{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
                                                         </div>
-                                                        @if($incomingFlightSegment['CabinClassCode'] == 'Y')
+                                                        @if($CabinClassCode == 'Y')
                                                             @php $cabinClass = "Economy"; @endphp
-                                                        @elseif($incomingFlightSegment['CabinClassCode'] == 'S')
+                                                        @elseif($CabinClassCode == 'S')
                                                             @php $cabinClass = "Premium Economy"; @endphp
-                                                        @elseif($incomingFlightSegment['CabinClassCode'] == 'C')
+                                                        @elseif($CabinClassCode == 'C')
                                                             @php $cabinClass = "Business"; @endphp
-                                                        @elseif($incomingFlightSegment['CabinClassCode'] == 'F')
+                                                        @elseif($CabinClassCode == 'F')
                                                             @php $cabinClass = "First"; @endphp
                                                         @else
-                                                            @php $cabinClass = $incomingFlightSegment['CabinClassCode']; @endphp
+                                                            @php $cabinClass = $CabinClassCode; @endphp
                                                         @endif
                                                         <div class="col-auto">
                                                             <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}}</div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                @php
+                                                    $outDepAirCode = $outGoingFLightSegment['DepartureAirportLocationCode'];
+                                                    $deptAirportData = getAirportData($outDepAirCode);
+
+                                                    $outArrAirCode = $outGoingFLightSegment['ArrivalAirportLocationCode'];
+                                                    $arrAirportData = getAirportData($outArrAirCode);
+
+                                                    $airlineCode = $outGoingFLightSegment['MarketingAirlineCode'];
+                                                    $airlineData = getAirlineData($airlineCode);
+                                                @endphp
                                                 <div class="py-30 px-30 border-top-light">
                                                     <div class="row y-gap-10 justify-between">
                                                         <div class="col-auto col-sm-8">
                                                             <div class="d-flex items-center mb-15">
                                                                 <div class="w-28 d-flex justify-center mr-15"><img
-                                                                        src="{{ $data['flightData'][$incomingFlightSegment['MarketingAirlineCode']]['AirLineLogo'] }}" alt="image"></div>
-                                                                <div class="text-14 text-light-1">{{ $incomingFlightSegment['MarketingAirlineName'] }} {{ $incomingFlightSegment['MarketingAirlineCode'] }} | {{ $incomingFlightSegment['FlightNumber']}}</div>
+                                                                        src="{{ $airlineData[0]['AirLineLogo'] }}" alt="image"></div>
+                                                                <div class="text-14 text-light-1">{{ $outGoingFLightSegment['MarketingAirlineName'] }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}</div>
                                                             </div>
                                                             <div class="relative z-0">
                                                                 <div class="border-line-2"></div>
@@ -224,12 +376,13 @@
                                                                     <div class="w-28 d-flex justify-center mr-15">
                                                                         <div class="size-10 border-light rounded-full bg-white"></div>
                                                                     </div>
+                                                                    
                                                                     <div class="row">
                                                                         <div class="col-auto">
-                                                                            <div class="lh-14 fw-500">{{ date('H:i', strtotime($incomingFlightSegment['DepartureDateTime'])) }}</div>
+                                                                            <div class="lh-14 fw-500">{{ date('H:i', strtotime($outGoingFLightSegment['DepartureDateTime'])) }}</div>
                                                                         </div>
                                                                         <div class="col-auto">
-                                                                            <div class="lh-14 fw-500">{{$data['airports'][$incomingFlightSegment['DepartureAirportLocationCode']]['AirportName'] }} ({{$incomingFlightSegment['DepartureAirportLocationCode']}})</div>
+                                                                            <div class="lh-14 fw-500">{{$deptAirportData[0]['AirportName'] }} ({{$outDepAirCode}})</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -237,7 +390,7 @@
                                                                     <div class="w-28 d-flex justify-center mr-15"><img
                                                                             src="{{ asset('assets/img/icon/plane.svg') }}" alt="image">
                                                                     </div>
-                                                                    <div class="text-14 text-light-1">{{ convertToHoursMins($incomingFlightSegment['JourneyDuration']) }}</div>
+                                                                    <div class="text-14 text-light-1">{{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
                                                                 </div>
                                                                 <div class="d-flex items-center mt-15">
                                                                     <div class="w-28 d-flex justify-center mr-15">
@@ -245,10 +398,10 @@
                                                                     </div>
                                                                     <div class="row">
                                                                         <div class="col-auto">
-                                                                            <div class="lh-14 fw-500">{{ date('H:i', strtotime($incomingFlightSegment['ArrivalDateTime'])) }}</div>
+                                                                            <div class="lh-14 fw-500">{{ date('H:i', strtotime($outGoingFLightSegment['ArrivalDateTime'])) }}</div>
                                                                         </div>
                                                                         <div class="col-auto">
-                                                                            <div class="lh-14 fw-500">{{$data['airports'][$incomingFlightSegment['ArrivalAirportLocationCode']]['AirportName'] }} ({{$incomingFlightSegment['ArrivalAirportLocationCode']}})</div>
+                                                                            <div class="lh-14 fw-500">{{$arrAirportData[0]['AirportName'] }} ({{$outArrAirCode}})</div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -263,47 +416,37 @@
                                                             </div>
 
                                                             @php  
-                                                                $bagKey = $incomingFlightSegment['MarketingAirlineCode'].'_'.$incomingFlightSegment['DepartureAirportLocationCode'].'_'.$incomingFlightSegment['ArrivalAirportLocationCode'];
+                                                                $bagKey = $airlineCode.'_'.$outDepAirCode.'_'.$outArrAirCode;
                                                             @endphp
-                                                            @if(array_key_exists($bagKey, $data['flightBaggageIn']))
-                                                                @php   $flightBagInKey = $data['flightBaggageIn'][$bagKey]; @endphp
-                                                                @foreach($flightBagInKey as $bagKey2=>$bagData)
+                                                            @if(array_key_exists($bagKey, $data['flightBaggageOut']))
+                                                                @php   $flightBagOutKey = $data['flightBaggageOut'][$bagKey]; @endphp
+                                                                @foreach($flightBagOutKey as $bagKeys=>$bagData)
                                                                     <div class="makeFlex spaceBetween appendBottom3 fontSize14">
-                                                                        <span class="baggageInfoText darkText col-sm-4"> {{ ($bagKey2=='ADT') ? "Adult" : (($bagKey2=="CHD") ? "Child" : "Infant") }} </span>
+                                                                        <span class="baggageInfoText darkText col-sm-4"> {{ ($bagKeys=='ADT') ? "Adult" : (($bagKeys=="CHD") ? "Child" : "Infant") }} </span>
                                                                         <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['baggage'] != '') ? $bagData['baggage'] : '-' }}</span>
                                                                         <span class="baggageInfoText darkText col-sm-4 text-center">{{ ($bagData['cabin_baggage'] != '') ? $bagData['cabin_baggage'] : '-' }}</span>
                                                                     </div>
                                                                 @endforeach
                                                             @endif
                                                         </div>
-                                                        @if(array_key_exists($incomingFlightSegment['ArrivalAirportLocationCode'], $data['layoversIn']))
-                                                            <div class="flightLayoverOuter">
-                                                                <div class="flightLayover mmtConnectLayover">
-                                                                    <div class="makeFlex fontSize14">
-                                                                        <p> <span style="color: #5d8f3a;">Change of planes</span> <b>{{ convertToHoursMins($data['layoversIn'][$incomingFlightSegment['ArrivalAirportLocationCode']]) }}</b> Layover in {{ $data['airports'][$incomingFlightSegment['ArrivalAirportLocationCode']]['City'] }}</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                        @endif
+                                                    
                                                     </div>
                                                 </div>
-                                                @php  $inn++;  @endphp
-                                            @endforeach
-                                        @else
-                                            <hr>
-                                            <div class="return-title fs-20" style="color:red;">
-                                                <h5>No Return Flight Found. </h5>
+                                                @php  $out++;  @endphp
                                             </div>
-                                        @endif
+                                            <hr>
+                                        @endforeach
                                     @endif
                             </div>
                         </div>
                         @php 
                             $amountLi  = $passengerName ='';
                             $totalBase = $totalTax = 0;
+                            $amountLiIn  = $passengerNameIn ='';
+                            $totalBaseIn = $totalTaxIn = 0;
 
                             $adult_amount = $child_amount = $infant_amount = 0;
+                            $adult_amountIn = $child_amountIn = $infant_amountIn = 0;
                           
                             if(isset($data['FareBreakdown'])){
                                 foreach($data['FareBreakdown'] as $fkey=>$fvalue){
@@ -329,6 +472,31 @@
                                     $amountLi .= "<li> ".$passengerName." Price x ". $fvalue['Quantity']."  <span>".$currencyCode." ".$fareBaseMargin."</span></li>";
                                 }
                             }  
+
+                            if(isset($data['FareBreakdownIn'])){
+                                foreach($data['FareBreakdownIn'] as $fkeyIn=>$fvalueIn){
+                                    $fareBaseIn = (float)$fvalueIn['BaseFare']['Amount'];
+                                   
+                                    $fareBaseMarginIn = (($fareBaseIn/100) * $totalmargin) + $fareBaseIn;
+                                    
+                                    $fareBaseMarginIn = number_format(floor($fareBaseMarginIn*100)/100, 2, '.', '');
+                                   
+                                    $totalBaseIn = $totalBaseIn + $fareBaseMarginIn;
+                                    
+                                    $currencyCodeIn = $fvalueIn['BaseFare']['CurrencyCode'];
+                                    if($fkeyIn == 'ADT'){
+                                        $passengerNameIn = 'Adult';
+                                        $adult_amountIn = $fareBaseMarginIn;
+                                    }elseif($fkeyIn == 'CHD'){
+                                        $passengerNameIn = 'Child';
+                                        $child_amountIn = $fareBaseMarginIn;
+                                    }elseif($fkeyIn == 'INF'){
+                                        $passengerNameIn = 'Infant';
+                                        $infant_amountIn = $fareBaseMarginIn;
+                                    }
+                                    $amountLiIn .= "<li> ".$passengerNameIn." Price x ". $fvalueIn['Quantity']."  <span>".$currencyCodeIn." ".$fareBaseMarginIn."</span></li>";
+                                }
+                            }  
                       
                             $desc = array(
                                 'GROUP_PAX' => '(Entire group)', 
@@ -343,8 +511,9 @@
                             $ItinTotalFares =  $data['ItinTotalFares'];
 
                             $TotalFare = $ItinTotalFares['TotalFare'];
+                            $totalFareAmount = $TotalFare['Amount'];
 
-                            $TotalFareMargin = (($TotalFare['Amount']/100) * $totalmargin) + $TotalFare['Amount'];
+                            $TotalFareMargin = (($totalFareAmount/100) * $totalmargin) + $totalFareAmount;
                             $TotalFareMargin = number_format(floor($TotalFareMargin*100)/100, 2, '.', '');
                             
                             $BaseFare = $ItinTotalFares['BaseFare'];
@@ -356,13 +525,42 @@
                             $taxFareMargin = (($TotalTax/100) * $totalmargin) + $TotalTax;
                             $taxFareMargin = number_format(floor($taxFareMargin*100)/100, 2, '.', '');
                             $currencyCode = $TotalFare['CurrencyCode'];
-            
+
+                            $TotalFareMarginIn = $baseFareMarginIn = $taxFareMarginIn = $totalFareAmountIn = $TotalTaxIn = 0;
+
+                            if(isset($data['ItinTotalFaresIn'])){
+                                $ItinTotalFaresIn =  $data['ItinTotalFaresIn'];
+
+                                $TotalFareIn = $ItinTotalFaresIn['TotalFare'];
+                                $totalFareAmountIn = $TotalFareIn['Amount'];
+                                $TotalFareMarginIn = (($TotalFareIn['Amount']/100) * $totalmargin) + $TotalFareIn['Amount'];
+                                $TotalFareMarginIn = number_format(floor($TotalFareMarginIn*100)/100, 2, '.', '');
+                                
+                                $BaseFareIn = $ItinTotalFaresIn['BaseFare'];
+                                $baseFareMarginIn = (($BaseFareIn['Amount']/100) * $totalmargin) + $BaseFareIn['Amount'];
+                                $baseFareMarginIn = number_format(floor($baseFareMarginIn*100)/100, 2, '.', '');
+
+                                $TotalTaxIn = $ItinTotalFaresIn['TotalTax']['Amount'];
+
+                                $taxFareMarginIn = (($TotalTaxIn/100) * $totalmargin) + $TotalTaxIn;
+                                $taxFareMarginIn = number_format(floor($taxFareMarginIn*100)/100, 2, '.', '');
+                                $currencyCodeIn = $TotalFareIn['CurrencyCode'];
+                            }
+                            $totalFareAmount = $totalFareAmount + $totalFareAmountIn;
+                            $TotalFareMargin = $TotalFareMargin + $TotalFareMarginIn;
+                            $taxFareMargin = $taxFareMargin + $taxFareMarginIn;
+                            $TotalTax = $TotalTax + $TotalTaxIn;
+                            $adult_amount = $adult_amount + $adult_amountIn;
+                            $child_amount = $child_amount + $child_amountIn;
+                            $infant_amount = $infant_amount + $infant_amountIn;
+
+                            $baseFareMargin = $baseFareMargin + $baseFareMarginIn; 
                         @endphp
                         <form action="{{ route('flight.create-booking') }}" method="post" id="bookingForm">
                             @csrf
                             <input type="hidden" name="total_addons" id="total_addons" value="0">
                             <input type="hidden" name="currency" id="currency" value="{{$currencyCode}}">
-                            <input type="hidden" name="total_amount_org" id="total_amount_org" value="{{$TotalFare['Amount']}}">
+                            <input type="hidden" name="total_amount_org" id="total_amount_org" value="{{$totalFareAmount}}">
                             <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFareMargin}}">
                             <input type="hidden" name="total_tax" id="total_tax" value="{{$taxFareMargin}}">
                             <input type="hidden" name="total_tax_org" id="total_tax_org" value="{{$TotalTax}}">
@@ -479,31 +677,12 @@
                                             <span class="hide bagError" id="bagInError" > </span>
                                         @endif
                                     </div>
+                                    
                                 </div>
                             </div>
                             @endif
 
-                            @if(isset($data['extraMeals']))
-                            <div class="tour_detail_right_sidebar">
-                                <div class="tour_details_right_boxed">
-                                    <div class="tour_details_right_box_heading">
-                                        <h3>Extra Meal</h3>
-                                    </div>
-                                    <div class="tour_package_details_bar_list">
-                                        <table>
-                                        @foreach($data['extraMeal'] as $exMeal)
-                                            @php  $exMealService = $exMeal['Service'];  @endphp
-                                            <tr>
-                                                <td>{{ $exMealService['Description'] }} {{ $desc[$exMealService['Behavior']] }} </td>
-                                                <td>{{ $exMealService['ServiceCost']['CurrencyCode'] }} {{ $exMealService['ServiceCost']['Amount'] }}   </td>
-                                                <td> <input type="checkbox" value="{{ $exMealService['ServiceId'] }}" class="" name="extraMeals" id="extraMeals"> </td>
-                                            </tr>
-                                        @endforeach
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
+                        
 
                             @if(isset($data['fareRulesOut']))
                             <div class="tour_detail_right_sidebar">
@@ -847,8 +1026,14 @@
                                         </div>
 
                                         <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCode']}}">
+                                        
                                         <input type="hidden" name="session_id" id="session_id" value="{{ $data['session_id'] }}">
-                                        <input type="hidden" name="direction" id="direction" value="{{ $data['DirectionInd'] }}">
+                                        @if(isset($data['FareSourceCodeInbound']))
+                                            <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCodeInbound']}}">
+                                            <input type="hidden" name="direction" id="direction" value="Return">
+                                        @else
+                                            <input type="hidden" name="direction" id="direction" value="{{ $data['DirectionInd'] }}">
+                                        @endif
                                         <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
                                         <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
                                         <input type="hidden" name="adultCount" id="adultCount" value="{{$data['adultCount']}}">
@@ -1040,7 +1225,7 @@
 @endpush
 @push('footer')
 <!-- SweetAlert -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ asset('assets/js/sweetalert.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script src="{{ asset('assets/js/intlTelInput.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
@@ -1055,7 +1240,6 @@
             type: "GET",
             data: { "_token": "{{ csrf_token() }}", "fare_source_code":fare_source_code, "session_id":session_id},
             success: function( response ) {
-                console.log(response);
                 if(response == "failed"){
                     swal({
                         title: "Not Available", 
@@ -1120,12 +1304,6 @@
     input.addEventListener('change', reset);
     input.addEventListener('keyup', reset);
 
-    let one_way_session = '{!! json_encode(Session::get("flight_search_oneway")) !!}';
-    one_way_session = JSON.parse(one_way_session);
-    let return_session = '{!! json_encode(Session::get("flight_search_return")) !!}';
-    return_session = JSON.parse(return_session);
-    let multi_session = '{!! json_encode(Session::get("flight_search_multi")) !!}';
-    multi_session = JSON.parse(multi_session);
 
     $(".passportExpiry").datepicker({
         dateFormat: "yy-mm-dd",
