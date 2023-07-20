@@ -226,7 +226,7 @@
                                     
                                 </div>
                             </div>
-                            @if(!empty($bookings[0]['extraServices'][0]))
+                            @if(!empty($bookings[0]['extraServices']))
                                 @php
                                     $desc = array(
                                         'GROUP_PAX' => '(Entire group)', 
