@@ -165,19 +165,13 @@ class FlightsController extends Controller
                 $stopsLoop = $refundLoop = array();
                 foreach($flightDetails as $fd){
                     // echo '<br><br>Normal loop  ==== '.$loop;
-                    $refundStatus = $fd['FareItinerary']['AirItineraryFareInfo']['IsRefundable'];
-                    $flights[$loop]['FareSourceCode'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareSourceCode'];
-                    $flights[$loop]['FareType'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareType'];
+                    $AirItineraryFareInfoOne = $fd['FareItinerary']['AirItineraryFareInfo'];
+                    $refundStatus = $AirItineraryFareInfoOne['IsRefundable'];
+                    $flights[$loop]['FareSourceCode'] = $AirItineraryFareInfoOne['FareSourceCode'];
+                    $flights[$loop]['FareType'] = $AirItineraryFareInfoOne['FareType'];
                     $flights[$loop]['IsRefundable'] = $refundStatus;
-                    $flights[$loop]['TotalFares'] = $fd['FareItinerary']['AirItineraryFareInfo']['ItinTotalFares'];
+                    $flights[$loop]['TotalFares'] = $AirItineraryFareInfoOne['ItinTotalFares'];
                     $flights[$loop]['DirectionInd'] = $fd['FareItinerary']['DirectionInd'];
-    
-                    $baggage = [];
-                    foreach($fd['FareItinerary']['AirItineraryFareInfo']['FareBreakdown'] as $fareBreak){
-                        $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['Baggage'] = $fareBreak['Baggage'];
-                        $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['CabinBaggage'] = $fareBreak['CabinBaggage'];
-                    }
-                    $flights[$loop]['Baggage'] = $baggage;
     
                     if(strtolower($refundStatus) == 'no' || strtolower($refundStatus) == false){
                         $no_refund++;
@@ -199,7 +193,8 @@ class FlightsController extends Controller
                     }
     
                     $flights[$loop]['totalOutStops'] = $totalStopsCount;
-                    $flights[$loop]['OriginDestinationOptionsOutbound'] = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                    $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                    $flights[$loop]['OriginDestinationOptionsOutbound'] = $flightSegment;
                         
                     $layover = [];
                     $journeyDurations = 0;
@@ -208,14 +203,14 @@ class FlightsController extends Controller
                     // echo '<br>Total Stops ====== '.$totalStopsCount;
                     
                     for($i=0; $i <= $totalStopsCount; $i++){
-                        $journeyDurations += $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][$i]['FlightSegment']['JourneyDuration'];
-                        $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                        $journeyDurations += $flightSegment[$i]['FlightSegment']['JourneyDuration'];
+                        $DepartureAirportLocationCode = $flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'];
                         if($totalStopsCount > 0){
                             if($i != 0 ){
                                 // if($flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
                                     $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$i]['FlightSegment']['DepartureDateTime']);
-                                    $layover[$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMin;
-                                    $layover['place'][] = $data['airports'][$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']]['City'];
+                                    $layover[$DepartureAirportLocationCode] = $timeInMin;
+                                    $layover['place'][] = $data['airports'][$DepartureAirportLocationCode]['City'];
                                     $layover['duration'][] = $timeInMin;                                
                                 // }
                             }
@@ -224,27 +219,23 @@ class FlightsController extends Controller
                         $flightCodes [] = $airlineCode;
                         $data['airlines'][$airlineCode] = isset($data['airlines'][$airlineCode]) ? ($data['airlines'][$airlineCode] + 1) : 1;
 
-                        $originCode = $flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'];
+                        $originCode = $DepartureAirportLocationCode;
                         $destinationCode = $flightSegment[$i]['FlightSegment']['ArrivalAirportLocationCode'];
                         
                         if(!empty($airlineFilters) && in_array($airlineCode, $airlineFilters)){
                             $unsetLoops[] = $loop;
                         }
-                        foreach($baggage as $key=>$value){
-                            $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = $value['Baggage'][$i];
-                            $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = $value['CabinBaggage'][$i];
-                        }
+                       
                     }
                        
                     if($totalStopsCount == 0){
-                        $totalDuration = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'];
+                        $totalDuration = $flightSegment[0]['FlightSegment']['JourneyDuration'];
                     }else{
                         $totalDuration = (isset($layover['duration'])) ? array_sum($layover['duration']) + $journeyDurations : $journeyDurations;
                     }
                     $flights[$loop]['totalDuration'] = $totalDuration;
                     $flights[$loop]['layovers'] = $layover;
-                    $flights[$loop]['flightBaggage'] = $flightBaggage;
-                       
+                   
                     // print_r($unsetLoops);
                     if(!empty($stopFilters) && in_array($totalStopsCount, $stopFilters)){
                         $stopsLoop[] = $loop;
@@ -300,19 +291,13 @@ class FlightsController extends Controller
                     $stopsLoop = $refundLoop = array();
                     foreach($flightDetails as $fd){
                         // echo '<br><br>Normal loop  ==== '.$loop;
-                        $refundStatus = $fd['FareItinerary']['AirItineraryFareInfo']['IsRefundable'];
-                        $flights[$loop]['FareSourceCode'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareSourceCode'];
-                        $flights[$loop]['FareType'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareType'];
+                        $AirItineraryFareInfoRe = $fd['FareItinerary']['AirItineraryFareInfo'];
+                        $refundStatus = $AirItineraryFareInfoRe['IsRefundable'];
+                        $flights[$loop]['FareSourceCode'] = $AirItineraryFareInfoRe['FareSourceCode'];
+                        $flights[$loop]['FareType'] = $AirItineraryFareInfoRe['FareType'];
                         $flights[$loop]['IsRefundable'] = $refundStatus;
-                        $flights[$loop]['TotalFares'] = $fd['FareItinerary']['AirItineraryFareInfo']['ItinTotalFares'];
+                        $flights[$loop]['TotalFares'] = $AirItineraryFareInfoRe['ItinTotalFares'];
                         $flights[$loop]['DirectionInd'] = $fd['FareItinerary']['DirectionInd'];
-        
-                        $baggage = [];
-                        foreach($fd['FareItinerary']['AirItineraryFareInfo']['FareBreakdown'] as $fareBreak){
-                            $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['Baggage'] = $fareBreak['Baggage'];
-                            $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['CabinBaggage'] = $fareBreak['CabinBaggage'];
-                        }
-                        $flights[$loop]['Baggage'] = $baggage;
         
                         if(strtolower($refundStatus) == 'no' || strtolower($refundStatus) == false){
                             $no_refund++;
@@ -330,55 +315,51 @@ class FlightsController extends Controller
                         }elseif($totalStopsOutCount == 3){
                             $three_stop++;
                         }
-        
+                        $OriginDestinationOption = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
                         $flights[$loop]['totalOutStops'] = $totalStopsOutCount;
-                        $flights[$loop]['OriginDestinationOptionsOutbound'] = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                        $flights[$loop]['OriginDestinationOptionsOutbound'] = $OriginDestinationOption;
                         
                         $layover = [];
                         $journeyDurations = 0;
-                        $bagCount = 0;
+                       
                         $flightBaggage = [];
                         for($i=0; $i <= $totalStopsOutCount; $i++){
-                            $journeyDurations += $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][$i]['FlightSegment']['JourneyDuration'];
-                            $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                            $journeyDurations += $OriginDestinationOption[$i]['FlightSegment']['JourneyDuration'];
+                            $flightSegment = $OriginDestinationOption;
+                            $newFlightSegment = $flightSegment[$i]['FlightSegment'];
+                            $DepartureAirportLocationCode = $newFlightSegment['DepartureAirportLocationCode'];
                             if($totalStopsOutCount > 0){
                                 if($i != 0){
                                     // if($flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
 
-                                        $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$i]['FlightSegment']['DepartureDateTime']);
-                                        $layover[$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMin;
-                                        $layover['place'][] = $data['airports'][$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']]['City'];
+                                        $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $newFlightSegment['DepartureDateTime']);
+                                        $layover[$DepartureAirportLocationCode] = $timeInMin;
+                                        $layover['place'][] = $data['airports'][$DepartureAirportLocationCode]['City'];
                                         $layover['duration'][] = $timeInMin;    
                                     // }
                                 }
                             }
-                            $airlineCode = $flightSegment[$i]['FlightSegment']['MarketingAirlineCode'];
+                            $airlineCode = $newFlightSegment['MarketingAirlineCode'];
                             $flightCodes [] = $airlineCode;
                             $data['airlines'][$airlineCode] = isset($data['airlines'][$airlineCode]) ? ($data['airlines'][$airlineCode] + 1) : 1;
 
-                            $originCode = $flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'];
-                            $destinationCode = $flightSegment[$i]['FlightSegment']['ArrivalAirportLocationCode'];
-                            
-                            foreach($baggage as $key=>$value){
-                                $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = $value['Baggage'][$bagCount];
-                                $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = $value['CabinBaggage'][$bagCount];
-                            }
-                            $bagCount = $bagCount + 1;
+                            $originCode = $DepartureAirportLocationCode;
+                            $destinationCode = $newFlightSegment['ArrivalAirportLocationCode'];
+                           
                             if(!empty($airlineFilters) && in_array($airlineCode, $airlineFilters)){
                                 $unsetLoops[] = $loop;
                             }
                         }
 
                         if($totalStopsOutCount == 0){
-                            $totalDuration = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'];
+                            $totalDuration = $OriginDestinationOption[0]['FlightSegment']['JourneyDuration'];
                         }else{
                             $totalDuration = array_sum($layover['duration']) + $journeyDurations;
                         }
 
                         $flights[$loop]['totalDuration'] = $totalDuration;
                         $flights[$loop]['layovers'] = $layover;
-                        $flights[$loop]['flightBaggage'] = $flightBaggage;
-
+                        
                         if(!empty($stopFilters) && (in_array($totalStopsOutCount, $stopFilters))){
                             $stopsLoop[] = $loop;
                         }
@@ -427,19 +408,13 @@ class FlightsController extends Controller
                     $stopsLoopIn = $refundLoopIn = array();
                     foreach($flightDetailsInbound as $fdIn){
                         // echo '<br><br>Normal loop  ==== '.$loop;
-                        $refundStatusIn = $fdIn['FareItinerary']['AirItineraryFareInfo']['IsRefundable'];
-                        $flightsIn[$loopIn]['FareSourceCode'] = $fdIn['FareItinerary']['AirItineraryFareInfo']['FareSourceCode'];
-                        $flightsIn[$loopIn]['FareType'] = $fdIn['FareItinerary']['AirItineraryFareInfo']['FareType'];
+                        $inAirItineraryFareInfo = $fdIn['FareItinerary']['AirItineraryFareInfo'];
+                        $refundStatusIn = $inAirItineraryFareInfo['IsRefundable'];
+                        $flightsIn[$loopIn]['FareSourceCode'] = $inAirItineraryFareInfo['FareSourceCode'];
+                        $flightsIn[$loopIn]['FareType'] = $inAirItineraryFareInfo['FareType'];
                         $flightsIn[$loopIn]['IsRefundable'] = $refundStatusIn;
-                        $flightsIn[$loopIn]['TotalFares'] = $fdIn['FareItinerary']['AirItineraryFareInfo']['ItinTotalFares'];
+                        $flightsIn[$loopIn]['TotalFares'] = $inAirItineraryFareInfo['ItinTotalFares'];
                         $flightsIn[$loopIn]['DirectionInd'] = $fdIn['FareItinerary']['DirectionInd'];
-        
-                        $baggageIn = [];
-                        foreach($fdIn['FareItinerary']['AirItineraryFareInfo']['FareBreakdown'] as $fareBreakIn){
-                            $baggageIn[$fareBreakIn['PassengerTypeQuantity']['Code']]['Baggage'] = $fareBreakIn['Baggage'];
-                            $baggageIn[$fareBreakIn['PassengerTypeQuantity']['Code']]['CabinBaggage'] = $fareBreakIn['CabinBaggage'];
-                        }
-                        $flightsIn[$loopIn]['Baggage'] = $baggageIn;
         
                         if(strtolower($refundStatusIn) == 'no' || strtolower($refundStatusIn) == false){
                             $no_refund++;
@@ -457,55 +432,50 @@ class FlightsController extends Controller
                         }elseif($totalStopsInCount == 3){
                             $three_stop++;
                         }
-        
+                        $flightSegmentIn = $fdIn['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
                         $flightsIn[$loopIn]['totalInStops'] = $totalStopsInCount;
-                        $flightsIn[$loopIn]['OriginDestinationOptionsInbound'] = $fdIn['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                        $flightsIn[$loopIn]['OriginDestinationOptionsInbound'] = $flightSegmentIn;
         
                         $layoverIn = [];
                         $journeyDurationsIn = 0;
                         $bagCountIn = 0;
                         $flightBaggageIn = [];
                         for($j=0; $j <= $totalStopsInCount; $j++){
-                            $journeyDurationsIn += $fdIn['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][$j]['FlightSegment']['JourneyDuration'];
-                            $flightSegmentIn = $fdIn['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                            $jFlightSegment  = $flightSegmentIn[$j]['FlightSegment'];
+                            $journeyDurationsIn += $jFlightSegment['JourneyDuration'];
+                            
                             if($totalStopsInCount > 0){
                                 if($j != 0){
-                                    // if($flightSegmentIn[$j]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegmentIn[$j-1]['FlightSegment']['ArrivalAirportLocationCode']){
+                                    // if($jFlightSegment['DepartureAirportLocationCode'] == $flightSegmentIn[$j-1]['FlightSegment']['ArrivalAirportLocationCode']){
 
-                                        $timeInMinIn = getTimeDiffInMInutes($flightSegmentIn[$j-1]['FlightSegment']['ArrivalDateTime'], $flightSegmentIn[$j]['FlightSegment']['DepartureDateTime']);
-                                        $layoverIn[$flightSegmentIn[$j]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMinIn;
-                                        $layoverIn['place'][] = $data['airports'][$flightSegmentIn[$j]['FlightSegment']['DepartureAirportLocationCode']]['City'];
+                                        $timeInMinIn = getTimeDiffInMInutes($flightSegmentIn[$j-1]['FlightSegment']['ArrivalDateTime'], $jFlightSegment['DepartureDateTime']);
+                                        $layoverIn[$jFlightSegment['DepartureAirportLocationCode']] = $timeInMinIn;
+                                        $layoverIn['place'][] = $data['airports'][$jFlightSegment['DepartureAirportLocationCode']]['City'];
                                         $layoverIn['duration'][] = $timeInMinIn;                               
                                     // }
                                 }
                             }
-                            $airlineCodeIn = $flightSegmentIn[$j]['FlightSegment']['MarketingAirlineCode'];
+                            $airlineCodeIn = $jFlightSegment['MarketingAirlineCode'];
                             $flightCodesIn [] = $airlineCodeIn;
                             $data['airlines'][$airlineCodeIn] = isset($data['airlines'][$airlineCodeIn]) ? ($data['airlines'][$airlineCodeIn] + 1) : 1;
 
-                            $originCodeIn = $flightSegmentIn[$j]['FlightSegment']['DepartureAirportLocationCode'];
-                            $destinationCodeIn = $flightSegmentIn[$j]['FlightSegment']['ArrivalAirportLocationCode'];
-                            
-                            foreach($baggage as $keyIn=>$valueIn){
-                                $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['baggage'] = (isset($valueIn['Baggage'][$bagCountIn])) ? $valueIn['Baggage'][$bagCountIn] : '';
-                                $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['cabin_baggage'] = (isset($valueIn['CabinBaggage'][$bagCountIn])) ? $valueIn['CabinBaggage'][$bagCountIn] : '';
-                            }
-                            $bagCountIn = $bagCountIn + 1;
+                            $originCodeIn = $jFlightSegment['DepartureAirportLocationCode'];
+                            $destinationCodeIn = $jFlightSegment['ArrivalAirportLocationCode'];
+                        
                             if(!empty($airlineFilters) && in_array($airlineCodeIn, $airlineFilters)){
                                 $unsetLoopsIn[] = $loopIn;
                             }
                         }
 
                         if($totalStopsInCount == 0){
-                            $totalDurationIn = $fdIn['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'];
+                            $totalDurationIn = $flightSegmentIn[0]['FlightSegment']['JourneyDuration'];
                         }else{
                             $totalDurationIn = array_sum($layoverIn['duration']) + $journeyDurationsIn;
                         }
         
                         $flightsIn[$loopIn]['totalDurationIn'] = $totalDurationIn;
                         $flightsIn[$loopIn]['layoversIn'] = $layoverIn;
-                        $flightsIn[$loopIn]['flightBaggageIn'] = $flightBaggageIn;
-
+                       
                         if(!empty($stopFilters) && (in_array($totalStopsInCount, $stopFilters))){
                             $stopsLoopIn[] = $loopIn;
                         }
@@ -557,29 +527,23 @@ class FlightsController extends Controller
                     $stopsLoop = $refundLoop = array();
                     foreach($flightDetails as $fd){
                         // echo '<br><br>Normal loop  ==== '.$loop;
-                        $refundStatus = $fd['FareItinerary']['AirItineraryFareInfo']['IsRefundable'];
-                        $flights[$loop]['FareSourceCode'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareSourceCode'];
-                        $flights[$loop]['FareType'] = $fd['FareItinerary']['AirItineraryFareInfo']['FareType'];
+                        $AirItineraryFareInfoReN  = $fd['FareItinerary']['AirItineraryFareInfo'];
+                        $refundStatus = $AirItineraryFareInfoReN['IsRefundable'];
+                        $flights[$loop]['FareSourceCode'] = $AirItineraryFareInfoReN['FareSourceCode'];
+                        $flights[$loop]['FareType'] = $AirItineraryFareInfoReN['FareType'];
                         $flights[$loop]['IsRefundable'] = $refundStatus;
-                        $flights[$loop]['TotalFares'] = $fd['FareItinerary']['AirItineraryFareInfo']['ItinTotalFares'];
+                        $flights[$loop]['TotalFares'] = $AirItineraryFareInfoReN['ItinTotalFares'];
                         $flights[$loop]['DirectionInd'] = $fd['FareItinerary']['DirectionInd'];
-        
-                        $baggage = [];
-                        foreach($fd['FareItinerary']['AirItineraryFareInfo']['FareBreakdown'] as $fareBreak){
-                            $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['Baggage'] = $fareBreak['Baggage'];
-                            $baggage[$fareBreak['PassengerTypeQuantity']['Code']]['CabinBaggage'] = $fareBreak['CabinBaggage'];
-                        }
-                        $flights[$loop]['Baggage'] = $baggage;
         
                         if(strtolower($refundStatus) == 'no' || strtolower($refundStatus) == false){
                             $no_refund++;
                         }else{
                             $refund++;
                         }
-                
-                            
-                        $totalStopsOutCount = $fd['FareItinerary']['OriginDestinationOptions'][0]['TotalStops'];
-                        $totalStopsInCount = isset($fd['FareItinerary']['OriginDestinationOptions'][1]) ? $fd['FareItinerary']['OriginDestinationOptions'][1]['TotalStops'] : '';
+                        $newOriginDestinationOptions  =  $fd['FareItinerary']['OriginDestinationOptions'];
+                        
+                        $totalStopsOutCount = $newOriginDestinationOptions[0]['TotalStops'];
+                        $totalStopsInCount = isset($newOriginDestinationOptions[1]) ? $newOriginDestinationOptions[1]['TotalStops'] : '';
 
                         if($totalStopsOutCount == 0){
                             $non_stop++;
@@ -600,49 +564,45 @@ class FlightsController extends Controller
                         }elseif($totalStopsInCount == 3){
                             $three_stop++;
                         }
-        
+                        $flightSegment = $newOriginDestinationOptions[0]['OriginDestinationOption'];
                         $flights[$loop]['totalOutStops'] = $totalStopsOutCount;
                         $flights[$loop]['totalInStops'] = $totalStopsInCount;
-                        $flights[$loop]['OriginDestinationOptionsOutbound'] = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
-                        $flights[$loop]['OriginDestinationOptionsInbound'] = isset($fd['FareItinerary']['OriginDestinationOptions'][1]) ? $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'] : [];
+                        $flights[$loop]['OriginDestinationOptionsOutbound'] = $flightSegment;
+                        $flights[$loop]['OriginDestinationOptionsInbound'] = isset($newOriginDestinationOptions[1]) ? $newOriginDestinationOptions[1]['OriginDestinationOption'] : [];
         
                         $layover = [];
                         $journeyDurations = 0;
                         $bagCount = 0;
                         $flightBaggage = [];
                         for($i=0; $i <= $totalStopsOutCount; $i++){
-                            $journeyDurations += $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][$i]['FlightSegment']['JourneyDuration'];
-                            $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'];
+                            $iFlightSegment = $flightSegment[$i]['FlightSegment'];
+                            $journeyDurations += $iFlightSegment['JourneyDuration'];
+                            
                             if($totalStopsOutCount > 0){
                                 if($i != 0){
-                                    // if($flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
+                                    // if($iFlightSegment['DepartureAirportLocationCode'] == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
 
-                                        $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$i]['FlightSegment']['DepartureDateTime']);
-                                        $layover[$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMin;
-                                        $layover['place'][] = $data['airports'][$flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode']]['City'];
+                                        $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $iFlightSegment['DepartureDateTime']);
+                                        $layover[$iFlightSegment['DepartureAirportLocationCode']] = $timeInMin;
+                                        $layover['place'][] = $data['airports'][$iFlightSegment['DepartureAirportLocationCode']]['City'];
                                         $layover['duration'][] = $timeInMin;    
                                     // }
                                 }
                             }
-                            $airlineCode = $flightSegment[$i]['FlightSegment']['MarketingAirlineCode'];
+                            $airlineCode = $iFlightSegment['MarketingAirlineCode'];
                             $flightCodes [] = $airlineCode;
                             $data['airlines'][$airlineCode] = isset($data['airlines'][$airlineCode]) ? ($data['airlines'][$airlineCode] + 1) : 1;
 
-                            $originCode = $flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'];
-                            $destinationCode = $flightSegment[$i]['FlightSegment']['ArrivalAirportLocationCode'];
-                            
-                            foreach($baggage as $key=>$value){
-                                $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = $value['Baggage'][$bagCount];
-                                $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = $value['CabinBaggage'][$bagCount];
-                            }
-                            $bagCount = $bagCount + 1;
+                            $originCode = $iFlightSegment['DepartureAirportLocationCode'];
+                            $destinationCode = $iFlightSegment['ArrivalAirportLocationCode'];
+    
                             if(!empty($airlineFilters) && in_array($airlineCode, $airlineFilters)){
                                 $unsetLoops[] = $loop;
                             }
                         }
 
                         if($totalStopsOutCount == 0){
-                            $totalDuration = $fd['FareItinerary']['OriginDestinationOptions'][0]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'];
+                            $totalDuration = $flightSegment[0]['FlightSegment']['JourneyDuration'];
                         }else{
                             $totalDuration = array_sum($layover['duration']) + $journeyDurations;
                         }
@@ -652,32 +612,29 @@ class FlightsController extends Controller
                         $journeyDurationsIn = 0;
                         $flightBaggageIn = [];
                         for($j=0; $j <= $totalStopsInCount; $j++){
-                            if(isset($fd['FareItinerary']['OriginDestinationOptions'][1])){
-                                $journeyDurationsIn += $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'][$j]['FlightSegment']['JourneyDuration'];
-                                $flightSegment = $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'];
+                            if(isset($newOriginDestinationOptions[1])){
+                                $jFlightSegment  = $flightSegment[$j]['FlightSegment'];
+
+                                $journeyDurationsIn += $newOriginDestinationOptions[1]['OriginDestinationOption'][$j]['FlightSegment']['JourneyDuration'];
+                                $flightSegment = $newOriginDestinationOptions[1]['OriginDestinationOption'];
                                 if($totalStopsInCount > 0){
                                     if($j != 0){
-                                        // if($flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$j-1]['FlightSegment']['ArrivalAirportLocationCode']){
+                                        // if($jFlightSegment['DepartureAirportLocationCode'] == $flightSegment[$j-1]['FlightSegment']['ArrivalAirportLocationCode']){
 
-                                            $timeInMin = getTimeDiffInMInutes($flightSegment[$j-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$j]['FlightSegment']['DepartureDateTime']);
-                                            $layoverIn[$flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode']] = $timeInMin;
-                                            $layoverIn['place'][] = $data['airports'][$flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode']]['City'];
+                                            $timeInMin = getTimeDiffInMInutes($flightSegment[$j-1]['FlightSegment']['ArrivalDateTime'], $jFlightSegment['DepartureDateTime']);
+                                            $layoverIn[$jFlightSegment['DepartureAirportLocationCode']] = $timeInMin;
+                                            $layoverIn['place'][] = $data['airports'][$jFlightSegment['DepartureAirportLocationCode']]['City'];
                                             $layoverIn['duration'][] = $timeInMin;                               
                                         // }
                                     }
                                 }
-                                $airlineCode = $flightSegment[$j]['FlightSegment']['MarketingAirlineCode'];
+                                $airlineCode = $jFlightSegment['MarketingAirlineCode'];
                                 $flightCodes [] = $airlineCode;
                                 $data['airlines'][$airlineCode] = isset($data['airlines'][$airlineCode]) ? ($data['airlines'][$airlineCode] + 1) : 1;
 
-                                $originCode = $flightSegment[$j]['FlightSegment']['DepartureAirportLocationCode'];
-                                $destinationCode = $flightSegment[$j]['FlightSegment']['ArrivalAirportLocationCode'];
+                                $originCode = $jFlightSegment['DepartureAirportLocationCode'];
+                                $destinationCode = $jFlightSegment['ArrivalAirportLocationCode'];
                                 
-                                foreach($baggage as $key=>$value){
-                                    $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = $value['Baggage'][$bagCount];
-                                    $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = $value['CabinBaggage'][$bagCount];
-                                }
-                                $bagCount = $bagCount + 1;
                                 if(!empty($airlineFilters) && in_array($airlineCode, $airlineFilters)){
                                     $unsetLoops[] = $loop;
                                 }
@@ -685,19 +642,17 @@ class FlightsController extends Controller
                         }
 
                         if($totalStopsInCount == 0){
-                            $totalDurationIn = isset($fd['FareItinerary']['OriginDestinationOptions'][1]) ?  $fd['FareItinerary']['OriginDestinationOptions'][1]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'] : 0;
+                            $totalDurationIn = isset($newOriginDestinationOptions[1]) ?  $newOriginDestinationOptions[1]['OriginDestinationOption'][0]['FlightSegment']['JourneyDuration'] : 0;
                         }else{
                             $totalDurationIn = isset($layoverIn['duration']) ? (array_sum($layoverIn['duration']) + $journeyDurationsIn) : $journeyDurationsIn;
                         }
         
                         $flights[$loop]['totalDurationIn'] = $totalDurationIn;
                         $flights[$loop]['layoversIn'] = $layoverIn;
-                        $flights[$loop]['flightBaggageIn'] = $flightBaggageIn;
-
+                       
                         $flights[$loop]['totalDuration'] = $totalDuration;
                         $flights[$loop]['layovers'] = $layover;
-                        $flights[$loop]['flightBaggage'] = $flightBaggage;
-
+                        
                         if(!empty($stopFilters) && (in_array($totalStopsOutCount, $stopFilters) || in_array($totalStopsInCount, $stopFilters))){
                             $stopsLoop[] = $loop;
                         }
@@ -772,6 +727,7 @@ class FlightsController extends Controller
         $data = [];
         // echo '<pre>';
         // print_r($request->all());
+        // die;
         if(isset($request->FareSourceCodeIn)){
             $apiKeys = [ 
                 "session_id" => $request->session_id,
@@ -788,6 +744,7 @@ class FlightsController extends Controller
         
         $data['session_id'] = $request->session_id;
         $data['fare_sourceCode'] = $request->FareSourceCode;
+        $data['fare_sourceCode_inbound'] = isset($request->FareSourceCodeIn) ? $request->FareSourceCodeIn : '';
         $data['search_type'] = $request->search_type;
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
         $data['countries'] = Countries::orderBy('name','ASC')->get();
@@ -802,175 +759,373 @@ class FlightsController extends Controller
         $layover = $layoverIn = [];
         $journeyDurations = $journeyDurationsIn = 0;
         $flightBaggage = $flightBaggageIn = [];
-        $bagCount = 0;
+        $bagCount =$bagCountIn = 0;
 
-        $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
-        if($IsValid == 1 || $IsValid == true){
-            $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
-            $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
-            if(isset($FareItineraries['FareItinerary'])){
-                $FareItinerary = $FareItineraries['FareItinerary'];
-                $AirItineraryFareInfo = $FareItinerary['AirItineraryFareInfo'];
-                $ItinTotalFares = $AirItineraryFareInfo['ItinTotalFares'];
+        if(!isset($result['AirRevalidateResponse']['AirRevalidateResultInbound'])){
+            $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
+            if($IsValid == 1 || $IsValid == true){
+                $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
+                $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
+                if(isset($FareItineraries['FareItinerary'])){
+                    $FareItinerary = $FareItineraries['FareItinerary'];
+                    $AirItineraryFareInfo = $FareItinerary['AirItineraryFareInfo'];
+                    $ItinTotalFares = $AirItineraryFareInfo['ItinTotalFares'];
 
-                $data['FareSourceCode'] = $AirItineraryFareInfo['FareSourceCode'];
-                $data['FareType'] =  $AirItineraryFareInfo['FareType'];
-                $data['IsRefundable'] = $AirItineraryFareInfo['IsRefundable'];
-                $data['totalBaseFare'] = $ItinTotalFares['BaseFare'];
-                $data['totalTax'] = $ItinTotalFares['TotalTax'];
-                $data['totalFare'] = $ItinTotalFares['TotalFare'];
-                $data['ItinTotalFares'] = $ItinTotalFares;
-                $data['IsPassportMandatory'] =$FareItinerary['IsPassportMandatory'];
-                $data['DirectionInd'] =$FareItinerary['DirectionInd'];
-                $baggage = [];
-                $passengers = [];
-                $adultCount = $childCount = $infantCount = 0;
-                
-                foreach($AirItineraryFareInfo['FareBreakdown'] as $fareBreak){
-                    $passengerCode = $fareBreak['PassengerTypeQuantity']['Code'];
-                    $passengerQuantity = $fareBreak['PassengerTypeQuantity']['Quantity'];
-                    if($passengerCode == "ADT"){
-                        $adultCount = $passengerQuantity;
-                    }elseif($passengerCode == "CHD"){
-                        $childCount = $passengerQuantity;
-                    }elseif($passengerCode == "INF"){
-                        $infantCount = $passengerQuantity;
-                    }
-                    $PassengerFare = $fareBreak['PassengerFare'];
-                    $baggage[$passengerCode]['Baggage'] = $fareBreak['Baggage'];
-                    $baggage[$passengerCode]['CabinBaggage'] = $fareBreak['CabinBaggage'];
-                    $baggage[$passengerCode]['Quantity'] = $passengerQuantity;
-                    $baggage[$passengerCode]['CabinBaggage'] = $fareBreak['CabinBaggage'];
-                    $baggage[$passengerCode]['BaseFare'] = $PassengerFare['BaseFare'];
-                    $baggage[$passengerCode]['ServiceTax'] = $PassengerFare['ServiceTax'];
-                    $baggage[$passengerCode]['TotalFare'] = $PassengerFare['TotalFare'];
-
-                    $passengers[$passengerCode] = $passengerQuantity;
-                }
-                $data['adultCount'] = $adultCount;
-                $data['childCount'] = $childCount;
-                $data['infantCount'] = $infantCount;
-                $data['FareBreakdown'] = $baggage;
-                $data['passengers'] = $passengers;
-
-                if($request->search_type != 'Circle'){
-                    $flightOutgoing = isset($FareItineraries['FareItinerary']['OriginDestinationOptions'][0]) ? $FareItineraries['FareItinerary']['OriginDestinationOptions'][0] : [];
-                    if(!empty($flightOutgoing)){
-                        $totalStopsCountOut = $flightOutgoing['TotalStops'];
-                        $data['flightsOutgoing'] = $flightSegment = $flightOutgoing['OriginDestinationOption'];
-                        for($i=0; $i <= $totalStopsCountOut; $i++){
-                            $i_FlightSegment = $flightSegment[$i]['FlightSegment'];
-                            $i_DepartureAirportCode = $i_FlightSegment['DepartureAirportLocationCode'];
-                            $journeyDurations += $i_FlightSegment['JourneyDuration'];
-                            if($totalStopsCountOut > 0){
-                                if($i != 0){
-                                    // if($i_DepartureAirportCode == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
-                                        $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $i_FlightSegment['DepartureDateTime']);
-                                        $layover[$i_DepartureAirportCode] = $timeInMin;
-                                        $layover['place'][] = $data['airports'][$i_DepartureAirportCode]['City'];
-                                        $layover['duration'][] = $timeInMin;                                
-                                    // }
-                                }
-                            }
-                            $airlineCode = $i_FlightSegment['MarketingAirlineCode'];
-                            
-                            $originCode = $i_DepartureAirportCode;
-                            $destinationCode = $i_FlightSegment['ArrivalAirportLocationCode'];
-                        
-                            foreach($baggage as $key=>$value){
-                                $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = (isset($value['Baggage'][$bagCount])) ? $value['Baggage'][$bagCount] : '';
-                                $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = (isset($value['CabinBaggage'][$bagCount])) ? $value['CabinBaggage'][$bagCount] : '';
-                            }
-                            $bagCount = $bagCount + 1;
+                    $data['FareSourceCode'] = $AirItineraryFareInfo['FareSourceCode'];
+                    $data['FareType'] =  $AirItineraryFareInfo['FareType'];
+                    $data['IsRefundable'] = $AirItineraryFareInfo['IsRefundable'];
+                    $data['totalBaseFare'] = $ItinTotalFares['BaseFare'];
+                    $data['totalTax'] = $ItinTotalFares['TotalTax'];
+                    $data['totalFare'] = $ItinTotalFares['TotalFare'];
+                    $data['ItinTotalFares'] = $ItinTotalFares;
+                    $data['IsPassportMandatory'] =$FareItinerary['IsPassportMandatory'];
+                    $data['DirectionInd'] =$FareItinerary['DirectionInd'];
+                    $baggage = [];
+                    $passengers = [];
+                    $adultCount = $childCount = $infantCount = 0;
+                    
+                    foreach($AirItineraryFareInfo['FareBreakdown'] as $fareBreak){
+                        $passengerCode = $fareBreak['PassengerTypeQuantity']['Code'];
+                        $passengerQuantity = $fareBreak['PassengerTypeQuantity']['Quantity'];
+                        if($passengerCode == "ADT"){
+                            $adultCount = $passengerQuantity;
+                        }elseif($passengerCode == "CHD"){
+                            $childCount = $passengerQuantity;
+                        }elseif($passengerCode == "INF"){
+                            $infantCount = $passengerQuantity;
                         }
-                        $data['flightBaggageOut'] = $flightBaggage;
-                        $data['layovers'] = $layover;
-                    }
+                        $PassengerFare = $fareBreak['PassengerFare'];
+                        $baggage[$passengerCode]['Baggage'] = $fareBreak['Baggage'];
+                        $baggage[$passengerCode]['CabinBaggage'] = $fareBreak['CabinBaggage'];
+                        $baggage[$passengerCode]['Quantity'] = $passengerQuantity;
+                        $baggage[$passengerCode]['CabinBaggage'] = $fareBreak['CabinBaggage'];
+                        $baggage[$passengerCode]['BaseFare'] = $PassengerFare['BaseFare'];
+                        $baggage[$passengerCode]['ServiceTax'] = $PassengerFare['ServiceTax'];
+                        $baggage[$passengerCode]['TotalFare'] = $PassengerFare['TotalFare'];
 
-                    $flightIncoming = isset($FareItineraries['FareItinerary']['OriginDestinationOptions'][1]) ? $FareItineraries['FareItinerary']['OriginDestinationOptions'][1] : [];
-                    if(!empty($flightIncoming)){
-                        $totalStopsCountIn = $flightIncoming['TotalStops'];
-                        $data['flightsIncoming'] = $flightSegmentIn = $flightIncoming['OriginDestinationOption'];
-                        for($in=0; $in <= $totalStopsCountIn; $in++){
-                            $in_FlightSegment = $flightSegmentIn[$in]['FlightSegment'];
-                            $journeyDurationsIn += $in_FlightSegment['JourneyDuration'];
-                            $in_DepartureAirportCode = $in_FlightSegment['DepartureAirportLocationCode'];
-                            if($totalStopsCountIn > 0){
-                                if($in != 0){
-                                    // if($in_DepartureAirportCode == $flightSegmentIn[$in-1]['FlightSegment']['ArrivalAirportLocationCode']){
-                                        $timeInMin = getTimeDiffInMInutes($flightSegmentIn[$in-1]['FlightSegment']['ArrivalDateTime'], $in_FlightSegment['DepartureDateTime']);
-                                        $layoverIn[$in_DepartureAirportCode] = $timeInMin;
-                                        $layoverIn['place'][] = $data['airports'][$in_DepartureAirportCode]['City'];
-                                        $layoverIn['duration'][] = $timeInMin;                                
-                                    // }
+                        $passengers[$passengerCode] = $passengerQuantity;
+                    }
+                    $data['adultCount'] = $adultCount;
+                    $data['childCount'] = $childCount;
+                    $data['infantCount'] = $infantCount;
+                    $data['FareBreakdown'] = $baggage;
+                    $data['passengers'] = $passengers;
+
+                    if($request->search_type != 'Circle'){
+                        $flightOutgoing = isset($FareItineraries['FareItinerary']['OriginDestinationOptions'][0]) ? $FareItineraries['FareItinerary']['OriginDestinationOptions'][0] : [];
+                        if(!empty($flightOutgoing)){
+                            $totalStopsCountOut = $flightOutgoing['TotalStops'];
+                            $data['flightsOutgoing'] = $flightSegment = $flightOutgoing['OriginDestinationOption'];
+                            for($i=0; $i <= $totalStopsCountOut; $i++){
+                                $i_FlightSegment = $flightSegment[$i]['FlightSegment'];
+                                $i_DepartureAirportCode = $i_FlightSegment['DepartureAirportLocationCode'];
+                                $journeyDurations += $i_FlightSegment['JourneyDuration'];
+                                if($totalStopsCountOut > 0){
+                                    if($i != 0){
+                                        // if($i_DepartureAirportCode == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
+                                            $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $i_FlightSegment['DepartureDateTime']);
+                                            $layover[$i_DepartureAirportCode] = $timeInMin;
+                                            $layover['place'][] = $data['airports'][$i_DepartureAirportCode]['City'];
+                                            $layover['duration'][] = $timeInMin;                                
+                                        // }
+                                    }
                                 }
-                            }
-                            $airlineCode = $in_FlightSegment['MarketingAirlineCode'];
-                            
-                            $originCode = $in_DepartureAirportCode;
-                            $destinationCode = $in_FlightSegment['ArrivalAirportLocationCode'];
-                        
-                            foreach($baggage as $key=>$value){
-                                $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = (isset($value['Baggage'][$bagCount])) ? $value['Baggage'][$bagCount] : '';
-                                $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = (isset($value['CabinBaggage'][$bagCount])) ? $value['CabinBaggage'][$bagCount] : '';
-                            }
-                            $bagCount = $bagCount + 1;
-                        }
-                        $data['flightBaggageIn'] = $flightBaggageIn;
-                        $data['layoversIn'] = $layoverIn;
-                    }
-                }else{
-                    $flightOutgoing = isset($FareItineraries['FareItinerary']['OriginDestinationOptions']) ? $FareItineraries['FareItinerary']['OriginDestinationOptions'] : [];
-                    if(!empty($flightOutgoing)){
-                        foreach($flightOutgoing as $fout){
-                            $flightSegment = $fout['OriginDestinationOption'];
-                            foreach($flightSegment as $fSegment){
-                                $data['flightsOutgoing'][] = $fSegment;
-                                $i_FlightSegment = $fSegment['FlightSegment'];
-                                $originCode = $i_FlightSegment['DepartureAirportLocationCode'];
-
                                 $airlineCode = $i_FlightSegment['MarketingAirlineCode'];
+                                
+                                $originCode = $i_DepartureAirportCode;
                                 $destinationCode = $i_FlightSegment['ArrivalAirportLocationCode'];
+                            
                                 foreach($baggage as $key=>$value){
                                     $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = (isset($value['Baggage'][$bagCount])) ? $value['Baggage'][$bagCount] : '';
                                     $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = (isset($value['CabinBaggage'][$bagCount])) ? $value['CabinBaggage'][$bagCount] : '';
                                 }
                                 $bagCount = $bagCount + 1;
                             }
+                            $data['flightBaggageOut'] = $flightBaggage;
+                            $data['layovers'] = $layover;
                         }
-                        
-                        $data['flightBaggageOut'] = $flightBaggage;
-                    }
-                }
-            }
-            if(isset($ExtraServices['Services'])){
-                if($data['search_type'] == 'Return' || $data['search_type'] == 'OneWay'){
-                    $extraServicesData = $ExtraServices['Services'];
-                    foreach($extraServicesData as $extService){
-                        $extraType = $extService['Service']['Type'];
-                        $extraBehavior = $extService['Service']['Behavior'];
-                        if($extraType == "BAGGAGE"){
-                            
-                            if($data['search_type'] == 'Return'){
-                                if(strpos($extraBehavior, 'OUTBOUND') !== false){
-                                    $data['extraBaggage']['outGoing'][] = $extService;
-                                } elseif(strpos($extraBehavior, 'INBOUND') !== false){
-                                    $data['extraBaggage']['inComing'][] = $extService;
+
+                        $flightIncoming = isset($FareItineraries['FareItinerary']['OriginDestinationOptions'][1]) ? $FareItineraries['FareItinerary']['OriginDestinationOptions'][1] : [];
+                        if(!empty($flightIncoming)){
+                            $totalStopsCountIn = $flightIncoming['TotalStops'];
+                            $data['flightsIncoming'] = $flightSegmentIn = $flightIncoming['OriginDestinationOption'];
+                            for($in=0; $in <= $totalStopsCountIn; $in++){
+                                $in_FlightSegment = $flightSegmentIn[$in]['FlightSegment'];
+                                $journeyDurationsIn += $in_FlightSegment['JourneyDuration'];
+                                $in_DepartureAirportCode = $in_FlightSegment['DepartureAirportLocationCode'];
+                                if($totalStopsCountIn > 0){
+                                    if($in != 0){
+                                        // if($in_DepartureAirportCode == $flightSegmentIn[$in-1]['FlightSegment']['ArrivalAirportLocationCode']){
+                                            $timeInMin = getTimeDiffInMInutes($flightSegmentIn[$in-1]['FlightSegment']['ArrivalDateTime'], $in_FlightSegment['DepartureDateTime']);
+                                            $layoverIn[$in_DepartureAirportCode] = $timeInMin;
+                                            $layoverIn['place'][] = $data['airports'][$in_DepartureAirportCode]['City'];
+                                            $layoverIn['duration'][] = $timeInMin;                                
+                                        // }
+                                    }
                                 }
-                            }elseif($data['search_type'] == 'OneWay'){
-                                $data['extraBaggage']['outGoing'][] = $extService;
+                                $airlineCode = $in_FlightSegment['MarketingAirlineCode'];
+                                
+                                $originCode = $in_DepartureAirportCode;
+                                $destinationCode = $in_FlightSegment['ArrivalAirportLocationCode'];
+                            
+                                foreach($baggage as $key=>$value){
+                                    $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = (isset($value['Baggage'][$bagCount])) ? $value['Baggage'][$bagCount] : '';
+                                    $flightBaggageIn[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = (isset($value['CabinBaggage'][$bagCount])) ? $value['CabinBaggage'][$bagCount] : '';
+                                }
+                                $bagCount = $bagCount + 1;
+                            }
+                            $data['flightBaggageIn'] = $flightBaggageIn;
+                            $data['layoversIn'] = $layoverIn;
+                        }
+                    }else{
+                        $flightOutgoing = isset($FareItineraries['FareItinerary']['OriginDestinationOptions']) ? $FareItineraries['FareItinerary']['OriginDestinationOptions'] : [];
+                        if(!empty($flightOutgoing)){
+                            foreach($flightOutgoing as $fout){
+                                $flightSegment = $fout['OriginDestinationOption'];
+                                foreach($flightSegment as $fSegment){
+                                    $data['flightsOutgoing'][] = $fSegment;
+                                    $i_FlightSegment = $fSegment['FlightSegment'];
+                                    $originCode = $i_FlightSegment['DepartureAirportLocationCode'];
+
+                                    $airlineCode = $i_FlightSegment['MarketingAirlineCode'];
+                                    $destinationCode = $i_FlightSegment['ArrivalAirportLocationCode'];
+                                    foreach($baggage as $key=>$value){
+                                        $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = (isset($value['Baggage'][$bagCount])) ? $value['Baggage'][$bagCount] : '';
+                                        $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = (isset($value['CabinBaggage'][$bagCount])) ? $value['CabinBaggage'][$bagCount] : '';
+                                    }
+                                    $bagCount = $bagCount + 1;
+                                }
                             }
                             
-                        }elseif($extraType == "MEAL"){
-                            $data['extraMeal'][] = $extService;
-                        }elseif($extraType == "SPEEDY_BOARDING "){
-                            $data['extraBording'][] = $extService;
-                        }elseif($extraType == "CHECKIN_CHARGE"){
-                            $data['extraCheckin'][] = $extService;
+                            $data['flightBaggageOut'] = $flightBaggage;
                         }
                     }
                 }
-               
+                if(isset($ExtraServices['Services'])){
+                    if($data['search_type'] == 'Return' || $data['search_type'] == 'OneWay'){
+                        $extraServicesData = $ExtraServices['Services'];
+                        foreach($extraServicesData as $extService){
+                            $extraType = $extService['Service']['Type'];
+                            $extraBehavior = $extService['Service']['Behavior'];
+                            if($extraType == "BAGGAGE"){
+                                
+                                if($data['search_type'] == 'Return'){
+                                    if(strpos($extraBehavior, 'OUTBOUND') !== false){
+                                        $data['extraBaggage']['outGoing'][] = $extService;
+                                    } elseif(strpos($extraBehavior, 'INBOUND') !== false){
+                                        $data['extraBaggage']['inComing'][] = $extService;
+                                    }
+                                }elseif($data['search_type'] == 'OneWay'){
+                                    $data['extraBaggage']['outGoing'][] = $extService;
+                                }
+                                
+                            }elseif($extraType == "MEAL"){
+                                $data['extraMeal'][] = $extService;
+                            }elseif($extraType == "SPEEDY_BOARDING "){
+                                $data['extraBording'][] = $extService;
+                            }elseif($extraType == "CHECKIN_CHARGE"){
+                                $data['extraCheckin'][] = $extService;
+                            }
+                        }
+                    }
+                
+                }
+            }
+        }else{
+            $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
+             if($IsValid == 1 || $IsValid == true){
+                $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
+                $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
+                if(isset($FareItineraries['FareItinerary'])){
+                    $FareItinerary = $FareItineraries['FareItinerary'];
+                    $AirItineraryFareInfo = $FareItinerary['AirItineraryFareInfo'];
+                    $ItinTotalFares = $AirItineraryFareInfo['ItinTotalFares'];
+
+                    $data['FareSourceCode'] = $AirItineraryFareInfo['FareSourceCode'];
+                    $data['FareType'] =  $AirItineraryFareInfo['FareType'];
+                    $data['IsRefundable'] = $AirItineraryFareInfo['IsRefundable'];
+                    $data['totalBaseFare'] = $ItinTotalFares['BaseFare'];
+                    $data['totalTax'] = $ItinTotalFares['TotalTax'];
+                    $data['totalFare'] = $ItinTotalFares['TotalFare'];
+                    $data['ItinTotalFares'] = $ItinTotalFares;
+                    $data['IsPassportMandatory'] =$FareItinerary['IsPassportMandatory'];
+                    $data['DirectionInd'] =$FareItinerary['DirectionInd'];
+                    $baggage = [];
+                    $passengers = [];
+                    $adultCount = $childCount = $infantCount = 0;
+                    
+                    foreach($AirItineraryFareInfo['FareBreakdown'] as $fareBreak){
+                        $passengerCode = $fareBreak['PassengerTypeQuantity']['Code'];
+                        $passengerQuantity = $fareBreak['PassengerTypeQuantity']['Quantity'];
+                        if($passengerCode == "ADT"){
+                            $adultCount = $passengerQuantity;
+                        }elseif($passengerCode == "CHD"){
+                            $childCount = $passengerQuantity;
+                        }elseif($passengerCode == "INF"){
+                            $infantCount = $passengerQuantity;
+                        }
+                        $PassengerFare = $fareBreak['PassengerFare'];
+                        $baggage[$passengerCode]['Baggage'] = $fareBreak['Baggage'];
+                        $baggage[$passengerCode]['CabinBaggage'] = $fareBreak['CabinBaggage'];
+                        $baggage[$passengerCode]['Quantity'] = $passengerQuantity;
+                        $baggage[$passengerCode]['CabinBaggage'] = $fareBreak['CabinBaggage'];
+                        $baggage[$passengerCode]['BaseFare'] = $PassengerFare['BaseFare'];
+                        $baggage[$passengerCode]['ServiceTax'] = $PassengerFare['ServiceTax'];
+                        $baggage[$passengerCode]['TotalFare'] = $PassengerFare['TotalFare'];
+
+                        $passengers[$passengerCode] = $passengerQuantity;
+                    }
+                    $data['adultCount'] = $adultCount;
+                    $data['childCount'] = $childCount;
+                    $data['infantCount'] = $infantCount;
+                    $data['FareBreakdown'] = $baggage;
+                    $data['passengers'] = $passengers;
+
+                    if($request->search_type == 'Return'){
+                        $flightOutgoing = isset($FareItineraries['FareItinerary']['OriginDestinationOptions'][0]) ? $FareItineraries['FareItinerary']['OriginDestinationOptions'][0] : [];
+                        if(!empty($flightOutgoing)){
+                            $totalStopsCountOut = $flightOutgoing['TotalStops'];
+                            $data['flightsOutgoing'] = $flightSegment = $flightOutgoing['OriginDestinationOption'];
+                            for($i=0; $i <= $totalStopsCountOut; $i++){
+                                $i_FlightSegment = $flightSegment[$i]['FlightSegment'];
+                                $i_DepartureAirportCode = $i_FlightSegment['DepartureAirportLocationCode'];
+                                $journeyDurations += $i_FlightSegment['JourneyDuration'];
+                                if($totalStopsCountOut > 0){
+                                    if($i != 0){
+                                        // if($i_DepartureAirportCode == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
+                                            $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $i_FlightSegment['DepartureDateTime']);
+                                            $layover[$i_DepartureAirportCode] = $timeInMin;
+                                            $layover['place'][] = $data['airports'][$i_DepartureAirportCode]['City'];
+                                            $layover['duration'][] = $timeInMin;                                
+                                        // }
+                                    }
+                                }
+                                $airlineCode = $i_FlightSegment['MarketingAirlineCode'];
+                                
+                                $originCode = $i_DepartureAirportCode;
+                                $destinationCode = $i_FlightSegment['ArrivalAirportLocationCode'];
+                            
+                                foreach($baggage as $key=>$value){
+                                    $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['baggage'] = (isset($value['Baggage'][$bagCount])) ? $value['Baggage'][$bagCount] : '';
+                                    $flightBaggage[$airlineCode.'_'.$originCode.'_'.$destinationCode][$key]['cabin_baggage'] = (isset($value['CabinBaggage'][$bagCount])) ? $value['CabinBaggage'][$bagCount] : '';
+                                }
+                                $bagCount = $bagCount + 1;
+                            }
+                            $data['flightBaggageOut'] = $flightBaggage;
+                            $data['layovers'] = $layover;
+                        }
+                    }
+                }
+                if(isset($ExtraServices['Services'])){
+                    if($data['search_type'] == 'Return' || $data['search_type'] == 'OneWay'){
+                        $extraServicesData = $ExtraServices['Services'];
+                        foreach($extraServicesData as $extService){
+                            $extraType = $extService['Service']['Type'];
+                            if($extraType == "BAGGAGE"){
+                                $data['extraBaggage']['outGoing'][] = $extService;
+                            }
+                        }
+                    }
+                
+                }
+            }
+
+            $IsValidIn = $result['AirRevalidateResponse']['AirRevalidateResultInbound']['IsValid'];
+            if($IsValidIn == 1 || $IsValidIn == true){
+                $FareItinerariesIn = $result['AirRevalidateResponse']['AirRevalidateResultInbound']['FareItineraries'];
+                $ExtraServicesIn = $result['AirRevalidateResponse']['AirRevalidateResultInbound']['ExtraServices'];
+                if(isset($FareItinerariesIn['FareItinerary'])){
+                    $FareItineraryIn = $FareItinerariesIn['FareItinerary'];
+                    $AirItineraryFareInfoIn = $FareItineraryIn['AirItineraryFareInfo'];
+                    $ItinTotalFaresIn = $AirItineraryFareInfoIn['ItinTotalFares'];
+
+                    $data['FareSourceCodeInbound'] = $AirItineraryFareInfoIn['FareSourceCode'];
+                    $data['FareTypeIn'] =  $AirItineraryFareInfoIn['FareType'];
+                    $data['IsRefundableIn'] = $AirItineraryFareInfoIn['IsRefundable'];
+                    $data['totalBaseFareIn'] = $ItinTotalFaresIn['BaseFare'];
+                    $data['totalTaxIn'] = $ItinTotalFaresIn['TotalTax'];
+                    $data['totalFareIn'] = $ItinTotalFaresIn['TotalFare'];
+                    $data['ItinTotalFaresIn'] = $ItinTotalFaresIn;
+                    $data['IsPassportMandatoryIn'] =$FareItineraryIn['IsPassportMandatory'];
+                    $data['DirectionIndIn'] =$FareItineraryIn['DirectionInd'];
+                    $baggageIn = [];
+                    $passengersIn = [];
+                    $adultCountIn = $childCountIn = $infantCountIn = 0;
+                    
+                    foreach($AirItineraryFareInfoIn['FareBreakdown'] as $fareBreakIn){
+                        $passengerCodeIn = $fareBreakIn['PassengerTypeQuantity']['Code'];
+                        $passengerQuantityIn = $fareBreakIn['PassengerTypeQuantity']['Quantity'];
+                        if($passengerCodeIn == "ADT"){
+                            $adultCountIn = $passengerQuantityIn;
+                        }elseif($passengerCodeIn == "CHD"){
+                            $childCountIn = $passengerQuantityIn;
+                        }elseif($passengerCodeIn == "INF"){
+                            $infantCountIn = $passengerQuantityIn;
+                        }
+                        $PassengerFareIn = $fareBreakIn['PassengerFare'];
+                        $baggageIn[$passengerCodeIn]['Baggage'] = $fareBreakIn['Baggage'];
+                        $baggageIn[$passengerCodeIn]['CabinBaggage'] = $fareBreakIn['CabinBaggage'];
+                        $baggageIn[$passengerCodeIn]['Quantity'] = $passengerQuantityIn;
+                        $baggageIn[$passengerCodeIn]['CabinBaggage'] = $fareBreakIn['CabinBaggage'];
+                        $baggageIn[$passengerCodeIn]['BaseFare'] = $PassengerFareIn['BaseFare'];
+                        $baggageIn[$passengerCodeIn]['ServiceTax'] = $PassengerFareIn['ServiceTax'];
+                        $baggageIn[$passengerCodeIn]['TotalFare'] = $PassengerFareIn['TotalFare'];
+
+                        $passengersIn[$passengerCodeIn] = $passengerQuantityIn;
+                    }
+                    $data['adultCountIn'] = $adultCountIn;
+                    $data['childCountIn'] = $childCountIn;
+                    $data['infantCountIn'] = $infantCountIn;
+                    $data['FareBreakdownIn'] = $baggageIn;
+                    $data['passengersIn'] = $passengersIn;
+
+                    if($request->search_type == 'Return'){
+                        $flightIncoming = isset($FareItinerariesIn['FareItinerary']['OriginDestinationOptions'][0]) ? $FareItinerariesIn['FareItinerary']['OriginDestinationOptions'][0] : [];
+                        if(!empty($flightIncoming)){
+                            $totalStopsCountIn = $flightIncoming['TotalStops'];
+                            $data['flightsIncoming'] = $flightSegmentIn = $flightIncoming['OriginDestinationOption'];
+                            for($in=0; $in <= $totalStopsCountIn; $in++){
+                                $in_FlightSegment = $flightSegmentIn[$in]['FlightSegment'];
+                                $in_DepartureAirportCode = $in_FlightSegment['DepartureAirportLocationCode'];
+                                $journeyDurationsIn += $in_FlightSegment['JourneyDuration'];
+                                if($totalStopsCountIn > 0){
+                                    if($in != 0){
+                                        // if($in_DepartureAirportCode == $flightSegmentIn[$in-1]['FlightSegment']['ArrivalAirportLocationCode']){
+                                            $timeInMinIn = getTimeDiffInMInutes($flightSegmentIn[$in-1]['FlightSegment']['ArrivalDateTime'], $in_FlightSegment['DepartureDateTime']);
+                                            $layoverIn[$in_DepartureAirportCode] = $timeInMinIn;
+                                            $layoverIn['place'][] = $data['airports'][$in_DepartureAirportCode]['City'];
+                                            $layoverIn['duration'][] = $timeInMinIn;                                
+                                        // }
+                                    }
+                                }
+                                $airlineCodeIn = $in_FlightSegment['MarketingAirlineCode'];
+                                
+                                $originCodeIn = $in_DepartureAirportCode;
+                                $destinationCodeIn = $in_FlightSegment['ArrivalAirportLocationCode'];
+                            
+                                foreach($baggageIn as $keyIn=>$valueIn){
+                                    $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['baggage'] = (isset($valueIn['Baggage'][$bagCountIn])) ? $valueIn['Baggage'][$bagCountIn] : '';
+                                    $flightBaggageIn[$airlineCodeIn.'_'.$originCodeIn.'_'.$destinationCodeIn][$keyIn]['cabin_baggage'] = (isset($valueIn['CabinBaggage'][$bagCountIn])) ? $valueIn['CabinBaggage'][$bagCountIn] : '';
+                                }
+                                $bagCountIn = $bagCountIn + 1;
+                            }
+                            $data['flightBaggageIn'] = $flightBaggageIn;
+                            $data['layoversIn'] = $layoverIn;
+                        }
+                    }
+                }
+                if(isset($ExtraServicesIn['Services'])){
+                    if($data['search_type'] == 'Return' || $data['search_type'] == 'OneWay'){
+                        $extraServicesDataIn = $ExtraServicesIn['Services'];
+                        foreach($extraServicesDataIn as $extServiceIn){
+                            $extraTypeIn = $extServiceIn['Service']['Type'];
+                            if($extraTypeIn == "BAGGAGE"){
+                                $data['extraBaggage']['inComing'][] = $extServiceIn;   
+                            }
+                        }
+                    }
+                
+                }
             }
         }
         // echo '<pre>';
@@ -1321,7 +1476,7 @@ class FlightsController extends Controller
                         if(isset($tripDetails['TripDetailsResponse'])){
                             $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
                             if($tripDetailsResult['Success'] == 'true'){
-                                $this->saveFlightBookingData($tripDetailsResult, $details);
+                                $bookingId = $this->saveFlightBookingData($tripDetailsResult, $details);
                             }
                         } 
                     }
@@ -1331,19 +1486,22 @@ class FlightsController extends Controller
                     if(isset($tripDetails['TripDetailsResponse'])){
                         $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
                         if($tripDetailsResult['Success'] == 'true'){
-                            $this->saveFlightBookingData($tripDetailsResult, $details);
+                            $bookingId = $this->saveFlightBookingData($tripDetailsResult, $details);
                         }
                     }
                 }
                 $msg = 'success';
+                $bookings = $this->getBookingDetails($bookingId);
             }else{
                 // print_r($bookResult);
+                $bookings= [];
                 $msg =  (isset($bookResult['Errors']['Error'])) ? $bookResult['Errors']['Error']['ErrorMessage'] : ((isset($bookResult['Errors']['Errors'])) ? $bookResult['Errors']['Errors']['ErrorMessage'] : 'Something went wrong');
             }
         }else{
+            $bookings = [];
             $msg =  (isset($result['status']['errors'][0])) ? $result['status']['errors'][0]['errorMessage'] : 'Something went wrong';
         }   
-        return  view('web.booking_success',compact('msg'));
+        return  view('web.booking_success',compact('msg','bookings'));
    }
 
     public function ticketOrder($bookingId){
@@ -1592,7 +1750,7 @@ class FlightsController extends Controller
             // print_r($passengers);
             FlightExtraServices::insert($extras);
         }
-
+        return $flightBookId;
         // die;
     }
 
@@ -2597,6 +2755,16 @@ class FlightsController extends Controller
         }
 
         // die;
+    }
+
+    public function getBookingDetails($id){
+        $bookings = FlightBookings::where('id',$id)->get();
+        if(isset($bookings[0])){
+            $bookings[0]['flights'] = FlightItineraryDetails::where('booking_id',$id)->get();
+            $bookings[0]['passengers'] = FlightPassengers::where('booking_id',$id)->get();
+            $bookings[0]['extraServices'] = FlightExtraServices::where('booking_id',$id)->get();
+        }
+        return $bookings;
     }
 }
 

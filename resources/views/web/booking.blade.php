@@ -442,8 +442,11 @@
                         @php 
                             $amountLi  = $passengerName ='';
                             $totalBase = $totalTax = 0;
+                            $amountLiIn  = $passengerNameIn ='';
+                            $totalBaseIn = $totalTaxIn = 0;
 
                             $adult_amount = $child_amount = $infant_amount = 0;
+                            $adult_amountIn = $child_amountIn = $infant_amountIn = 0;
                           
                             if(isset($data['FareBreakdown'])){
                                 foreach($data['FareBreakdown'] as $fkey=>$fvalue){
@@ -469,6 +472,31 @@
                                     $amountLi .= "<li> ".$passengerName." Price x ". $fvalue['Quantity']."  <span>".$currencyCode." ".$fareBaseMargin."</span></li>";
                                 }
                             }  
+
+                            if(isset($data['FareBreakdownIn'])){
+                                foreach($data['FareBreakdownIn'] as $fkeyIn=>$fvalueIn){
+                                    $fareBaseIn = (float)$fvalueIn['BaseFare']['Amount'];
+                                   
+                                    $fareBaseMarginIn = (($fareBaseIn/100) * $totalmargin) + $fareBaseIn;
+                                    
+                                    $fareBaseMarginIn = number_format(floor($fareBaseMarginIn*100)/100, 2, '.', '');
+                                   
+                                    $totalBaseIn = $totalBaseIn + $fareBaseMarginIn;
+                                    
+                                    $currencyCodeIn = $fvalueIn['BaseFare']['CurrencyCode'];
+                                    if($fkeyIn == 'ADT'){
+                                        $passengerNameIn = 'Adult';
+                                        $adult_amountIn = $fareBaseMarginIn;
+                                    }elseif($fkeyIn == 'CHD'){
+                                        $passengerNameIn = 'Child';
+                                        $child_amountIn = $fareBaseMarginIn;
+                                    }elseif($fkeyIn == 'INF'){
+                                        $passengerNameIn = 'Infant';
+                                        $infant_amountIn = $fareBaseMarginIn;
+                                    }
+                                    $amountLiIn .= "<li> ".$passengerNameIn." Price x ". $fvalueIn['Quantity']."  <span>".$currencyCodeIn." ".$fareBaseMarginIn."</span></li>";
+                                }
+                            }  
                       
                             $desc = array(
                                 'GROUP_PAX' => '(Entire group)', 
@@ -483,8 +511,9 @@
                             $ItinTotalFares =  $data['ItinTotalFares'];
 
                             $TotalFare = $ItinTotalFares['TotalFare'];
+                            $totalFareAmount = $TotalFare['Amount'];
 
-                            $TotalFareMargin = (($TotalFare['Amount']/100) * $totalmargin) + $TotalFare['Amount'];
+                            $TotalFareMargin = (($totalFareAmount/100) * $totalmargin) + $totalFareAmount;
                             $TotalFareMargin = number_format(floor($TotalFareMargin*100)/100, 2, '.', '');
                             
                             $BaseFare = $ItinTotalFares['BaseFare'];
@@ -496,13 +525,42 @@
                             $taxFareMargin = (($TotalTax/100) * $totalmargin) + $TotalTax;
                             $taxFareMargin = number_format(floor($taxFareMargin*100)/100, 2, '.', '');
                             $currencyCode = $TotalFare['CurrencyCode'];
-            
+
+                            $TotalFareMarginIn = $baseFareMarginIn = $taxFareMarginIn = $totalFareAmountIn = $TotalTaxIn = 0;
+
+                            if(isset($data['ItinTotalFaresIn'])){
+                                $ItinTotalFaresIn =  $data['ItinTotalFaresIn'];
+
+                                $TotalFareIn = $ItinTotalFaresIn['TotalFare'];
+                                $totalFareAmountIn = $TotalFareIn['Amount'];
+                                $TotalFareMarginIn = (($TotalFareIn['Amount']/100) * $totalmargin) + $TotalFareIn['Amount'];
+                                $TotalFareMarginIn = number_format(floor($TotalFareMarginIn*100)/100, 2, '.', '');
+                                
+                                $BaseFareIn = $ItinTotalFaresIn['BaseFare'];
+                                $baseFareMarginIn = (($BaseFareIn['Amount']/100) * $totalmargin) + $BaseFareIn['Amount'];
+                                $baseFareMarginIn = number_format(floor($baseFareMarginIn*100)/100, 2, '.', '');
+
+                                $TotalTaxIn = $ItinTotalFaresIn['TotalTax']['Amount'];
+
+                                $taxFareMarginIn = (($TotalTaxIn/100) * $totalmargin) + $TotalTaxIn;
+                                $taxFareMarginIn = number_format(floor($taxFareMarginIn*100)/100, 2, '.', '');
+                                $currencyCodeIn = $TotalFareIn['CurrencyCode'];
+                            }
+                            $totalFareAmount = $totalFareAmount + $totalFareAmountIn;
+                            $TotalFareMargin = $TotalFareMargin + $TotalFareMarginIn;
+                            $taxFareMargin = $taxFareMargin + $taxFareMarginIn;
+                            $TotalTax = $TotalTax + $TotalTaxIn;
+                            $adult_amount = $adult_amount + $adult_amountIn;
+                            $child_amount = $child_amount + $child_amountIn;
+                            $infant_amount = $infant_amount + $infant_amountIn;
+
+                            $baseFareMargin = $baseFareMargin + $baseFareMarginIn; 
                         @endphp
                         <form action="{{ route('flight.create-booking') }}" method="post" id="bookingForm">
                             @csrf
                             <input type="hidden" name="total_addons" id="total_addons" value="0">
                             <input type="hidden" name="currency" id="currency" value="{{$currencyCode}}">
-                            <input type="hidden" name="total_amount_org" id="total_amount_org" value="{{$TotalFare['Amount']}}">
+                            <input type="hidden" name="total_amount_org" id="total_amount_org" value="{{$totalFareAmount}}">
                             <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFareMargin}}">
                             <input type="hidden" name="total_tax" id="total_tax" value="{{$taxFareMargin}}">
                             <input type="hidden" name="total_tax_org" id="total_tax_org" value="{{$TotalTax}}">
@@ -619,31 +677,12 @@
                                             <span class="hide bagError" id="bagInError" > </span>
                                         @endif
                                     </div>
+                                    
                                 </div>
                             </div>
                             @endif
 
-                            @if(isset($data['extraMeals']))
-                            <div class="tour_detail_right_sidebar">
-                                <div class="tour_details_right_boxed">
-                                    <div class="tour_details_right_box_heading">
-                                        <h3>Extra Meal</h3>
-                                    </div>
-                                    <div class="tour_package_details_bar_list">
-                                        <table>
-                                        @foreach($data['extraMeal'] as $exMeal)
-                                            @php  $exMealService = $exMeal['Service'];  @endphp
-                                            <tr>
-                                                <td>{{ $exMealService['Description'] }} {{ $desc[$exMealService['Behavior']] }} </td>
-                                                <td>{{ $exMealService['ServiceCost']['CurrencyCode'] }} {{ $exMealService['ServiceCost']['Amount'] }}   </td>
-                                                <td> <input type="checkbox" value="{{ $exMealService['ServiceId'] }}" class="" name="extraMeals" id="extraMeals"> </td>
-                                            </tr>
-                                        @endforeach
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
+                        
 
                             @if(isset($data['fareRulesOut']))
                             <div class="tour_detail_right_sidebar">
@@ -987,8 +1026,14 @@
                                         </div>
 
                                         <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCode']}}">
+                                        
                                         <input type="hidden" name="session_id" id="session_id" value="{{ $data['session_id'] }}">
-                                        <input type="hidden" name="direction" id="direction" value="{{ $data['DirectionInd'] }}">
+                                        @if(isset($data['FareSourceCodeInbound']))
+                                            <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCodeInbound']}}">
+                                            <input type="hidden" name="direction" id="direction" value="Return">
+                                        @else
+                                            <input type="hidden" name="direction" id="direction" value="{{ $data['DirectionInd'] }}">
+                                        @endif
                                         <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
                                         <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
                                         <input type="hidden" name="adultCount" id="adultCount" value="{{$data['adultCount']}}">
@@ -1259,12 +1304,6 @@
     input.addEventListener('change', reset);
     input.addEventListener('keyup', reset);
 
-    let one_way_session = '{!! json_encode(Session::get("flight_search_oneway")) !!}';
-    one_way_session = JSON.parse(one_way_session);
-    let return_session = '{!! json_encode(Session::get("flight_search_return")) !!}';
-    return_session = JSON.parse(return_session);
-    let multi_session = '{!! json_encode(Session::get("flight_search_multi")) !!}';
-    multi_session = JSON.parse(multi_session);
 
     $(".passportExpiry").datepicker({
         dateFormat: "yy-mm-dd",

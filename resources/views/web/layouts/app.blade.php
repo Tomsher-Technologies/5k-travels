@@ -280,6 +280,15 @@
         flight_view_details: "{{ route('flight-view-details') }}",
     };
 
+    let one_way_session = '{!! json_encode(Session::get("flight_search_oneway")) !!}';
+    one_way_session = JSON.parse(one_way_session);
+
+    let return_session = '{!! json_encode(Session::get("flight_search_return")) !!}';
+    return_session = JSON.parse(return_session);
+
+    let multi_session = '{!! json_encode(Session::get("flight_search_multi")) !!}';
+    multi_session = JSON.parse(multi_session);
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

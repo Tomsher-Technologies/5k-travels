@@ -413,15 +413,6 @@
     <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('assets/js/search_flights.js') }}"></script>
     <script type="text/javascript">
-    let one_way_session = '{!! json_encode(Session::get("flight_search_oneway"))  !!}';
-    one_way_session = JSON.parse(one_way_session);
-
-    let return_session = '{!!  json_encode(Session::get("flight_search_return")) !!}';
-    return_session = JSON.parse(return_session);
-
-    let multi_session = '{!! json_encode(Session::get("flight_search_multi")) !!}';
-    multi_session = JSON.parse(multi_session);
-
 
     </script>
 @endpush
