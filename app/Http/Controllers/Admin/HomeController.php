@@ -10,6 +10,7 @@ use App\Models\FaqCategories;
 use App\Models\FaqContents;
 use App\Models\FlightBookings;
 use App\Models\FlightItineraryDetails;
+use App\Models\FlightExtraServices;
 use App\Models\FlightPassengers;
 use App\Models\FlightMarginAmounts;
 use App\Models\User;
@@ -372,6 +373,7 @@ class HomeController extends Controller
                                                     ->where('booking_id',$request->id)
                                                     ->where('transaction_type','cr')
                                                     ->orderBy('id','desc')->get();
+            $bookings[0]['extraServices'] = FlightExtraServices::where('booking_id',$request->id)->get();
         }
        
         return  view('admin.bookings.bookings_details',compact('bookings'));

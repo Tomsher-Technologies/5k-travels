@@ -3,3 +3,9 @@ ALTER TABLE `user_details` CHANGE `gender` `gender` ENUM('male','female') CHARAC
 
 -- changes on 08/07/2023
 ALTER TABLE `flight_bookings` ADD `direction` VARCHAR(191) NULL DEFAULT NULL AFTER `unique_booking_id`;
+
+
+
+
+ALTER TABLE `flight_searches` ADD `direction` VARCHAR(191) NULL DEFAULT NULL AFTER `booking_id`;
+ALTER TABLE `flight_bookings` ADD `reissue_quote_ptr` VARCHAR(191) NULL DEFAULT NULL AFTER `agents_amount`;

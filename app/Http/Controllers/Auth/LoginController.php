@@ -60,6 +60,7 @@ class LoginController extends Controller
         } else {
             if (Auth::attempt($request->only(["email", "password"]))) {
                 if(Auth::user()->user_type == "user" || Auth::user()->user_type == "admin" || (Auth::user()->user_type == "agent" && Auth::user()->is_approved == 1 && Auth::user()->is_active == 1)){
+                    Session::put('user_currency', Auth::user()->currency);
                     return response()->json([
                         "status" => true, 
                         "redirect" => url("web-dashboard"),

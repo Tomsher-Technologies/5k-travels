@@ -1029,10 +1029,10 @@
                                         
                                         <input type="hidden" name="session_id" id="session_id" value="{{ $data['session_id'] }}">
                                         @if(isset($data['FareSourceCodeInbound']))
-                                            <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCodeInbound']}}">
+                                            <input type="hidden" name="fare_source_code_inbound" id="fare_source_code_inbound" value="{{$data['FareSourceCodeInbound']}}">
                                             <input type="hidden" name="direction" id="direction" value="Return">
                                         @else
-                                            <input type="hidden" name="direction" id="direction" value="{{ $data['DirectionInd'] }}">
+                                            <input type="hidden" name="direction" id="direction" value="{{ $data['search_type'] }}">
                                         @endif
                                         <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
                                         <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
@@ -1084,10 +1084,21 @@
                                     <h3>Booking amount</h3>
                                 </div>
                                 <div class="tour_booking_amount_area">
-                                    <ul>
-                                       
-                                       {!! $amountLi !!}
-                                    </ul>
+                                    
+                                    @if(isset($data['FareBreakdownIn']))
+                                        <h6 class="mt-3 amount-head"> Onward Travel </h6>
+                                        <ul>
+                                            {!! $amountLi !!}
+                                        </ul>
+                                        <h6 class="mt-3 amount-head"> Return Travel </h6>
+                                        <ul>
+                                            {!! $amountLiIn !!}
+                                        </ul>
+                                    @else
+                                        <ul>
+                                            {!! $amountLi !!}
+                                        </ul>
+                                    @endif
                                     <div class="tour_bokking_subtotal_area">
                                         <h6>Total Base Fare <span>{{$currencyCode}} {{  $baseFareMargin }}</span></h6>
                                     </div>
@@ -1170,7 +1181,11 @@
         display: flex;
         justify-content: space-between;
     }
-   
+   .amount-head{
+    color: #1fba71;
+    text-decoration: underline;
+    font-weight: 600;
+   }
     .btn_lg{
         padding: 12px 100px;
         font-size: 18px;

@@ -29,14 +29,34 @@
 
                             <li>
                                 <div class="dropdown language-option">
+                                @php
+                                        if(Session::has('user_currency') && Session::get('user_currency') == 'USD'){
+                                            $currency = 'USD';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'AFN'){
+                                            $currency = 'AFN';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'IRR'){
+                                            $currency = 'IRR';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'AED'){
+                                            $currency = 'AED';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'INR'){
+                                            $currency = 'INR';
+                                        }else{
+                                            $currency = 'USD';
+                                        }
+
+                                    @endphp
                                     <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                         aria-haspopup="true" aria-expanded="false">
-                                        <span class="lang-name"></span>
+                                        <span class="lang-name">{{ $currency }}</span>
                                     </button>
-                                    <div class="dropdown-menu language-dropdown-menu">
-                                        <a class="dropdown-item {{ (config('global.api_requiredCurrency') == 'USD') ? 'selected' : '' }}" href="{{ route('change-currency','USD') }}">USD</a>
-                                        <a class="dropdown-item {{ (config('global.api_requiredCurrency') == 'AFN') ? 'selected' : '' }}" href="{{ route('change-currency','AFN') }}">AFN</a>
-                                        <a class="dropdown-item {{ (config('global.api_requiredCurrency') == 'IRR') ? 'selected' : '' }}" href="{{ route('change-currency','IRR') }}">IRR</a>
+                                    
+                                    <div class="dropdown-menu language-dropdown-menu" style="min-width: 5rem;text-align: center;">
+                                        
+                                        <a class="dropdown-item {{ ($currency == 'AED') ? 'selected' : '' }}" href="{{ route('change-currency','AED') }}">AED</a>
+                                        <a class="dropdown-item {{ ($currency == 'AFN') ? 'selected' : '' }}" href="{{ route('change-currency','AFN') }}">AFN</a>
+                                        <a class="dropdown-item {{ ($currency == 'INR') ? 'selected' : '' }}" href="{{ route('change-currency','INR') }}">INR</a>
+                                        <a class="dropdown-item {{ ($currency == 'IRR') ? 'selected' : '' }}" href="{{ route('change-currency','IRR') }}">IRR</a>
+                                        <a class="dropdown-item {{ ($currency == 'USD') ? 'selected' : '' }}" href="{{ route('change-currency','USD') }}">USD</a>
                                     </div>
                                 </div>
                             </li>

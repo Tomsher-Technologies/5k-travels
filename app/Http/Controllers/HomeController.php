@@ -26,6 +26,7 @@ use Str;
 use File;
 use Mail;
 use Config;
+use Session;
 
 class HomeController extends Controller
 {
@@ -73,6 +74,11 @@ class HomeController extends Controller
     }
 
     public function changeCurrency($currency){
+        Session::put('user_currency', $currency);
+        if(Auth::check()){
+            User::where('id',Auth::user()->id)->update(['currency'=>$currency]);
+        }
+        
         return back();
     }
 

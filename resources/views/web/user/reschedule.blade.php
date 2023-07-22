@@ -39,24 +39,46 @@
 
                         <div class="tab-content mt-4">
                             <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group d-flex">
-                                        <div class="col-sm-3">
-                                            <label class="mt-10" for="agent_code">Select Reschedule Date :<span class="required">*</span></label>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="reschedule_date" name="reschedule_date" required="required" value="">
-                                            <div class="required hide " id="errorDate" >Choose schedule date</div>
+                                <form id="reschedule" action="#">
+                                    <div class="col-sm-12">
+                                        @if($data['search'])
+                                            @foreach($data['search'] as $search)
+                                                <div class="col-sm-12 d-flex mt-3">
+                                                    <div class="form-group col-sm-2">
+                                                        <label class="form-label">Origin </label>
+                                                        <input class="form-control" type="text" name="origin[]" readonly value="{{ $search->departure_airport }}">
+                                                    </div>
+                                                    <div class="form-group col-sm-2 ml-10">
+                                                        <label class="form-label">Destination </label>
+                                                        <input  class="form-control" type="text" name="destination[]" readonly value="{{ $search->arrival_airport }}">
+                                                    </div>
+                                                    <div class="form-group col-sm-2 ml-10">
+                                                        <label class="form-label">Journey Date </label>
+                                                        <input  class="form-control reschedule_date" type="text" readonly placeholder="YYYY-MM-DD" name="date[{{ $search->departure_airport }}-{{ $search->arrival_airport }}]" value="{{ date('Y-m-d',strtotime($search->departure_date_time)) }}">
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                        <!-- <div class="form-group d-flex">
+                                            <div class="col-sm-3">
+                                                <label class="mt-10" for="agent_code">Select Reschedule Date :<span class="required">*</span></label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="reschedule_date" name="reschedule_date" required="required" value="">
+                                                <div class="required hide " id="errorDate" >Choose schedule date</div>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group ">
+                                            <div class="col-sm-12">
+                                                <input type="text" name="booking_id" id="booking_id" value="{{$data['id']}}">
+                                                <input type="text" name="unique_id" id="unique_id" value="{{$data['uniqueBookId']}}">
+                                                <button type="submit" class="btn back-btn btn btn_theme btn_lg mt-10" id="checkNewFlights">Check Available Flights</button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <div class="form-group ">
-                                        <div class="col-sm-6 offset-sm-3">
-                                            <button class="btn back-btn btn btn_theme btn_lg mt-10" id="checkFlights" data-id="{{$data['id']}}" data-uniqueid="{{$data['uniqueBookId']}}" >Check Available Flights</button>
-                                        </div>
-                                    </div>
-                                </div>
+                                </form>
 
                                 <div class="col-sm-12">
                                     <div id="availableFlights">
@@ -80,13 +102,19 @@
 @push('header')
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
 <style>
-
+.ml-10{
+    margin-left : 10px;
+}
+.form-control[readonly] {
+    background-color: #fff;
+    opacity: 1;
+}
 </style>
 @endpush
 @push('footer')
 
 <script type="text/javascript">
-    $("#reschedule_date").datepicker({
+    $(".reschedule_date").datepicker({
         dateFormat: "yy-mm-dd",
         changeYear: true,
         changeMonth: true,
@@ -94,6 +122,49 @@
         minDate: "-0y"
     });
 
+    $("#reschedule").validate({
+        rules: {
+            'origin[]': {
+                required : true,
+                minlength:3
+            },
+            'destination[]':{
+                required : true,
+                minlength:3
+            },
+            'date[]': 'required'
+        },
+        errorPlacement: function (error, element) {
+            if(element.hasClass('select2')) {
+                error.insertAfter(element.next('.select2-container'));
+            }else{
+                error.appendTo(element.parent("div"));
+            }
+        },
+        submitHandler: function(form, event) {
+            event.preventDefault();
+            $('.ajaxloader').css('display','block');
+            $.ajax({
+                url: "{{ route('reschedule-flight')}}",
+                type: "POST",
+                data: $(form).serialize(),
+                success: function( response ) {
+                    $('.ajaxloader').css('display','none');
+                    var resp = JSON.parse(response);
+                    if(resp.status == true){
+                        $('#availableFlights').html(resp.data);
+                    }else{
+                        swal({
+                            title: "Failed", 
+                            text: resp.msg, 
+                            icon: "error",
+                            closeOnClickOutside: false,
+                        });
+                    }
+                }
+            });
+        }
+    });
 
     $('#checkFlights').on('click', function () {
         $('#errorDate').addClass('hide');
