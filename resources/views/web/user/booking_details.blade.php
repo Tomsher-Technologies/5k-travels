@@ -243,7 +243,7 @@
                                                                            
                                                                         @endphp
                                                                         <span class="fs-14 mb-2 fw-semibold  d-block">Gender : {{ $pass->gender }}</span>
-                                                                        <span class="fs-14 mb-2 fw-semibold  d-block">Date Of Birth : {{ $pass->date_of_birth }}</span>
+                                                                        <span class="fs-14 mb-2 fw-semibold  d-block">Date Of Birth : {{ date('Y-m-d',strtotime($pass->date_of_birth)) }}</span>
                                                                         <span class="fs-14 mb-2 fw-semibold  d-block">Passport Number : {{ $pass->passport_number }}</span>
                                                                         
                                                                         <span class=" mb-2 fw-600 d-block">E-TICKET NUMBER : {{ $pass->eticket_number }}</span>
@@ -255,7 +255,36 @@
 
                                                             </div>
                                                             @endforeach
-                                                        
+                                                            @if(!empty($bookings[0]['extraServices']))
+                                                                @php
+                                                                    $desc = array(
+                                                                        'GROUP_PAX' => '(Entire group)', 
+                                                                        'PER_PAX' => '(Each passenger)', 
+                                                                        'GROUP_PAX_INBOUND' => '(Entire group only on the return trip)',
+                                                                        'GROUP_PAX_OUTBOUND' => '(Entire group only on for the onward travel)', 
+                                                                        'PER_PAX_INBOUND' => '(Each passenger only on the return trip)', 
+                                                                        'PER_PAX_OUTBOUND' => '(Each passenger only on for the onward travel)'
+                                                                    );
+                                                                @endphp
+                                                                <div class=" mt-1 col-sm-12" style="padding: 1%;">
+                                                                    <div class="">
+                                                                        <div class="tour_details_right_box_heading">
+                                                                            <h3>Extra Services</h3>
+                                                                        </div>
+
+                                                                        <div class="tour_booking_amount_area">
+                                                                            <ul>
+                                                                                @foreach($bookings[0]['extraServices'] as $extra)
+                                                                                    <li style="border-bottom:none;">{{ $extra->description }} {{ (isset($desc[$extra->behavior])) ? $desc[$extra->behavior] : '' }}
+                                                                                        <span>{{ $extra->currency }} {{ $extra->service_amount }}</span>
+                                                                                    </li>
+                                                                                @endforeach
+                                                                            </ul>
+                                                                        
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                     @endif
                                                 </div>

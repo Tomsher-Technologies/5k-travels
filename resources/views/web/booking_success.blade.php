@@ -18,7 +18,7 @@
     <div class="container container-bboking">
         <div class="row">
             <div class="col-lg-12">
-                <div class="tou_booking_form_Wrapper text-center padding20">
+                <div class="tou_booking_form_Wrapper padding20">
                     
                     @if(!empty($bookings))
                     <div class="col-sm-12">
@@ -37,7 +37,7 @@
                                                                 
                                                                 @if(isset($bookings[0]))
 
-                                                                <h3 class="fw-medium mb-1 mt-3 text-left">Trip from {{ $bookings[0]->origin }} to {{ $bookings[0]->destination }} 
+                                                                <h3 class="fw-medium mb-3 text-left">{{ $bookings[0]->direction }} trip from {{ $bookings[0]->origin }} to {{ $bookings[0]->destination }} 
                                                                 <span style="font-size: 14px;float: right;" class="mt-2">Booking Id : {{ $bookings[0]->unique_booking_id }}</span>
                                                                 </h3>
 
@@ -193,7 +193,7 @@
                                                                                 <span
                                                                                     class="fs-14 mb-2 fw-semibold  d-block">Date
                                                                                     Of Birth :
-                                                                                    {{ $pass->date_of_birth }}</span>
+                                                                                    {{ date('Y-m-d',strtotime($pass->date_of_birth)) }}</span>
                                                                                 <span
                                                                                     class="fs-14 mb-2 fw-semibold  d-block">Passport
                                                                                     Number :

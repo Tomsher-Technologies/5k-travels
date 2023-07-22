@@ -71,7 +71,7 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/flights/refundQuote', [FlightsController::class, 'refundQuote'])->name('flight.refundQuote');
     Route::post('/flights/refund', [FlightsController::class, 'refundAPI'])->name('flight.refund');
     Route::get('/changeDate/{type}/{id}/{unique_id}', [FlightsController::class, 'changeDate'])->name('change-date');
-    Route::get('/reschedule-flight', [FlightsController::class, 'rescheduleFlight'])->name('reschedule-flight');
+    Route::post('/reschedule-flight', [FlightsController::class, 'rescheduleFlight'])->name('reschedule-flight');
     Route::post('/send-reschedule-request', [FlightsController::class, 'sendRescheduleRequest'])->name('send-reschedule-request');
     Route::get('/flights/reissue_prtStatus', [FlightsController::class, 'reissuePtrStatusCheck'])->name('flight.reissue_prtStatus');
 });

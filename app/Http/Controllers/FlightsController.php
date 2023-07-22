@@ -14,6 +14,7 @@ use App\Models\FlightPassengers;
 use App\Models\FlightItineraryDetails;
 use App\Models\FlightMarginAmounts;
 use App\Models\FlightExtraServices;
+use App\Models\FlightSearches;
 use App\Models\UserDetails;
 use App\Models\User;
 
@@ -135,7 +136,7 @@ class FlightsController extends Controller
                                                     "user_password"=> config('global.api_user_password'),
                                                     "access"=> config('global.api_access'),
                                                     "ip_address"=> config('global.api_ip_address'),
-                                                    "requiredCurrency"=> config('global.api_requiredCurrency'),
+                                                    "requiredCurrency"=> (Session::has('user_currency') ? Session::get('user_currency') : config('global.api_requiredCurrency')),
                                                     "journeyType"=> $request->search_type,
                                                     "OriginDestinationInfo"=> $originDestinationInfo,
                                                     "class"=> $cabinClass,
@@ -1381,6 +1382,9 @@ class FlightsController extends Controller
         // die;
         $data['flightBookingInfo']['flight_session_id'] = $request->session_id;
         $data['flightBookingInfo']['fare_source_code'] = $request->fare_source_code;
+        if(isset($request->fare_source_code_inbound)){
+            $data['flightBookingInfo']['fare_source_code_inbound'] = $request->fare_source_code_inbound;
+        }
         $data['flightBookingInfo']['IsPassportMandatory'] = $request->IsPassportMandatory;
         $data['flightBookingInfo']['fareType'] = $request->FareType;
         $data['flightBookingInfo']['countryCode'] = $request->mobile_code;
@@ -1473,6 +1477,9 @@ class FlightsController extends Controller
                     if($ticketOrderResSuccess == "true" || $ticketOrderResSuccess == "1"){
                         $tripDetails = $this->getTripDetails($bookingId);
                         $tripDetails = json_decode($tripDetails, true);
+                        // echo '<pre>';
+                        // print_r($tripDetails);
+                        // die;
                         if(isset($tripDetails['TripDetailsResponse'])){
                             $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
                             if($tripDetailsResult['Success'] == 'true'){
@@ -1483,6 +1490,9 @@ class FlightsController extends Controller
                 }else{
                     $tripDetails = $this->getTripDetails($bookingId);
                     $tripDetails = json_decode($tripDetails, true);
+                    // echo '<pre>';
+                    // print_r($tripDetails);
+                    // die;
                     if(isset($tripDetails['TripDetailsResponse'])){
                         $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
                         if($tripDetailsResult['Success'] == 'true'){
@@ -1749,6 +1759,58 @@ class FlightsController extends Controller
             }
             // print_r($passengers);
             FlightExtraServices::insert($extras);
+        }
+
+        if($data['direction'] == 'OneWay'){
+            if(Session::has("flight_search_oneway")){
+                $session_data = Session::get("flight_search_oneway");
+                $oneway = new FlightSearches;
+                $oneway->booking_id = $flightBookId;
+                $oneway->origin = isset($session_data['oFrom']) ? $session_data['oFrom'] : '';
+                $oneway->destination = isset($session_data['oTo']) ? $session_data['oTo'] : '';
+                $oneway->from_date = isset($session_data['oDate']) ? $session_data['oDate'] : '';
+                $oneway->to_date = NULL;
+                $oneway->cabin_class = isset($session_data['oClass']) ? $session_data['oClass'] : '';
+                $oneway->save();
+            } 
+        }elseif($data['direction'] == 'Return'){
+            if(Session::has("flight_search_return")){
+                $session_data = Session::get("flight_search_return");
+                $return = new FlightSearches;
+                $return->booking_id = $flightBookId;
+                $return->origin = isset($session_data['rFrom']) ? $session_data['rFrom'] : '';
+                $return->destination = isset($session_data['rTo']) ? $session_data['rTo'] : '';
+                $return->from_date = isset($session_data['rDate']) ? $session_data['rDate'] : '';
+                $return->to_date = isset($session_data['rReturnDate']) ? $session_data['rReturnDate'] : '';
+                $return->cabin_class = isset($session_data['rClass']) ? $session_data['rClass'] : '';
+                $return->save();
+            } 
+        }elseif($data['direction'] == 'Circle'){
+            if(Session::has("flight_search_multi")){
+                $multiData = [];
+                $session_data = Session::get("flight_search_multi");
+                $mFrom = isset($session_data['mFrom']) ? $session_data['mFrom'] : [];
+                $mTo = isset($session_data['mTo']) ? $session_data['mTo'] : [];
+                $mDate = isset($session_data['mDate']) ? $session_data['mDate'] : [];
+                $mClass = isset($session_data['mClass']) ? $session_data['mClass'] : '';
+                $count = count($mFrom);
+                
+                if($count != 0){
+                    for($i=0 ; $i<$count; $i++){
+                        $multiData[] = array(
+                            'booking_id' => $flightBookId,
+                            'origin' => $mFrom[$i],
+                            'destination' => isset($mTo[$i]) ? $mTo[$i] : '',
+                            'from_date' =>  isset($mDate[$i]) ? $mDate[$i] : '',
+                            'to_date' => NULL,
+                            'cabin_class' =>  $mClass,
+                        );
+                    }
+                }
+                if(!empty($multiData)){
+                    FlightSearches::insert($multiData);
+                }
+            } 
         }
         return $flightBookId;
         // die;
@@ -2305,12 +2367,35 @@ class FlightsController extends Controller
         $data['uniqueBookId'] = $request->unique_id;
         $data['id'] = $request->id;
         $type = $request->type;
+        $data['search'] = FlightItineraryDetails::where('booking_id', $data['id'])->orderBy('id','ASC')->get();
         return  view('web.user.reschedule',compact('data','type'));
     }
 
     public function rescheduleFlight(Request $request){
-        $uniqueBookId = $request->uniqueBookId;
-        $id = $request->id;
+        // echo '<pre>';
+        // print_r($request->all());
+        $origin = $request->origin;
+        $destination = $request->destination;
+        $date = $request->date;
+        $id = $request->booking_id;
+        $uniqueBookId = $request->unique_id;
+       
+        $OriginDestinationInfo = [];
+        $itineraryDetails = FlightItineraryDetails::where('booking_id', $id)->orderBy('id','ASC')->get();
+        foreach ($itineraryDetails as $item) {
+            $airport = $item->departure_airport.'-'.$item->arrival_airport;
+            $reDate = isset($date[$airport]) ? $date[$airport] : date('Y-m-d', strtotime($item->departure_date_time));
+            $OriginDestinationInfo[] = array(
+                                        "airportOriginCode" => $item->departure_airport,
+                                        "airportDestinationCode"   => $item->arrival_airport,
+                                        "cabinPreference" => ($item->cabin_class != '') ? $item->cabin_class : 'Y',
+                                        "departureDate"   => $reDate,
+                                        "flightNumber" => $item->flight_number,
+                                        "airlineCode"   => $item->marketing_airline_code,
+                                    );
+        }
+        // print_r($OriginDestinationInfo);
+        // die;
         $reDate = $request->rescheduleDate;
 
         $bookDetails = FlightBookings::where('id', $id)->get();
@@ -2326,20 +2411,6 @@ class FlightsController extends Controller
                                     "eTicket" => $key->eticket_number
                             );   
         }
-
-        $itineraryDetails = FlightItineraryDetails::where('booking_id', $id)->get();
-        $OriginDestinationInfo = [];
-        foreach ($itineraryDetails as $item) {
-            $OriginDestinationInfo[] = array(
-                                        "airportOriginCode" => $item->departure_airport,
-                                        "airportDestinationCode"   => $item->arrival_airport,
-                                        "cabinPreference" => ($item->cabin_class != '') ? $item->cabin_class : 'Y',
-                                        "departureDate"   => $reDate,
-                                        "flightNumber" => $item->flight_number,
-                                        "airlineCode"   => $item->marketing_airline_code,
-                                    );
-        }
-                
         // echo '<pre>';
         // print_r($paxDetails);
         // print_r($OriginDestinationInfo);
@@ -2357,90 +2428,34 @@ class FlightsController extends Controller
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
         // print_r($result);
-
+        // die;
         if(isset($result['ReissueQuoteResponse']['ReissueQuoteResult'])){
             $ReissueQuoteResult = $result['ReissueQuoteResponse']['ReissueQuoteResult'];
             if(isset($ReissueQuoteResult['Success']) && $ReissueQuoteResult['Success'] == true){
                 if($ReissueQuoteResult['ptrUniqueID'] != ''){
                     $ptrUniqueId = $ReissueQuoteResult['ptrUniqueID'];
+                    FlightBookings::where('id', $id)->update(['reissue_quote_ptr' => $ptrUniqueId]);
                     $responseStatus = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
                         "user_id"=> config('global.api_user_id'),
                         "user_password"=> config('global.api_user_password'),
                         "access"=> config('global.api_access'),
                         "ip_address"=> config('global.api_ip_address'),
                         "UniqueID"=> $uniqueBookId,
-                        "ptrUniqueID" => $ReissueQuoteResult['ptrUniqueID']
+                        "ptrUniqueID" => $ptrUniqueId
                     ]);
             
                     $resultStatus = $responseStatus->getBody()->getContents();
                     $resultStatus = json_decode($resultStatus, true);
                     // print_r($resultStatus);
+                    // die;
                     if(isset($resultStatus['PtrResponse']['PtrResult']['Success'])) {
                         $PtrResult = $resultStatus['PtrResponse']['PtrResult'];
                         if($PtrResult['Success'] == true){
                             $PtrDetails = $resultStatus['PtrResponse']['PtrResult']['PtrDetails'][0];
                             if(isset($PtrDetails['RequestedPreferences'])){
-                                $html = '';
-                                $RequestedPreferences = $PtrDetails['RequestedPreferences'];
-                                $arrrowImg = asset('assets/img/icon/right_arrow.png');
-                                foreach($RequestedPreferences as $pref){
-                                    $html .= '<div class="flight_search_items">
-                                            <div class="multi_city_flight_lists">';
-                                    foreach($pref['QuotedSegments'] as $segment){
-                                        $airlineData = getAirlineData($segment['AirlineCode']);
-                                        $deptAirportData = getAirportData($segment['DepartureAirportLocationCode']);
-                                        $arrAirportData = getAirportData($segment['ArrivalAirportLocationCode']);
-
-                                        $html .= '<div class="flight_multis_area_wrapper">
-                                                    <div class="flight_search_left">
-                                                        <div class="flight_logo">
-                                                            <img src="'.$airlineData[0]['AirLineLogo'].'" alt="img">
-                                                            <div class="flight-details">
-                                                                <h4>'.$airlineData[0]['AirLineName'].' </h4>
-                                                                <h6>'.$segment['FlightNumber'].' </h6>
-                                                            </div>
-                                                        </div>
-                                                        <div class="flight_search_destination">
-                                                            <p>From</p>
-                                                            <span>'.date('d M, Y', strtotime($segment['DepartureDateTime'])).'</span>
-                                                            <h2>'. date('H:i', strtotime($segment['DepartureDateTime'])).' </h2>
-                                                            <h4>'.$deptAirportData[0]['City'].' </h4>
-                                                            <h6>'.$deptAirportData[0]['AirportName'].'</h6>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="flight_search_middel">
-                                                        <div class="flight_right_arrow">
-                                                            <img src="'.$arrrowImg.'" alt="icon">
-                                                        
-                                                            <p>'.convertToHoursMins($segment['JourneyDuration']).' </p>
-                                                        </div>
-                                                        <div class="flight_search_destination">
-                                                            <p>To</p>
-                                                            <span>'.date('d M, Y', strtotime($segment['ArrivalDateTime'])).'</span>
-                                                            <h2>'.date('H:i', strtotime($segment['ArrivalDateTime'])).' </h2>
-                                                            <h4>'. $arrAirportData[0]['City'] .' </h4>
-                                                            <h6>'.$arrAirportData[0]['AirportName'].' </h6>
-                                                        </div>
-                                                    </div>
-                                                </div>';
-                                    }
-                                    $fareDiff = 0;
-                                    $currency = '';
-                                    foreach($pref['QuotedFares'] as $fares){
-                                        $fareDiff = $fareDiff + $fares['TotalFareDifference']['Amount'];
-                                        $currency = $fares['TotalFareDifference']['CurrencyCode'];
-                                    }
-                                    $html .='<div class="flight_search_right">
-                                                <h4> Total fare difference </h4>
-                                                <h2>'.$currency.' '.$fareDiff.' </h2>
-                                                <button type="submit" class="btn btn_theme btn_lg mt-10 reissueButton" data-uniqueID="'.$uniqueBookId.'" data-ptrUniqueID="'.$ptrUniqueId.'" data-currency="'.$currency.'" data-fare="'.$fareDiff.'" data-preference="'.$pref['PreferenceOption'].'" name="reissueButton" id="reissueButton">Send Reschedule Request</button>
-                                            </div>
-                                        </div>
-                                    </div>';
-                                }
-                                
-                                $msg = array('status' => true, 'data' => $html, 'msg' => 'success' );
+                                $viewData = view('web.user.reschedule_data', compact('PtrDetails','uniqueBookId','ptrUniqueId'))->render();
+                               
+                                $msg = array('status' => true, 'data' => $viewData, 'msg' => 'success' );
                             }else{
                                 $msg = array('status' => false, 'data' => '', 'msg' => 'Alternative flights not found' );
                             }
@@ -2455,6 +2470,38 @@ class FlightsController extends Controller
                 $msg = array('status' => false, 'data' => '', 'msg' =>  (isset($ReissueQuoteResult['Errors'])) ? $ReissueQuoteResult['Errors']['ErrorMessage'] : 'Alternative flights not found');
             }
         }else{
+            $reissue_quote_ptr = FlightBookings::where('id', $id)->pluck('reissue_quote_ptr');
+            if($reissue_quote_ptr[0] != ''){
+                $ptrUniqueId = $reissue_quote_ptr[0];
+                $responseStatus = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
+                    "user_id"=> config('global.api_user_id'),
+                    "user_password"=> config('global.api_user_password'),
+                    "access"=> config('global.api_access'),
+                    "ip_address"=> config('global.api_ip_address'),
+                    "UniqueID"=> $uniqueBookId,
+                    "ptrUniqueID" => $ptrUniqueId
+                ]);
+        
+                $resultStatus = $responseStatus->getBody()->getContents();
+                $resultStatus = json_decode($resultStatus, true);
+                if(isset($resultStatus['PtrResponse']['PtrResult']['Success'])) {
+                    $PtrResult = $resultStatus['PtrResponse']['PtrResult'];
+                    if($PtrResult['Success'] == true){
+                        $PtrDetails = $resultStatus['PtrResponse']['PtrResult']['PtrDetails'][0];
+                        if(isset($PtrDetails['RequestedPreferences'])){
+                            $viewData = view('web.user.reschedule_data', compact('PtrDetails','uniqueBookId','ptrUniqueId'))->render();
+                           
+                            $msg = array('status' => true, 'data' => $viewData, 'msg' => 'success' );
+                        }else{
+                            $msg = array('status' => false, 'data' => '', 'msg' => 'Alternative flights not found' );
+                        }
+                    }else{
+                        $msg = array('status' => false, 'data' => '', 'msg' => (isset($PtrResult['Errors'])) ? $PtrResult['Errors']['ErrorMessage'] : 'Alternative flights not found');
+                    }
+                }else{
+                    $msg = array('status' => false, 'data' => '', 'msg' => (isset($resultStatus['Errors'])) ? $resultStatus['Errors']['ErrorMessage'] : 'Alternative flights not found');
+                }               
+            }
             $msg = array('status' => false, 'data' => '', 'msg' =>  (isset($result['Errors'])) ? $result['Errors']['ErrorMessage'] : 'Alternative flights not found');
         }
         return json_encode($msg);

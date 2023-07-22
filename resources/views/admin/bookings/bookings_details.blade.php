@@ -186,7 +186,7 @@
                                                                                         <span
                                                                                             class="fs-14 mb-2 fw-semibold  d-block">Date
                                                                                             Of Birth :
-                                                                                            {{ $pass->date_of_birth }}</span>
+                                                                                            {{ date('Y-m-d',strtotime($pass->date_of_birth)) }}</span>
                                                                                         <span
                                                                                             class="fs-14 mb-2 fw-semibold  d-block">Passport
                                                                                             Number :
@@ -204,7 +204,36 @@
 
                                                                             </div>
                                                                             @endforeach
+                                                                            @if(!empty($bookings[0]['extraServices']))
+                                                                                @php
+                                                                                    $desc = array(
+                                                                                        'GROUP_PAX' => '(Entire group)', 
+                                                                                        'PER_PAX' => '(Each passenger)', 
+                                                                                        'GROUP_PAX_INBOUND' => '(Entire group only on the return trip)',
+                                                                                        'GROUP_PAX_OUTBOUND' => '(Entire group only on for the onward travel)', 
+                                                                                        'PER_PAX_INBOUND' => '(Each passenger only on the return trip)', 
+                                                                                        'PER_PAX_OUTBOUND' => '(Each passenger only on for the onward travel)'
+                                                                                    );
+                                                                                @endphp
+                                                                                <div class=" mt-1 col-sm-12" style="padding: 1%;">
+                                                                                    <div class="">
+                                                                                        <div class="tour_details_right_box_heading">
+                                                                                            <h3>Extra Services</h3>
+                                                                                        </div>
 
+                                                                                        <div class="tour_booking_amount_area">
+                                                                                            <ul>
+                                                                                                @foreach($bookings[0]['extraServices'] as $extra)
+                                                                                                    <li style="border-bottom:none;">{{ $extra->description }} {{ (isset($desc[$extra->behavior])) ? $desc[$extra->behavior] : '' }}
+                                                                                                        <span>{{ $extra->currency }} {{ $extra->service_amount }}</span>
+                                                                                                    </li>
+                                                                                                @endforeach
+                                                                                            </ul>
+                                                                                        
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            @endif
                                                                         </div>
                                                                         @endif
                                                                     </div>
@@ -219,7 +248,7 @@
                                             
                                         </div>
                                     </div>
-                                    <div class="tour_detail_right_sidebar mt-1 col-sm-4">
+                                    <div class="tour_detail_right_sidebar mt-1 col-sm-6">
                                         <div class="tour_details_right_boxed">
                                             <div class="tour_details_right_box_heading">
                                                 <h3>Booking amount</h3>

@@ -162,7 +162,17 @@
             <div class="col-lg-9">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="flight_search_result_wrapper">
+                        @php
+                            $divId = '';
+                            if($data['search_type'] == 'OneWay'){
+                                $divId = 'one_way_trip';
+                            }elseif($data['search_type'] == 'Return'){
+                                $divId = 'return_trip';
+                            }elseif($data['search_type'] == 'Circle'){
+                                $divId = 'multi_city_trip';
+                            }
+                        @endphp
+                        <div class="flight_search_result_wrapper" id="{{$divId}}">
                            
                             @if($data['flightDetails'])
                                 @foreach($data['flightDetails'] as $fdata)
