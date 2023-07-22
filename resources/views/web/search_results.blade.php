@@ -367,7 +367,7 @@
                                             <h2>
                                             <!-- {{ $totalFares['Amount'] }}
                                             == -->
-                                            {{ $totalFares['CurrencyCode'] }}
+                                            <span class="crc"> {{ $totalFares['CurrencyCode'] }}</span>
                                               
                                                 <!-- <sup>*20% OFF</sup> -->
                                                
