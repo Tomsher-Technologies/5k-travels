@@ -42,6 +42,7 @@ class FlightBookings extends Model
         'cancel_request',
         'is_reissued',
         'parent_id',
-        'customer_name'
+        'customer_name',
+        'reschedule_fare_difference'
     ];
 }

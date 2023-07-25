@@ -7,7 +7,7 @@
                 <ul class=" navbar-right">
                     <li class="nav-item dropdown open" style="padding-left: 15px;">
                         <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                            <img src="{{ asset('assets/images/img.jpg') }}" alt="">{{ Auth::user()->name }}
+                            <img src="{{ asset('assets/img/avatar-place.png') }}" alt="">{{ Auth::user()->name }}
                         </a>
                         <div class="dropdown-menu dropdown-usermenu pull-left" aria-labelledby="navbarDropdown"  style="left: auto !important;">
                             <!-- <a class="dropdown-item" href="javascript:;"> Profile</a> -->

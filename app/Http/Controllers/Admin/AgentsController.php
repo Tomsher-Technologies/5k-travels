@@ -32,7 +32,9 @@ class AgentsController extends Controller
             $agent_search = $request->agent;
         }
       
-        $query = User::leftJoin('user_details as ud','ud.user_id','=','users.id')
+        $query = User::select('users.*','ud.*','pud.code as parent_code')->leftJoin('user_details as ud','ud.user_id','=','users.id')
+                            ->leftJoin('users as pu', 'pu.id','=','users.parent_id')
+                            ->leftJoin('user_details as pud', 'pud.user_id','=','pu.id')
                             ->where('users.user_type','agent')
                             ->where('users.is_deleted',0);
         if($sort_search){  
@@ -49,12 +51,23 @@ class AgentsController extends Controller
             }               
         }
         if($agent_search){
-            $query->where('users.parent_id',$agent_search);
+            $parent = User::with(['user_details'])->where('id', $agent_search)->first();
+            $allChilds = $parent->children->pipe(function ($collection){
+                $array = $collection->toArray();
+                $ids = [];
+                array_walk_recursive($array, function ($value, $key) use (&$ids) {
+                    if ($key === 'id') {
+                        $ids[] = $value;
+                    };
+                });
+                return $ids;
+            });
+            $query->whereIn('users.id',$allChilds);
         }
 
         $agents = $query->orderBy('users.id','DESC')->paginate(10);
-        $mainAgents = User::where('user_type','agent')->whereNull('parent_id')->where('is_deleted',0)->where('is_approved',1)->get();
-        return view('admin.agents.index', compact('agents', 'sort_search','mainAgents'));
+        $mainAgents = User::where('user_type','agent')->where('is_deleted',0)->where('is_approved',1)->get();
+        return view('admin.agents.index', compact('agents', 'agent_search','sort_search','mainAgents'));
     }
 
 
@@ -119,12 +132,12 @@ class AgentsController extends Controller
 
         $user = User::create([
             'user_type' => 'agent',
-            'parent_id' => (isset($request->main_agent) ? $request->main_agent : NULL),
+            'parent_id' => ((isset($request->main_agent) && $request->agent_type == 'sub') ? $request->main_agent : NULL),
             'name' => $request->first_name.' '.$request->last_name,
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
             'is_approved' => 0,
-            'is_active' => 0,
+            'is_active' => 1,
         ]);
 
         if($user->id){
@@ -303,8 +316,8 @@ class AgentsController extends Controller
     public function approve(Request $request){
         $user = User::find($request->id);
         $user->update(['is_approved' => 1]);
-        $site_url = config('app.url');
-        $content = 'Welcome to '.env('APP_NAME').'. Your account has been approved. Click <a href="{{ '.$site_url.' }}">Here to login</a> to the site.';
+        $site_url = env('APP_URL');
+        $content = 'Welcome to '.env('APP_NAME').'. Your account has been approved by the Administrator. Click <a href="'.$site_url.'">Here to login</a> to the site.';
 
         $info = array(
             'name' => $user->name,

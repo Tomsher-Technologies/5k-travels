@@ -60,14 +60,16 @@
                                                 <td>USD {{$agent->credit_balance}}</td>
                                                 <td class="text-center" id="approve_{{$agent->user_id}}">
                                                     @if ($agent->is_approved == 1)
+                                                        @php $switchClass = ''; @endphp
                                                         <span class="label label-success">Approved</span>
                                                     @else
+                                                        @php $switchClass = 'pointer-none'; @endphp
                                                         <span class="label label-danger"> Not Approved</span>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
-                                                    <label class="switch" title="{{ (($agent->is_active) == 1) ? 'Enabled' : 'Disabled' }}">
-                                                        <input type="checkbox" onchange="changeStatus({{$agent->user_id}},{{$agent->is_active}})" {{ (($agent->is_active) == 1) ? "checked" : '' }} >
+                                                    <label class="switch {{$switchClass}}" title="{{ (($agent->is_active) == 1) ? 'Enabled' : 'Disabled' }}">
+                                                        <input type="checkbox"  onchange="changeStatus({{$agent->user_id}},{{$agent->is_active}})" {{ (($agent->is_active) == 1) ? "checked" : '' }} >
                                                         <span class="slider round"></span>
                                                     </label>
                                                 </td>
@@ -101,7 +103,9 @@
 @push('header')
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
 <style>
-
+.pointer-none{
+    pointer-events : none !important;
+}
 </style>
 @endpush
 @push('footer')

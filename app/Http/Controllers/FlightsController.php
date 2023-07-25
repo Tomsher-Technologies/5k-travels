@@ -23,6 +23,7 @@ use Session;
 use Helper;
 use DB;
 use Auth;
+use Mail;
 
 class FlightsController extends Controller
 {
@@ -1502,6 +1503,8 @@ class FlightsController extends Controller
                 }
                 $msg = 'success';
                 $bookings = $this->getBookingDetails($bookingId);
+                $this->sendBookingMail($bookings);
+                
             }else{
                 // print_r($bookResult);
                 $bookings= [];
@@ -1513,6 +1516,42 @@ class FlightsController extends Controller
         }   
         return  view('web.booking_success',compact('msg','bookings'));
    }
+
+    public function sendBookingMail($bookings){
+        $name = $to_name = $bookings[0]->customer_name;
+        $to_email = $bookings[0]->customer_email;
+        $viewdata = view('web.booking_email', compact('name','bookings'))->render();
+        $data = array('name'=> $to_name, 'body' => $viewdata);
+        Mail::send('web.email.booking_email', $data, function($message) use ($to_name, $to_email) {
+            $message->to($to_email, $to_name) ->subject('Flight Booked!');
+            $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+        });
+
+    }
+
+    public function sendReissueBookingMail($bookings){
+        $name = $to_name = $bookings[0]->customer_name;
+        $to_email = $bookings[0]->customer_email;
+        $viewdata = view('web.booking_email', compact('name','bookings'))->render();
+        $data = array('name'=> $to_name, 'body' => $viewdata);
+        Mail::send('web.email.booking_email', $data, function($message) use ($to_name, $to_email) {
+            $message->to($to_email, $to_name) ->subject('Flight Booking Reissued!');
+            $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+        });
+
+    }
+
+    public function sendCancelMail($bookings){
+        $name = $to_name = $bookings[0]->customer_name;
+        $to_email = $bookings[0]->customer_email;
+        $viewdata = view('web.cancel_email', compact('name','bookings'))->render();
+        $data = array('name'=> $to_name, 'body' => $viewdata);
+        Mail::send('web.email.booking_email', $data, function($message) use ($to_name, $to_email) {
+            $message->to($to_email, $to_name) ->subject('Flight Booking Cancelled!');
+            $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+        });
+
+    }
 
     public function ticketOrder($bookingId){
         $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'ticket_order', [
@@ -1877,6 +1916,8 @@ class FlightsController extends Controller
                         $CancelBookingResult = $result['CancelBookingResponse']['CancelBookingResult'];
                         if( $CancelBookingResult['Success'] == true){
                             FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1,'is_cancelled' => 1]);
+                            $bookData = getBookingDataByUniqueId($uniqueBookId);
+                            $this->sendCancelMail($bookData);
                             $msg = ['status' => true,'type' => 'cancel','msg' => 'Cancel request send successfully'];
                         }else{
                             $msg =  ['status' => false,'msg' => (isset($CancelBookingResult['Errors']['ErrorMessage'])) ? $CancelBookingResult['Errors']['ErrorMessage'] : 'Something went wrong'];
@@ -2198,6 +2239,8 @@ class FlightsController extends Controller
                     if($PtrDetails['PtrStatus'] == 'Completed'){
                         if($PtrDetails['PtrType'] == 'Void' || $PtrDetails['PtrType'] == 'Refund'){
                             FlightBookings::where('unique_booking_id', $uniqueId)->update(['is_cancelled' => 1]);
+                            $bookData = getBookingDataByUniqueId($uniqueId);
+                            $this->sendCancelMail($bookData);
                         }
                         $msg = "Your Request for ticket cancellation is Completed.";
                     }else{
@@ -2590,7 +2633,9 @@ class FlightsController extends Controller
                                         if(isset($tripDetailsReissue['TripDetailsResponse'])){
                                             $tripDetailsResultReissue = $tripDetailsReissue['TripDetailsResponse']['TripDetailsResult'];
                                             if($tripDetailsResultReissue['Success'] == 'true'){
-                                                $this->saveFlightReissueBookingData($tripDetailsResultReissue, $details);
+                                                $newBookingId = $this->saveFlightReissueBookingData($tripDetailsResultReissue, $details);
+                                                $newbooking = $this->getBookingDetails($newBookingId);
+                                                $this->sendReissueBookingMail($newbooking);
                                                 $msg = "Your Request for ticket Reissue is Completed.";
                                             }else{
                                                 $msg = "Your Request for ticket Reissue is Not Completed.";
@@ -2688,7 +2733,8 @@ class FlightsController extends Controller
             'adult_amount' => $adultAmount, 
             'child_amount' => $childAmount, 
             'infant_amount' => $infAmount, 
-            'total_amount' => $totalAmount, 
+            'total_amount' => $totalAmount,
+            'reschedule_fare_difference' =>  $newTotal,
             'total_tax' => $totalTax, 
             'addon_amount' => $oldBookingData->addon_amount, 
             'created_at'=> date('Y-m-d H:i:s'),
@@ -2802,6 +2848,7 @@ class FlightsController extends Controller
         }
 
         // die;
+        return $flightBookId;
     }
 
     public function getBookingDetails($id){
