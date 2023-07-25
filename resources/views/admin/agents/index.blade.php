@@ -29,12 +29,12 @@
                                                         <label> Search by category or name or email or agent code</label>
                                                         <div class="form-group">
                                                             <input type="text" class="form-control w-90" id="search" name="search" @isset($sort_search) value="{{ $sort_search }}" @endisset
-                                                            placeholder="Type category or name or email or agent code & Enter">
+                                                            placeholder="Type category or name or email or agent code">
                                                            
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4 col-sm-4  form-group pull-right top_search">
-                                                        <label> Search by Main agents</label>
+                                                        <label> Filter Sub-Agents</label>
                                                         <div class="form-group">
                                                             <select class="form-control w-80 pointer" name="agent" id="agent">
                                                                 @if($mainAgents)
@@ -42,11 +42,11 @@
                                                                     @foreach ($mainAgents as $agent )
                                                                         @php 
                                                                             $selected = '';
-                                                                            if(isset($data['agent'])){
-                                                                                $selected = ($data['agent'] == $agent->id) ? 'selected' : '';
+                                                                            if(isset($agent_search)){
+                                                                                $selected = ($agent_search == $agent->id) ? 'selected' : '';
                                                                             }  
                                                                         @endphp
-                                                                        <option value="{{ $agent->id }}" {{ $selected }}>{{ ucfirst(strtolower($agent->name)) }}</option>
+                                                                        <option value="{{ $agent->id }}" {{ $selected }}>{{ ucfirst(strtolower($agent->name)) }} ({{ $agent->user_details->code }})</option>
                                                                     @endforeach
                                                                 @endif
                                                             </select>
@@ -68,8 +68,9 @@
                                                 <th>Sl No.</th>
                                                 <th>Agent Code</th>
                                                 <th>Category</th>
+                                                <th>Main Agent Code</th>
                                                 <th>Agent Name</th>
-                                                <th>No. Of Sub-agents</th>
+                                               
                                                 <th>Email</th>
                                                 <th>Phone</th>
                                                 <th>Credit Balance (USD)</th>
@@ -85,8 +86,8 @@
                                                     <td>{{$loop->iteration}}</td>
                                                     <td>{{$agent->code}}</td>
                                                     <td>{{ ($agent->parent_id == '') ? 'Agent' : 'Sub Agent' }}</td>
-
-                                                    <td>{{$agent->name}}</td>
+                                                    <td>{{ ($agent->parent_code != '') ? $agent->parent_code : '-'}}</td>
+                                                    
                                                     <td>{{$agent->name}}</td>
                                                     <td>{{$agent->email}}</td>
                                                     <td>{{$agent->phone_number}}</td>

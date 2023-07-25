@@ -32,6 +32,13 @@
                         <div class="mt-n5 d-flex gap-3 flex-wrap align-items-end">
                             <div>
                                 <h3>Booking Details</h3>
+                                @php
+                                    $childId = '';
+                                    if($bookings[0]->is_reissued == 1){
+                                        $childId = getNewReissuedBooking($bookings[0]->id);
+                                        $childId = isset($childId[0]) ? $childId[0] : $bookings[0]->id;
+                                    }
+                                @endphp
                             </div>
                                
                             <div class="ms-md-auto">
@@ -74,7 +81,9 @@
                                         @if($bookings[0]->is_reissued == 0 && $bookings[0]->reissue_request == 1)
                                             <a href="javascript:void(0)" class="btn btn-info reissuePTRStatusCheck" title="Check Cancel Status" data-id="{{ $bookings[0]->id }}" data-uniqueid="{{ $bookings[0]->unique_booking_id }}"  data-ptr="{{ $bookings[0]->reissue_ptr }}">Check Reissue Status</a> 
                                         @elseif($bookings[0]->is_reissued == 1)
-                                            <span class="badge bg-info line-height-badge"> Rescheduled </span>
+                                            <a href="{{ route('booking-details', ['type' => $type, 'id' => $childId] ) }}">
+                                                <span class="badge bg-info line-height-badge"> Rescheduled </span>
+                                            </a>
                                         @else
                                             <a href="{{ route('change-date',['type' => $type,'id' => $bookings[0]->id,'unique_id' => $bookings[0]->unique_booking_id] ) }}" class="btn btn-warning ">Reschedule Booking</a>
                                         @endif
@@ -83,7 +92,7 @@
                                     @if($bookings[0]->is_cancelled == 1)
                                         <span class="badge bg-danger line-height-badge"> Cancelled </span>
                                     @elseif($bookings[0]->is_reissued == 1)
-                                        <span class="badge bg-info line-height-badge"> Rescheduled </span>
+                                        <a href="{{ route('booking-details', ['type' => $type, 'id' => $childId] ) }}"><span class="badge bg-info line-height-badge"> Rescheduled </span></a>
                                     @endif
 
                                 @endif
@@ -341,6 +350,28 @@
                                     
                                 </div>
                             </div>
+                            @if($bookings[0]->parent_id != '')
+                            <div class="tour_details_right_boxed mt-4">
+                                <div class="tour_details_right_box_heading">
+                                    <h3>Reschedule Fare Details</h3>
+                                </div>
+
+                                <div class="tour_booking_amount_area">
+                                    <div class="tour_bokking_subtotal_area">
+                                        <h6>Old Booking Fare<span>{{ $bookings[0]->currency }} {{ $bookings[0]->total_amount - $bookings[0]->reschedule_fare_difference }}</span></h6>
+                                    </div>
+                                    <div class="tour_bokking_subtotal_area">
+                                        <h6>New Booking Fare Difference <span>{{ $bookings[0]->currency }} {{ $bookings[0]->reschedule_fare_difference }}</span></h6>
+                                    </div>
+                                    <div class="total_subtotal_booking">
+                                        <h4>Total Amount <span >{{ $bookings[0]->currency }} {{ $bookings[0]->total_amount }}</span> </h4>
+                                    </div>
+                                    <hr>
+
+                                    
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
 

@@ -57,7 +57,7 @@ Highcharts.chart('container', {
         inverted: false,
         marginBottom: 170,
         marginRight: 20,
-        // width:750
+        height:1000
     },
     title: {
         text: 'Agents',

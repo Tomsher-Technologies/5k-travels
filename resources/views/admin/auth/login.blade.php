@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5k-Travels | Login</title>
+    <title>{{ env('APP_NAME') }} | Login</title>
 
      <!-- Bootstrap -->
      <link href="{{ asset('assets/plugins/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet" />

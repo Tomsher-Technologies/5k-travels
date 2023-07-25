@@ -44,15 +44,15 @@
                                         @if($data['search'])
                                             @foreach($data['search'] as $search)
                                                 <div class="col-sm-12 d-flex mt-3">
-                                                    <div class="form-group col-sm-2">
+                                                    <div class="form-group col-sm-3">
                                                         <label class="form-label">Origin </label>
                                                         <input class="form-control" type="text" name="origin[]" readonly value="{{ $search->departure_airport }}">
                                                     </div>
-                                                    <div class="form-group col-sm-2 ml-10">
+                                                    <div class="form-group col-sm-3 ml-10">
                                                         <label class="form-label">Destination </label>
                                                         <input  class="form-control" type="text" name="destination[]" readonly value="{{ $search->arrival_airport }}">
                                                     </div>
-                                                    <div class="form-group col-sm-2 ml-10">
+                                                    <div class="form-group col-sm-3 ml-10">
                                                         <label class="form-label">Journey Date </label>
                                                         <input  class="form-control reschedule_date" type="text" readonly placeholder="YYYY-MM-DD" name="date[{{ $search->departure_airport }}-{{ $search->arrival_airport }}]" value="{{ date('Y-m-d',strtotime($search->departure_date_time)) }}">
                                                     </div>
@@ -72,8 +72,8 @@
                                     <div class="col-sm-12">
                                         <div class="form-group ">
                                             <div class="col-sm-12">
-                                                <input type="text" name="booking_id" id="booking_id" value="{{$data['id']}}">
-                                                <input type="text" name="unique_id" id="unique_id" value="{{$data['uniqueBookId']}}">
+                                                <input type="hidden" name="booking_id" id="booking_id" value="{{$data['id']}}">
+                                                <input type="hidden" name="unique_id" id="unique_id" value="{{$data['uniqueBookId']}}">
                                                 <button type="submit" class="btn back-btn btn btn_theme btn_lg mt-10" id="checkNewFlights">Check Available Flights</button>
                                             </div>
                                         </div>

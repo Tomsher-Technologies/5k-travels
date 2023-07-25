@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use App\Models\UserDetails;
 use App\Models\GeneralSettings;
+use App\Models\FlightBookings;
 use App\Models\Airlines;
 use App\Models\Airports;
 use App\Models\User;
@@ -122,6 +123,7 @@ if (! function_exists('getAgentMarginData')) {
     }
 }
 
+
 if (! function_exists('getUserMarginData')) {
     function getUserMarginData() {
         $margin = GeneralSettings::where('type','admin_margin_users')->first();
@@ -179,6 +181,25 @@ if (! function_exists('getCurrencyValue')) {
                                     ->get();
         }
         return number_format(($oneCurrency), 4, '.', '');
+    }
+}
+
+if (! function_exists('getNewReissuedBooking')) {
+    function getNewReissuedBooking($id) {
+        $details = FlightBookings::select('id')->where('parent_id',$id)
+                        ->pluck('id')->toArray();
+                        // echo '<pre>';
+                        // print_r($details);die;
+        return $details;
+    }
+}
+
+if (! function_exists('getBookingDataByUniqueId')) {
+    function getBookingDataByUniqueId($uniqueid) {
+        $details = FlightBookings::select('*')->where('unique_booking_id',$uniqueid)
+                        ->get();
+            
+        return $details;
     }
 }
 
