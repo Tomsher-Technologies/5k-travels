@@ -13,6 +13,11 @@ use App\Models\UserDetails;
 use Session;
 use Helper;
 use Hash;
+use Carbon;
+use Mail;
+use DB;
+use Str;
+
 class LoginController extends Controller
 {
     /*
@@ -146,53 +151,66 @@ class LoginController extends Controller
         return redirect()->route('home');
     }
 
-    // private function validator(Request $request)
-    // {
-    //     //validation rules.
-    //     $rules = [
-    //         'email'    => 'required|email|exists:users|min:5|max:191',
-    //         'password' => 'required|string|min:4|max:255',
-    //     ];
+    public function submitForgetPassword(Request $request)
+      {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users'
+        ]);
+      
+        if ($validator->fails()){
+            $error = json_decode($validator->errors());
+            return response()->json([
+                    "status" => false,
+                    "message" => $error->email[0]
+                ]);
+        } else{
+            $token = Str::random(64);
+  
+            DB::table('password_resets')->insert([
+                'email' => $request->email, 
+                'token' => $token, 
+                'created_at' => date('Y-m-d H:i:s')
+              ]);
+    
+            Mail::send('admin.emails.forgetPassword', ['token' => $token], function($message) use($request){
+                $message->to($request->email);
+                $message->subject('Reset Password');
+            });
+            return response()->json([
+                "status" => true,
+                "message" => 'We have e-mailed your password reset link!'
+            ]);
+        }
+      }
 
-    //     //custom validation error messages.
-    //     $messages = [
-    //         'email.exists' => 'These credentials do not match our records.',
-    //     ];
+      public function showResetPasswordForm($token) { 
+        return view('admin.auth.passwords.reset', ['token' => $token]);
+     }
 
-    //     //validate the request.
-    //     $request->validate($rules,$messages);
-    // }
+     public function submitResetPasswordForm(Request $request)
+      {
+          $request->validate([
+              'email' => 'required|email|exists:users',
+              'password' => 'required|string|min:6|confirmed',
+              'password_confirmation' => 'required'
+          ]);
 
-    // private function loginFailed(){
-    //     return redirect()
-    //         ->back()
-    //         ->withInput()
-    //         ->with('error','Login failed, please try again!');
-    // }
-
-    // public function login(Request $request)
-    // {
-    //     $this->validator($request);
-       
-    //     if(Auth::attempt($request->only('email','password'),$request->filled('remember'))){
-    //         //Authentication passed...
-    //         return 1;
-    //     }
-
-    //     //Authentication failed...
-    //     return 0;
-    // }
-
-    // public function logout(Request $request)
-    // {
-    //     auth()->guard()->logout();
-       
-    //     $request->session()->invalidate();
-
-    //     $request->session()->regenerateToken();
-
-    //     return redirect()
-    //         ->route('admin.login')
-    //         ->with('status','Admin has been logged out!');
-    // }
+          $updatePassword = DB::table('password_resets')
+                              ->where([
+                                'email' => $request->email, 
+                                'token' => $request->token
+                              ])
+                              ->first();
+ 
+          if(!$updatePassword){
+              return back()->withInput()->with('error', 'Invalid token!');
+          }
+  
+          $user = User::where('email', $request->email)
+                      ->update(['password' => Hash::make($request->password)]);
+ 
+          DB::table('password_resets')->where(['email'=> $request->email])->delete();
+  
+          return back()->with('message', 'Your password has been changed!');
+      }
 }
