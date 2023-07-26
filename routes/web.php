@@ -37,6 +37,10 @@ Route::get('/flight-view-details', [FlightsController::class, 'fightViewDetails'
 
 Route::post('web-post-login', [LoginController::class, 'postLogin'])->name('web.login.post');
 Route::post('post-registration', [LoginController::class, 'postRegistration'])->name('register.post'); 
+Route::post('web.forgot.password', [LoginController::class, 'submitForgetPassword'])->name('web.forgot.password');
+
+Route::get('reset-password/{token}', [LoginController::class, 'showResetPasswordForm'])->name('reset.password.get');
+Route::post('reset-password', [LoginController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 // Logout Routes...
 Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logout');
 

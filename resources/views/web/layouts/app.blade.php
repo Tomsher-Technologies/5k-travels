@@ -141,6 +141,13 @@
                                                         aria-controls="register" aria-selected="false"><i
                                                             class="fas fa-edit"></i> Register</button>
                                                 </li>
+                                                <li class="nav-item " role="presentation">
+                                                    <button class="nav-link" id="forgot-password-tab"
+                                                        data-bs-toggle="tab" data-bs-target="#forgot-password"
+                                                        type="button" role="tab" aria-controls="forgot-password"
+                                                        aria-selected="false"><i class="fas fa-user"></i> Forgot Password</button>
+                                                </li>
+
                                             </ul>
                                         </div>
                                         <div class="tab-content" id="myTabContent">
@@ -157,16 +164,15 @@
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <input type="password" class="form-control" name="password" placeholder="Enter password" />
-                                                                    <a href="forgot-password.html">Forgot password?</a>
+                                                                    <a href="#"  >Forgot password?</a>
                                                                 </div>
                                                                 <div id="errors-list"></div>
                                                                 <div class="common_form_submit">
                                                                     <button type="submit" class="btn btn_theme btn_md">Log in</button>
                                                                 </div>
                                                                 <div class="have_acount_area">
-                                                                    <p>Dont have an account? <a href="#register"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#register">Register now</a>
+                                                                    <p>Dont have an account? <a href="#" data-bs-toggle="tab" 
+                                                                            data-bs-target="#register" aria-controls="register" >Register now</a>
                                                                     </p>
                                                                 </div>
                                                             </form>
@@ -175,8 +181,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="tab-pane fade" id="register" role="tabpanel"
-                                                aria-labelledby="register-tab">
+                                            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
 
                                                 <div id="common_author_area">
 
@@ -233,6 +238,33 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="tab-pane fade" id="forgot-password" role="tabpanel" aria-labelledby="forgot-password-tab">
+                                                <!--  Common Author Area -->
+                                                <div id="common_author_area">
+                                                    <div class="common_author_boxed">
+                                                        <div class="common_author_form">
+                                                            <form action="{{ route('web.forgot.password') }}" id="forgot_password_form" method="POST">
+                                                                @csrf
+                                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token() }}">
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-control" name="forgot_email" id="forgot_email" placeholder="Enter your email" />
+                                                                </div>
+                                                               
+                                                                
+                                                                <div class="common_form_submit">
+                                                                    <button type="submit" id="forgot-button" class="btn btn_theme btn_md">Reset Password </button>
+                                                                </div>
+                                                                <div class="mt-2" id="forgot-error-list">
+                                                                   
+                                                                </div>
+                                                            </form>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -292,6 +324,38 @@
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $("#forgot_password_form").validate({
+        rules: {
+            forgot_email: 'required'
+        },
+        messages: {
+            forgot_email: 'This field is required'
+        },
+        errorPlacement: function (error, element) {
+            error.appendTo(element.parent("div"));
+        },
+        submitHandler: function(form, event) {
+            event.preventDefault();
+            $('#forgot-button').html('<i class="fa fa-spinner fa-spin font-20"></i>');
+            $.ajax({
+                url: "{{ route('web.forgot.password') }}",
+                type: "POST",
+                data: {"email" : $('#forgot_email').val()},
+                success: function(response) {
+                    
+                    if (response.status) {
+                        $('#forgot-button').html('Mail Send! ');
+                        $("#forgot-error-list").html("<div class='alert alert-success'>" + response.message + "</div>");
+                    }else{
+                        $('#forgot-button').html('Reset Password');
+                        $("#forgot-error-list").html("<div class='alert alert-danger'>" + response.message + "</div>");
+                    }
+                }
+            });
+            return false;
         }
     });
 
