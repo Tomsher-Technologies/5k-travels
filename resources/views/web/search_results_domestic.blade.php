@@ -185,7 +185,7 @@
                                             <div class="col-lg-12">
                                                 <div class="flight_logo" style="display:flex; padding: 10px;">
                                                     <img class="flight-logo-img"
-                                                        src="{{ $data['flightData'][$firstFlight['FlightSegment']['MarketingAirlineCode']]['AirLineLogo'] }}"
+                                                        src="{{ $data['flightData'][$firstFlightSegment['MarketingAirlineCode']]['AirLineLogo'] }}"
                                                         alt="img">
                                                     <div class="flight-details" style="    margin-left: 10px;">
                                                         <h4 id="depFlight{{$loop->iteration}}">{{ $firstFlightSegment['MarketingAirlineName'] }} </h4>
@@ -301,7 +301,7 @@
                                             <div class="col-lg-12">
                                                 <div class="flight_logo" style="display:flex; padding: 10px;">
                                                     <img class="flight-logo-img"
-                                                        src="{{ $data['flightData'][$firstFlight['FlightSegment']['MarketingAirlineCode']]['AirLineLogo'] }}"
+                                                        src="{{ $data['flightData'][$firstFlightSegmentIn['MarketingAirlineCode']]['AirLineLogo'] }}"
                                                         alt="img">
                                                     <div class="flight-details" style="    margin-left: 10px;">
                                                         <h4 id="returnFlight{{$loop->iteration}}">{{ $firstFlightSegmentIn['MarketingAirlineName'] }}

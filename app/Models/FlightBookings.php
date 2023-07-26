@@ -43,6 +43,7 @@ class FlightBookings extends Model
         'is_reissued',
         'parent_id',
         'customer_name',
-        'reschedule_fare_difference'
+        'reschedule_fare_difference',
+        'is_domestic'
     ];
 }

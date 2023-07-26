@@ -43,68 +43,69 @@
                 </p> -->
 
                 <table style="width: 100%;border-collapse: collapse;" cellspacing="0" cellpadding="0">
-                    <tr>
-                        @if(isset($bookings[0]))
-                            @foreach($bookings[0]['flights'] as $flights)
+                    
+                    @if(isset($bookings[0]))
+                        @foreach($bookings[0]['flights'] as $flights)
+                            <tr>
                                 @php   
                                     $airlineData = getAirlineData($flights->marketing_airline_code);
                                     $deptAirportData = getAirportData($flights->departure_airport);
                                     $arrAirportData = getAirportData($flights->arrival_airport);
                                     $airlinePNR = $flights->airline_pnr;
                                 @endphp
-                            <td  colspan="2"
-                                style="padding: 12px 5px; vertical-align: middle ;text-align: center; border: 1px solid #eee;background-color: #eee;">
-                                <div
-                                    style="height: 64px;width: 64px;display: flex; align-items: center;justify-content: center;border-radius: 6px; margin: auto; ">
-                                    <img src="{{ $airlineData[0]['AirLineLogo'] }}" alt="" height="38">
+                                <td  colspan="2"
+                                    style="padding: 12px 5px; vertical-align: middle ;text-align: center; border: 1px solid #eee;background-color: #eee;">
+                                    <div
+                                        style="height: 64px;width: 64px;display: flex; align-items: center;justify-content: center;border-radius: 6px; margin: auto; ">
+                                        <img src="{{ $airlineData[0]['AirLineLogo'] }}" alt="" height="38">
 
-                                </div>
-                        
-                                <h6 style="font-size: 15px; margin: 0px;font-weight: 500; font-family: 'Poppins', sans-serif;">
-                                {{$airlineData[0]['AirLineName']}}</h6>
-                                <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px;">
-                                {{$flights->flight_number}}</p>
-                                <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px;">
-                                Duration : {{ convertToHoursMins($flights->journey_duration) }}</p>
-                                <p style="padding: 10px; color: #fff !important; text-align: center; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px; background-color: #1a7971;">
-                                    PNR : {{ $airlinePNR }}</p>
-                            </td>
+                                    </div>
+                            
+                                    <h6 style="font-size: 15px; margin: 0px;font-weight: 500; font-family: 'Poppins', sans-serif;">
+                                    {{$airlineData[0]['AirLineName']}}</h6>
+                                    <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px;">
+                                    {{$flights->flight_number}}</p>
+                                    <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px;">
+                                    Duration : {{ convertToHoursMins($flights->journey_duration) }}</p>
+                                    <p style="padding: 10px; color: #fff !important; text-align: center; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px; background-color: #1a7971;">
+                                        PNR : {{ $airlinePNR }}</p>
+                                </td>
 
-                            <td  style="padding: 15px 10px; vertical-align: middle; border: 1px solid #eee;">
+                                <td  style="padding: 15px 10px; vertical-align: middle; border: 1px solid #eee;">
 
-                                <h6 style="font-size: 15px; margin: 0px;font-weight: 500; font-family: 'Poppins', sans-serif;">
-                                {{ $deptAirportData[0]['AirportName'] }}</h6>
-                                <p style="color: #878a99 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
-                                {{ $flights->departure_airport }} {{ date('H:i', strtotime($flights->departure_date_time)) }} hrs
-                                </p>
+                                    <h6 style="font-size: 15px; margin: 0px;font-weight: 500; font-family: 'Poppins', sans-serif;">
+                                    {{ $deptAirportData[0]['AirportName'] }}</h6>
+                                    <p style="color: #878a99 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
+                                    {{ $flights->departure_airport }} {{ date('H:i', strtotime($flights->departure_date_time)) }} hrs
+                                    </p>
 
-                                <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 0;">
-                                {{ date('d M, Y', strtotime($flights->departure_date_time)) }}</p>
+                                    <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 0;">
+                                    {{ date('d M, Y', strtotime($flights->departure_date_time)) }}</p>
+                                        <hr>
+                                    <p style="color: #333 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
+                                    {{ $deptAirportData[0]['AirportName'] }} Terminal {{$flights->departure_terminal}}
+                                    </p>
+                                </td>
+
+                                <td style="padding: 15px 10px; vertical-align: middle; border: 1px solid #eee;">
+                                    <h6 style="font-size: 15px; margin: 0px;font-weight: 500; font-family: 'Poppins', sans-serif;">
+                                    {{ $arrAirportData[0]['AirportName'] }}</h6>
+                                    <p style="color: #878a99 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
+                                    {{ date('H:i', strtotime($flights->arrival_date_time)) }} hrs
+                                    </p>
+
+                                    <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 0;">
+                                    {{ date('d M, Y', strtotime($flights->arrival_date_time)) }}
+                                    </p>
                                     <hr>
-                                <p style="color: #333 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
-                                {{ $deptAirportData[0]['AirportName'] }} Terminal {{$flights->departure_terminal}}
-                                </p>
-                            </td>
 
-                            <td style="padding: 15px 10px; vertical-align: middle; border: 1px solid #eee;">
-                                <h6 style="font-size: 15px; margin: 0px;font-weight: 500; font-family: 'Poppins', sans-serif;">
-                                {{ $arrAirportData[0]['AirportName'] }}</h6>
-                                <p style="color: #878a99 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
-                                {{ date('H:i', strtotime($flights->arrival_date_time)) }} hrs
-                                </p>
-
-                                <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 0;">
-                                {{ date('d M, Y', strtotime($flights->arrival_date_time)) }}
-                                </p>
-                                <hr>
-
-                                <p style="color: #333 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
-                                {{ $arrAirportData[0]['AirportName'] }} Terminal ({{ $flights->arrival_terminal }}) </p>
-                            </td>
-
-                            @endforeach
-                        @endif
-                    </tr>
+                                    <p style="color: #333 !important; margin-bottom: 10px; font-size: 13px;font-weight: 500;margin-top: 6px;">
+                                    {{ $arrAirportData[0]['AirportName'] }} Terminal ({{ $flights->arrival_terminal }}) </p>
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
+                   
                     @if(!empty($bookings[0]['extraServices']))
                         @php
                             $desc = array(
@@ -194,7 +195,8 @@
                         <tr>
                             <td colspan="4" style="padding: 12px 8px; font-size: 15px;border-top: 1px solid #e9ebec;">
                                 <div style="padding: 1.5rem; background-color: #eee; text-align: left; border-radius: 10px;">
-                                    <p style="color: #333 !important; margin-bottom: 0px;margin-top: 0px;">TRAVELLER {{ $loop->iteration }} ({{ ($pass->passenger_type =='ADT') ? "Adult" : (($pass->passenger_type =="CHD") ? "Child" : "Infant") }})</p>
+                                    <p style="color: #333 !important; margin-bottom: 0px;margin-top: 0px;">TRAVELLER ({{ ($pass->passenger_type =='ADT') ? "Adult" : (($pass->passenger_type =="CHD") ? "Child" : "Infant") }})
+                                    - <span style="color: #1fba71;font-weight: 600;">{{ ($pass->is_return == 0) ? "Onward Trip" : "Return Trip" }}</span></p>
                                     <h5 style="font-size: 18px;font-family: 'Poppins', sans-serif;font-weight: 600;margin-bottom: 0px;margin-top: 0px;line-height: 1.2;color: #1a7971 !important;">
                                     {{ $pass->passenger_first_name }} {{ $pass->passenger_last_name }} <span style="font-size: 13px; color: #333;"></span>
                                     </h5>

@@ -20,6 +20,7 @@ class FlightPassengers extends Model
         'passenger_nationality', 
         'eticket_number', 
         'itemRPH', 
-        'created_at'
+        'created_at',
+        'is_return'
     ];
 }

@@ -240,10 +240,13 @@
                                                    
                                                         <div class="row">
                                                             @foreach($bookings[0]['passengers'] as $pass)
+                                                            
                                                             <div class="col-md-6">
                                                                 <div class="traveler-b-detl">
 
-                                                                    <h4>TRAVELLER {{ $loop->iteration }} ({{ ($pass->passenger_type =='ADT') ? "Adult" : (($pass->passenger_type =="CHD") ? "Child" : "Infant") }})</h4>
+                                                                    <h4>TRAVELLER ({{ ($pass->passenger_type =='ADT') ? "Adult" : (($pass->passenger_type =="CHD") ? "Child" : "Infant") }})
+                                                                        - <span class="head-travel">{{ ($pass->is_return == 0) ? "Onward Trip" : "Return Trip" }}</span>
+                                                                    </h4>
                                                                     <div class="form-check-label">
                                                                         <span class="mb-2 fw-semibold fs-12 d-block text-muted text-uppercase fw-500">
                                                                             {{ $pass->passenger_first_name }} {{ $pass->passenger_last_name }}
@@ -445,7 +448,10 @@
 @push('header')
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
 <style>
-
+.head-travel{
+    color: #1fba71;
+    font-weight: 600;
+}
 </style>
 @endpush
 @push('footer')

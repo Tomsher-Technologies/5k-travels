@@ -102,6 +102,13 @@
 }
 
 @media (max-width: 992px) {
+    #return_trip .flight_search_right{
+        width: 100%;
+    }
+    
+    #return_trip .multi_city_flight_lists {
+    width: 100%;
+    }
     .theme_search_form_tabbtn .nav-tabs {
         border-bottom: none;
         justify-content: center;

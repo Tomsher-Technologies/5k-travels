@@ -558,502 +558,506 @@
                         @endphp
                         <form action="{{ route('flight.create-booking') }}" method="post" id="bookingForm">
                             @csrf
-                            <input type="hidden" name="total_addons" id="total_addons" value="0">
-                            <input type="hidden" name="currency" id="currency" value="{{$currencyCode}}">
-                            <input type="hidden" name="total_amount_org" id="total_amount_org" value="{{$totalFareAmount}}">
-                            <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFareMargin}}">
-                            <input type="hidden" name="total_tax" id="total_tax" value="{{$taxFareMargin}}">
-                            <input type="hidden" name="total_tax_org" id="total_tax_org" value="{{$TotalTax}}">
-                            <input type="hidden" name="adult_amount" id="adult_amount" value="{{$adult_amount}}">
-                            <input type="hidden" name="child_amount" id="child_amount" value="{{$child_amount}}">
-                            <input type="hidden" name="infant_amount" id="infant_amount" value="{{$infant_amount}}">
-                            @if(isset($data['extraBaggage']))
-                            <div class="tour_detail_right_sidebar">
-                                <div class="tour_details_right_boxed">
-                                    <div class="tour_details_right_box_heading">
-                                        <h3>Extra Baggage</h3>
+                            <div class="">
+                                <div class="">
+                                    <input type="hidden" name="total_addons" id="total_addons" value="0">
+                                    <input type="hidden" name="currency" id="currency" value="{{$currencyCode}}">
+                                    <input type="hidden" name="total_amount_org" id="total_amount_org" value="{{$totalFareAmount}}">
+                                    <input type="hidden" name="total_amount" id="total_amount" value="{{$TotalFareMargin}}">
+                                    <input type="hidden" name="total_tax" id="total_tax" value="{{$taxFareMargin}}">
+                                    <input type="hidden" name="total_tax_org" id="total_tax_org" value="{{$TotalTax}}">
+                                    <input type="hidden" name="adult_amount" id="adult_amount" value="{{$adult_amount}}">
+                                    <input type="hidden" name="child_amount" id="child_amount" value="{{$child_amount}}">
+                                    <input type="hidden" name="infant_amount" id="infant_amount" value="{{$infant_amount}}">
+                                </div>
+                                @if(isset($data['extraBaggage']))
+                                <div class="tour_detail_right_sidebar">
+                                    <div class="tour_details_right_boxed">
+                                        <div class="tour_details_right_box_heading">
+                                            <h3>Extra Baggage</h3>
+                                            
+                                        </div>
+                                        <div class="tour_package_details_bar_list">
+                                            @php  
+                                                $adultCount = (isset($data['adultCount'])) ? $data['adultCount'] : 0;
+                                                $childCount = (isset($data['childCount'])) ? $data['childCount'] : 0;
+                                                $infantCount = (isset($data['infantCount'])) ? $data['infantCount'] : 0;
+
+                                                $bagRestict = $adultCount + $childCount;
+                                                
+                                            @endphp
+                                            @if(isset($data['extraBaggage']['outGoing']))
+                                                <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($outFrom != '') ? $data['airports'][$outFrom]['AirportName'] : '' }} -> {{ ($outTo != '') ?  $data['airports'][$outTo]['AirportName'] : '' }}</h4>
+                                                <table>
+                                                @php 
+                                                    $bout = 0; 
+                                                    $bagRestictOut = $bagRestict;
+                                                    $extraBaggageOutGoing = $data['extraBaggage']['outGoing'];
+                                                @endphp
+
+                                                @foreach( $extraBaggageOutGoing as $exBagOut)
+                                                    @php    
+                                                        $exBagOutService = $exBagOut['Service'];
+                                                    @endphp
+                                                    @if(isset($exBagOutService['Description']))
+                                                        @php  
+                                                            $description = explode('||',$exBagOutService['Description']);
+                                                            $description = $description[0];
+                                                        @endphp
+
+                                                    @endif
+
+                                                    @php
+                                                        if(($bout == 0) && strpos($exBagOutService['Behavior'], 'GROUP') !== false){
+                                                            $bagRestictOut = 1;
+                                                        }
+
+                                                        $exBagOutServiceServiceCost = $exBagOutService['ServiceCost'];
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $description }} {{ (isset($desc[$exBagOutService['Behavior']])) ? $desc[$exBagOutService['Behavior']] : '' }} </td>
+                                                        <td>{{ $exBagOutServiceServiceCost['CurrencyCode'] }} {{ $exBagOutServiceServiceCost['Amount'] }}   </td>
+                                                        <td class="text"> 
+                                                            <div class="d-flex"> 
+                                                                <button type="button" class="extraService bag_countOut f-7" id="minusBag" data-max="{{$bagRestictOut}}"  data-price="{{$exBagOutServiceServiceCost['Amount']}}" data-id="{{ $exBagOutService['ServiceId'] }}">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                                <input type="text" name="baggageOut[{{ $exBagOutService['ServiceId'] }}][]" id="baggageOut" class="baggage_count" value="0">
+                                                                <button type="button" class=" extraService bag_countOut" data-max="{{$bagRestictOut}}" data-price="{{$exBagOutServiceServiceCost['Amount']}}" data-id="{{ $exBagOutService['ServiceId'] }}" id="plusBag">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    @php $bout++; @endphp
+                                                @endforeach
+                                                </table>
+                                                <span class="hide bagError" id="bagOutError" > </span>
+                                            @endif
+
+                                            @if(isset($data['extraBaggage']['inComing']))
+                                                <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($inFrom != '') ? $data['airports'][$inFrom]['AirportName'] : '' }} -> {{ ($inTo != '') ? $data['airports'][$inTo]['AirportName'] : '' }}</h4>
+                                                <table>
+                                                @php 
+                                                    $bin = 0; 
+                                                    $bagRestictIn = $bagRestict; 
+                                                    $extraBaggageinComing = $data['extraBaggage']['inComing'];
+                                                @endphp
+                                                @foreach($extraBaggageinComing as $exBagIn)
+                                                    @php
+                                                        $exBagInService = $exBagIn['Service'];
+                                                    @endphp
+                                                    @if(isset($exBagInService['Description']))
+                                                        @php  
+                                                            $description = explode('||',$exBagInService['Description']);
+                                                            $description = $description[0];
+                                                        @endphp
+
+                                                    @endif
+                                                    @php
+                                                        if(($bin == 0) && strpos($exBagInService['Behavior'], 'GROUP') !== false){
+                                                            $bagRestictIn = 1;
+                                                        } 
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $description }} {{ (isset($desc[$exBagInService['Behavior']])) ? $desc[$exBagInService['Behavior']] : '' }} </td>
+                                                        <td>{{ $exBagInService['ServiceCost']['CurrencyCode'] }} {{ $exBagInService['ServiceCost']['Amount'] }}   </td>
+                                                        <td> 
+                                                            <div class="d-flex"> 
+                                                                <button type="button" class=" extraService bag_countIn f-7" id="minusBagIn" data-max="{{$bagRestictIn}}" data-price="{{$exBagInService['ServiceCost']['Amount']}}" data-id="{{ $exBagInService['ServiceId'] }}">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                                <input type="text" name="baggageIn[{{ $exBagInService['ServiceId'] }}][]" id="baggage" class="baggage_countIn" value="0">
+                                                                <button type="button" class=" extraService bag_countIn" data-max="{{$bagRestictIn}}" data-price="{{$exBagInService['ServiceCost']['Amount']}}" data-id="{{ $exBagInService['ServiceId'] }}" id="plusBagIn">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    @php $bin++; @endphp
+                                                @endforeach
+                                                </table>
+                                                <span class="hide bagError" id="bagInError" > </span>
+                                            @endif
+                                        </div>
                                         
                                     </div>
-                                    <div class="tour_package_details_bar_list">
-                                        @php  
-                                            $adultCount = (isset($data['adultCount'])) ? $data['adultCount'] : 0;
-                                            $childCount = (isset($data['childCount'])) ? $data['childCount'] : 0;
-                                            $infantCount = (isset($data['infantCount'])) ? $data['infantCount'] : 0;
-
-                                            $bagRestict = $adultCount + $childCount;
-                                            
-                                        @endphp
-                                        @if(isset($data['extraBaggage']['outGoing']))
-                                            <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($outFrom != '') ? $data['airports'][$outFrom]['AirportName'] : '' }} -> {{ ($outTo != '') ?  $data['airports'][$outTo]['AirportName'] : '' }}</h4>
-                                            <table>
-                                            @php 
-                                                $bout = 0; 
-                                                $bagRestictOut = $bagRestict;
-                                                $extraBaggageOutGoing = $data['extraBaggage']['outGoing'];
-                                            @endphp
-
-                                            @foreach( $extraBaggageOutGoing as $exBagOut)
-                                                @php    
-                                                    $exBagOutService = $exBagOut['Service'];
-                                                @endphp
-                                                @if(isset($exBagOutService['Description']))
-                                                    @php  
-                                                        $description = explode('||',$exBagOutService['Description']);
-                                                        $description = $description[0];
-                                                    @endphp
-
-                                                @endif
-
-                                                @php
-                                                    if(($bout == 0) && strpos($exBagOutService['Behavior'], 'GROUP') !== false){
-                                                        $bagRestictOut = 1;
-                                                    }
-
-                                                    $exBagOutServiceServiceCost = $exBagOutService['ServiceCost'];
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ $description }} {{ (isset($desc[$exBagOutService['Behavior']])) ? $desc[$exBagOutService['Behavior']] : '' }} </td>
-                                                    <td>{{ $exBagOutServiceServiceCost['CurrencyCode'] }} {{ $exBagOutServiceServiceCost['Amount'] }}   </td>
-                                                    <td class="text"> 
-                                                        <div class="d-flex"> 
-                                                            <button type="button" class="extraService bag_countOut f-7" id="minusBag" data-max="{{$bagRestictOut}}"  data-price="{{$exBagOutServiceServiceCost['Amount']}}" data-id="{{ $exBagOutService['ServiceId'] }}">
-                                                                <i class="fas fa-minus"></i>
-                                                            </button>
-                                                            <input type="text" name="baggageOut[{{ $exBagOutService['ServiceId'] }}][]" id="baggageOut" class="baggage_count" value="0">
-                                                            <button type="button" class=" extraService bag_countOut" data-max="{{$bagRestictOut}}" data-price="{{$exBagOutServiceServiceCost['Amount']}}" data-id="{{ $exBagOutService['ServiceId'] }}" id="plusBag">
-                                                                <i class="fas fa-plus"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                @php $bout++; @endphp
-                                            @endforeach
-                                            </table>
-                                            <span class="hide bagError" id="bagOutError" > </span>
-                                        @endif
-
-                                        @if(isset($data['extraBaggage']['inComing']))
-                                            <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($inFrom != '') ? $data['airports'][$inFrom]['AirportName'] : '' }} -> {{ ($inTo != '') ? $data['airports'][$inTo]['AirportName'] : '' }}</h4>
-                                            <table>
-                                            @php 
-                                                $bin = 0; 
-                                                $bagRestictIn = $bagRestict; 
-                                                $extraBaggageinComing = $data['extraBaggage']['inComing'];
-                                            @endphp
-                                            @foreach($extraBaggageinComing as $exBagIn)
-                                                @php
-                                                    $exBagInService = $exBagIn['Service'];
-                                                @endphp
-                                                @if(isset($exBagInService['Description']))
-                                                    @php  
-                                                        $description = explode('||',$exBagInService['Description']);
-                                                        $description = $description[0];
-                                                    @endphp
-
-                                                @endif
-                                                @php
-                                                    if(($bin == 0) && strpos($exBagInService['Behavior'], 'GROUP') !== false){
-                                                        $bagRestictIn = 1;
-                                                    } 
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ $description }} {{ (isset($desc[$exBagInService['Behavior']])) ? $desc[$exBagInService['Behavior']] : '' }} </td>
-                                                    <td>{{ $exBagInService['ServiceCost']['CurrencyCode'] }} {{ $exBagInService['ServiceCost']['Amount'] }}   </td>
-                                                    <td> 
-                                                        <div class="d-flex"> 
-                                                            <button type="button" class=" extraService bag_countIn f-7" id="minusBagIn" data-max="{{$bagRestictIn}}" data-price="{{$exBagInService['ServiceCost']['Amount']}}" data-id="{{ $exBagInService['ServiceId'] }}">
-                                                                <i class="fas fa-minus"></i>
-                                                            </button>
-                                                            <input type="text" name="baggageIn[{{ $exBagInService['ServiceId'] }}][]" id="baggage" class="baggage_countIn" value="0">
-                                                            <button type="button" class=" extraService bag_countIn" data-max="{{$bagRestictIn}}" data-price="{{$exBagInService['ServiceCost']['Amount']}}" data-id="{{ $exBagInService['ServiceId'] }}" id="plusBagIn">
-                                                                <i class="fas fa-plus"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                @php $bin++; @endphp
-                                            @endforeach
-                                            </table>
-                                            <span class="hide bagError" id="bagInError" > </span>
-                                        @endif
-                                    </div>
-                                    
                                 </div>
-                            </div>
-                            @endif
+                                @endif
 
                         
 
-                            @if(isset($data['fareRulesOut']))
-                            <div class="tour_detail_right_sidebar">
-                                <div class="tour_details_right_boxed">
-                                    <div class="tour_details_right_box_heading">
-                                        <h3>Fare rules</h3>
-                                    </div>
-                                    <div class="tour_package_details_bar_list">
-                                        @foreach($data['fareRulesOut'] as $farerule)
-                                            @php
-                                                $fareruleCityPair = $farerule['FareRule']['CityPair'];
-                                                $fromCity = $toCity = '';
-                                                $cityString = (isset($fareruleCityPair) && $fareruleCityPair != '') ? str_split($fareruleCityPair, 3) : '';
-                                                if($cityString){
-                                                    $fromCity = $cityString[0];
-                                                    $toCity = $cityString[1];
-                                                }
-                                                
-                                            @endphp
-
-                                            @if(($fromCity != '') && ($toCity != ''))
-                                                <h4 class="fareRule-heading"><i class="fa fa-plane"></i>&nbsp;{{  $data['airports'][$fromCity]['AirportName'] }} -> {{  $data['airports'][$toCity]['AirportName'] }}</h4>
-                                            @endif
-                                            <h5> {!! $farerule['FareRule']['Category'] !!} </h5>
-                                            {!! $farerule['FareRule']['Rules'] !!}
-                                        @endforeach
-                                    
-                                    </div>
-                                    <!-- <div class="tour_package_details_bar_price">
-                                        <h5>Price</h5>
-                                        <div class="tour_package_bar_price">
-                                            <h6><del>$ 35,500</del></h6>
-                                            <h3>$ 30,500 <sub> / Adult X 1</sub> </h3>
+                                @if(isset($data['fareRulesOut']))
+                                <div class="tour_detail_right_sidebar">
+                                    <div class="tour_details_right_boxed">
+                                        <div class="tour_details_right_box_heading">
+                                            <h3>Fare rules</h3>
                                         </div>
-                                    </div> -->
-                                </div>
-                            </div>
-                            @endif
-
-                            @php   
-                                $passengers = $data['passengers'];
-                            @endphp
-                            @if(isset($passengers))
-                                @php $countries = ''; $passCount = 1; @endphp
-                                
-                                @foreach($data['countries'] as $country)
-                                    @php $countries .= '<option value="'.$country->code.'"> '.$country->name.' </option>'; @endphp
-                                @endforeach
-                            @endif
-                            
-                            <div class="booking_tour_form">
-                                <h3 class="heading_theme">Passenger information</h3>
-                                
-                                    @if(isset($passengers['ADT']))
-
-                                        @for($ad=1; $ad <= $passengers['ADT']; $ad++)
-                                            <div class="tour_booking_form_box {{ ($ad!=1) ? 'mt-3' : '' }}">
-                                                <h3>Passenger {{$passCount}} (Adult)</h3>
-                                                <div class="row form_area">
-                                                    <div class="col-lg-4">
-                                                        <label for="gender">Title<span class="required">*</span></label>
-                                                        <div class="form-group">
-                                                            <select class="form-control appearance-auto" name="adult_title[]" id="adult_title{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                <option value="Mr">Mr</option>
-                                                                <option value="Mrs">Mrs</option>
-                                                                <option value="Miss">Miss</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="first_name">First Name<span class="required">*</span></label>
-                                                            <input type="text"  class="form-control bg_input " id="adult_first_name{{$passCount}}" name="adult_first_name[]" placeholder="First Name">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="last_name">Last Name<span class="required">*</span></label>
-                                                            <input type="text"  class="form-control bg_input" id="adult_last_name{{$passCount}}" name="adult_last_name[]" placeholder="Last Name">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <label for="gender">Gender<span class="required">*</span></label>
-                                                        <div class="form-group">
-                                                            <select class="form-control appearance-auto" name="adult_gender[]" id="adult_gender{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                <option value="male">Male</option>
-                                                                <option value="female">Female</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                
-                                                    <div class="col-lg-4">
-                                                        <label for="date">Date Of Birth<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input datepickerAdult" readonly placeholder="YYYY-MM-DD" name="adult_dob[]" id="datepickerAdult{{$passCount}}" />
-                                                        <div class="error-div" id="adult_date_error{{$passCount}}" ></div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Nationality<span class="required">*</span></label>
-                                                            <select class="form-control appearance-auto" name="adult_nationality[]" id="adult_nationality{{$passCount}}" placeholder="MM">
-                                                                <option value=""> Select</option>
-                                                                {!! $countries !!}
-                                                            </select>
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Passport Number<span class="required">*</span></label>
-                                                            <input type="text" class="form-control bg_input" placeholder="Passport Number" id="adult_passport{{$passCount}}" name="adult_passport[]">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Passport Issuing Country<span class="required">*</span></label>
-                                                            <select class="form-control appearance-auto" name="adult_passport_country[]" id="adult_passport_country{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                {!! $countries !!}
-                                                            </select>
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
+                                        <div class="tour_package_details_bar_list">
+                                            @foreach($data['fareRulesOut'] as $farerule)
+                                                @php
+                                                    $fareruleCityPair = $farerule['FareRule']['CityPair'];
+                                                    $fromCity = $toCity = '';
+                                                    $cityString = (isset($fareruleCityPair) && $fareruleCityPair != '') ? str_split($fareruleCityPair, 3) : '';
+                                                    if($cityString){
+                                                        $fromCity = $cityString[0];
+                                                        $toCity = $cityString[1];
+                                                    }
                                                     
-                                                    <div class="col-lg-4">
-                                                        <label for="date">Passport Expiry<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="adult_passport_expiry[]" id="passportExpiry{{$passCount}}" />
-                                                        <div class="error-div"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @php  $passCount++; @endphp
-                                        @endfor
-                                    @endif
-                                    @if(isset($passengers['CHD']))
+                                                @endphp
+
+                                                @if(($fromCity != '') && ($toCity != ''))
+                                                    <h4 class="fareRule-heading"><i class="fa fa-plane"></i>&nbsp;{{  $data['airports'][$fromCity]['AirportName'] }} -> {{  $data['airports'][$toCity]['AirportName'] }}</h4>
+                                                @endif
+                                                <h5> {!! $farerule['FareRule']['Category'] !!} </h5>
+                                                {!! $farerule['FareRule']['Rules'] !!}
+                                            @endforeach
                                         
-                                        @for($ch=1; $ch <= $passengers['CHD']; $ch++)
-                                            <div class="tour_booking_form_box mt-3">
-                                                <h3>Passenger {{$passCount}} (Child)</h3>
-                                                <div class="row form_area">
-                                                    <div class="col-lg-4">
-                                                        <label for="gender">Title<span class="required">*</span></label>
-                                                        <div class="form-group">
-                                                            <select class="form-control appearance-auto" name="child_title[]" id="child_title{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                <option value="Master">Master</option>
-                                                                <option value="Miss">Miss</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="first_name">First Name<span class="required">*</span></label>
-                                                            <input type="text"  class="form-control bg_input " name="child_first_name[]" id="child_first_name{{$passCount}}" placeholder="First Name">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="last_name">Last Name<span class="required">*</span></label>
-                                                            <input type="text"  class="form-control bg_input" name="child_last_name[]" id="child_last_name{{$passCount}}" placeholder="Last Name">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <label for="gender">Gender<span class="required">*</span></label>
-                                                        <div class="form-group">
-                                                            <select class="form-control appearance-auto" name="child_gender[]" id="child_gender{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                <option value="male">Male</option>
-                                                                <option value="female">Female</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <label for="date">Date Of Birth<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input datepickerChild" readonly placeholder="YYYY-MM-DD" name="child_dob[]" id="datepickerChild{{$passCount}}" />
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Nationality<span class="required">*</span></label>
-                                                            <select class="form-control appearance-auto" name="child_nationality[]" id="child_nationality{{$passCount}}" placeholder="MM">
-                                                                <option value=""> Select</option>
-                                                                {!! $countries !!}
-                                                            </select>
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Passport Number<span class="required">*</span></label>
-                                                            <input type="text" class="form-control bg_input" placeholder="Passport Number"  id="child_passport{{$passCount}}" name="child_passport[]">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Passport Issuing Country<span class="required">*</span></label>
-                                                            <select class="form-control appearance-auto" name="child_passport_country[]"  id="child_passport_country{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                {!! $countries !!}
-                                                            </select>
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-lg-4">
-                                                        <label for="date">Passport Expiry<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="child_passport_expiry[]" id="passportExpiry{{$passCount}}" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @php  $passCount++; @endphp
-                                        @endfor
-                                    @endif
-                                    @if(isset($passengers['INF']))
-
-                                        @for($inf=1; $inf <= $passengers['INF']; $inf++)
-                                            <div class="tour_booking_form_box mt-3">
-                                                <h3>Passenger {{$passCount}} (Infant)</h3>
-                                                <div class="row form_area">
-                                                    <div class="col-lg-4">
-                                                        <label for="gender">Title<span class="required">*</span></label>
-                                                        <div class="form-group">
-                                                            <select class="form-control appearance-auto" name="infant_title[]" id="infant_title{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                <option value="Master">Master</option>
-                                                                <option value="Miss">Miss</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="first_name">First Name<span class="required">*</span></label>
-                                                            <input type="text"  class="form-control bg_input " name="infant_first_name[]"  id="infant_first_name{{$passCount}}" placeholder="First Name">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="last_name">Last Name<span class="required">*</span></label>
-                                                            <input type="text"  class="form-control bg_input" name="infant_last_name[]" id="infant_last_name{{$passCount}}"  placeholder="Last Name">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <label for="gender">Gender<span class="required">*</span></label>
-                                                        <div class="form-group">
-                                                            <select class="form-control appearance-auto" name="infant_gender[]" id="infant_gender{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                <option value="male">Male</option>
-                                                                <option value="female">Female</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <label for="date">Date Of Birth<span class="required">*</span></label>
-                                                        <input type="text" id="datepickerInfant{{$passCount}}" readonly placeholder="YYYY-MM-DD" class="form-control bg_input datepickerInfant" name="infant_dob[]" />
-                                                        <div class="error-div"></div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Nationality<span class="required">*</span></label>
-                                                            <select class="form-control appearance-auto" name="infant_nationality[]" id="infant_nationality{{$passCount}}" placeholder="MM">
-                                                                <option value=""> Select</option>
-                                                                {!! $countries !!}
-                                                            </select>
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Passport Number<span class="required">*</span></label>
-                                                            <input type="text" class="form-control bg_input" placeholder="Passport Number"  id="infant_passport{{$passCount}}" name="infant_passport[]">
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-lg-4">
-                                                        <div class="form-group">
-                                                            <label for="date">Passport Issuing Country<span class="required">*</span></label>
-                                                            <select class="form-control appearance-auto" name="infant_passport_country[]"  id="infant_passport_country{{$passCount}}">
-                                                                <option value=""> Select</option>
-                                                                {!! $countries !!}
-                                                            </select>
-                                                            <div class="error-div"></div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-lg-4">
-                                                        <label for="date">Passport Expiry<span class="required">*</span></label>
-                                                        <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="infant_passport_expiry[]" id="passportExpiry{{$passCount}}" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @php  $passCount++; @endphp
-                                        @endfor
-                                    @endif
-
-                                    <div class="tour_booking_form_box mt-3">
-                                        <h3>Contact Details</h3>
-                                        <div class="row form_area">
-                                            <!-- <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="first_name">Country Code</label>
-                                                    <input type="text"  class="form-control bg_input " name="country_code"  id="country_code" >
-                                                    <div class="error-div"></div>
-                                                </div>
-                                            </div> -->
-                                            <div class="col-lg-6">
-                                                <input type="hidden" name="mobile_code" id="mobile_code">
-                                                <div class="form-group">
-                                                    <label for="first_name">Mobile No<span class="required">*</span></label>
-                                                    <input type="text"  class="form-control bg_input " autocomplete="none" placeholder="Mobile No" name="mobile_no"  id="mobile_no" >
-                                                    <div class="error-div"></div>
-                                                    <span id="valid-msg" class="hide">✓ Valid</span>
-                                                    <span id="error-msg" class="hide"></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-group">
-                                                    <label for="last_name">Email<span class="required">*</span></label>
-                                                    <input type="text"  class="form-control bg_input" name="email" id="email"  placeholder="Email">
-                                                    <div class="error-div"></div>
-                                                </div>
-                                            </div>
                                         </div>
+                                        <!-- <div class="tour_package_details_bar_price">
+                                            <h5>Price</h5>
+                                            <div class="tour_package_bar_price">
+                                                <h6><del>$ 35,500</del></h6>
+                                                <h3>$ 30,500 <sub> / Adult X 1</sub> </h3>
+                                            </div>
+                                        </div> -->
                                     </div>
-                                    <div class="tour_booking_form_box mt-3">
-                                        <div class="form-check write_spical_check mt-3">
-                                            <input class="form-check-input" type="checkbox" value="" id="terms_conditions" name="terms_conditions">
-                                            <label class="form-check-label" for="flexCheckDefaultf1">
-                                                I read and accept all <a href="terms-service.html">Terms and conditios</a>
-                                            </label>
-                                        </div>
+                                </div>
+                                @endif
 
-                                        <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCode']}}">
-                                        
-                                        <input type="hidden" name="session_id" id="session_id" value="{{ $data['session_id'] }}">
-                                        @if(isset($data['FareSourceCodeInbound']))
-                                            <input type="hidden" name="fare_source_code_inbound" id="fare_source_code_inbound" value="{{$data['FareSourceCodeInbound']}}">
-                                            <input type="hidden" name="direction" id="direction" value="Return">
-                                        @else
-                                            <input type="hidden" name="direction" id="direction" value="{{ $data['search_type'] }}">
-                                        @endif
-                                        <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
-                                        <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
-                                        <input type="hidden" name="adultCount" id="adultCount" value="{{$data['adultCount']}}">
-                                        <input type="hidden" name="childCount" id="childCount" value="{{$data['childCount']}}">
-                                        <input type="hidden" name="infantCount" id="infantCount" value="{{$data['infantCount']}}">
-
-                                    </div>
-                                    <div class="booking_btn float-right">
-                                        @if(Auth::check())
-                                            @php $balance = getAgentWalletBalance(Auth::user()->id);  @endphp
-                                            @if($balance >= $TotalFareMargin)
-                                                <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
-                                            @else
-                                                <div class='alert alert-danger mt-3' style="width: 300px;text-align: center;">Insufficient balance in wallet. </div>
-                                            @endif
-                                        @else
-                                            <button type="button" id="loginCheck" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
-                                        @endif
-                                    </div>
+                                @php   
+                                    $passengers = $data['passengers'];
+                                @endphp
+                                @if(isset($passengers))
+                                    @php $countries = ''; $passCount = 1; @endphp
+                                    
+                                    @foreach($data['countries'] as $country)
+                                        @php $countries .= '<option value="'.$country->code.'"> '.$country->name.' </option>'; @endphp
+                                    @endforeach
+                                @endif
                                 
+                                <div class="booking_tour_form">
+                                    <h3 class="heading_theme">Passenger information</h3>
+                                    
+                                        @if(isset($passengers['ADT']))
+
+                                            @for($ad=1; $ad <= $passengers['ADT']; $ad++)
+                                                <div class="tour_booking_form_box {{ ($ad!=1) ? 'mt-3' : '' }}">
+                                                    <h3>Passenger {{$passCount}} (Adult)</h3>
+                                                    <div class="row form_area">
+                                                        <div class="col-lg-4">
+                                                            <label for="gender">Title<span class="required">*</span></label>
+                                                            <div class="form-group">
+                                                                <select class="form-control appearance-auto" name="adult_title[]" id="adult_title{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    <option value="Mr">Mr</option>
+                                                                    <option value="Mrs">Mrs</option>
+                                                                    <option value="Miss">Miss</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="first_name">First Name<span class="required">*</span></label>
+                                                                <input type="text"  class="form-control bg_input " id="adult_first_name{{$passCount}}" name="adult_first_name[]" placeholder="First Name">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="last_name">Last Name<span class="required">*</span></label>
+                                                                <input type="text"  class="form-control bg_input" id="adult_last_name{{$passCount}}" name="adult_last_name[]" placeholder="Last Name">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <label for="gender">Gender<span class="required">*</span></label>
+                                                            <div class="form-group">
+                                                                <select class="form-control appearance-auto" name="adult_gender[]" id="adult_gender{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    <option value="male">Male</option>
+                                                                    <option value="female">Female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <div class="col-lg-4">
+                                                            <label for="date">Date Of Birth<span class="required">*</span></label>
+                                                            <input type="text" class="form-control bg_input datepickerAdult" readonly placeholder="YYYY-MM-DD" name="adult_dob[]" id="datepickerAdult{{$passCount}}" />
+                                                            <div class="error-div" id="adult_date_error{{$passCount}}" ></div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Nationality<span class="required">*</span></label>
+                                                                <select class="form-control appearance-auto" name="adult_nationality[]" id="adult_nationality{{$passCount}}" placeholder="MM">
+                                                                    <option value=""> Select</option>
+                                                                    {!! $countries !!}
+                                                                </select>
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Passport Number<span class="required">*</span></label>
+                                                                <input type="text" class="form-control bg_input" placeholder="Passport Number" id="adult_passport{{$passCount}}" name="adult_passport[]">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Passport Issuing Country<span class="required">*</span></label>
+                                                                <select class="form-control appearance-auto" name="adult_passport_country[]" id="adult_passport_country{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    {!! $countries !!}
+                                                                </select>
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-lg-4">
+                                                            <label for="date">Passport Expiry<span class="required">*</span></label>
+                                                            <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="adult_passport_expiry[]" id="passportExpiry{{$passCount}}" />
+                                                            <div class="error-div"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @php  $passCount++; @endphp
+                                            @endfor
+                                        @endif
+                                        @if(isset($passengers['CHD']))
+                                            
+                                            @for($ch=1; $ch <= $passengers['CHD']; $ch++)
+                                                <div class="tour_booking_form_box mt-3">
+                                                    <h3>Passenger {{$passCount}} (Child)</h3>
+                                                    <div class="row form_area">
+                                                        <div class="col-lg-4">
+                                                            <label for="gender">Title<span class="required">*</span></label>
+                                                            <div class="form-group">
+                                                                <select class="form-control appearance-auto" name="child_title[]" id="child_title{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    <option value="Master">Master</option>
+                                                                    <option value="Miss">Miss</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="first_name">First Name<span class="required">*</span></label>
+                                                                <input type="text"  class="form-control bg_input " name="child_first_name[]" id="child_first_name{{$passCount}}" placeholder="First Name">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="last_name">Last Name<span class="required">*</span></label>
+                                                                <input type="text"  class="form-control bg_input" name="child_last_name[]" id="child_last_name{{$passCount}}" placeholder="Last Name">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <label for="gender">Gender<span class="required">*</span></label>
+                                                            <div class="form-group">
+                                                                <select class="form-control appearance-auto" name="child_gender[]" id="child_gender{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    <option value="male">Male</option>
+                                                                    <option value="female">Female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <label for="date">Date Of Birth<span class="required">*</span></label>
+                                                            <input type="text" class="form-control bg_input datepickerChild" readonly placeholder="YYYY-MM-DD" name="child_dob[]" id="datepickerChild{{$passCount}}" />
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Nationality<span class="required">*</span></label>
+                                                                <select class="form-control appearance-auto" name="child_nationality[]" id="child_nationality{{$passCount}}" placeholder="MM">
+                                                                    <option value=""> Select</option>
+                                                                    {!! $countries !!}
+                                                                </select>
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Passport Number<span class="required">*</span></label>
+                                                                <input type="text" class="form-control bg_input" placeholder="Passport Number"  id="child_passport{{$passCount}}" name="child_passport[]">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Passport Issuing Country<span class="required">*</span></label>
+                                                                <select class="form-control appearance-auto" name="child_passport_country[]"  id="child_passport_country{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    {!! $countries !!}
+                                                                </select>
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-4">
+                                                            <label for="date">Passport Expiry<span class="required">*</span></label>
+                                                            <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="child_passport_expiry[]" id="passportExpiry{{$passCount}}" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @php  $passCount++; @endphp
+                                            @endfor
+                                        @endif
+                                        @if(isset($passengers['INF']))
+
+                                            @for($inf=1; $inf <= $passengers['INF']; $inf++)
+                                                <div class="tour_booking_form_box mt-3">
+                                                    <h3>Passenger {{$passCount}} (Infant)</h3>
+                                                    <div class="row form_area">
+                                                        <div class="col-lg-4">
+                                                            <label for="gender">Title<span class="required">*</span></label>
+                                                            <div class="form-group">
+                                                                <select class="form-control appearance-auto" name="infant_title[]" id="infant_title{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    <option value="Master">Master</option>
+                                                                    <option value="Miss">Miss</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="first_name">First Name<span class="required">*</span></label>
+                                                                <input type="text"  class="form-control bg_input " name="infant_first_name[]"  id="infant_first_name{{$passCount}}" placeholder="First Name">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="last_name">Last Name<span class="required">*</span></label>
+                                                                <input type="text"  class="form-control bg_input" name="infant_last_name[]" id="infant_last_name{{$passCount}}"  placeholder="Last Name">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <label for="gender">Gender<span class="required">*</span></label>
+                                                            <div class="form-group">
+                                                                <select class="form-control appearance-auto" name="infant_gender[]" id="infant_gender{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    <option value="male">Male</option>
+                                                                    <option value="female">Female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <label for="date">Date Of Birth<span class="required">*</span></label>
+                                                            <input type="text" id="datepickerInfant{{$passCount}}" readonly placeholder="YYYY-MM-DD" class="form-control bg_input datepickerInfant" name="infant_dob[]" />
+                                                            <div class="error-div"></div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Nationality<span class="required">*</span></label>
+                                                                <select class="form-control appearance-auto" name="infant_nationality[]" id="infant_nationality{{$passCount}}" placeholder="MM">
+                                                                    <option value=""> Select</option>
+                                                                    {!! $countries !!}
+                                                                </select>
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Passport Number<span class="required">*</span></label>
+                                                                <input type="text" class="form-control bg_input" placeholder="Passport Number"  id="infant_passport{{$passCount}}" name="infant_passport[]">
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="date">Passport Issuing Country<span class="required">*</span></label>
+                                                                <select class="form-control appearance-auto" name="infant_passport_country[]"  id="infant_passport_country{{$passCount}}">
+                                                                    <option value=""> Select</option>
+                                                                    {!! $countries !!}
+                                                                </select>
+                                                                <div class="error-div"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-4">
+                                                            <label for="date">Passport Expiry<span class="required">*</span></label>
+                                                            <input type="text" class="form-control bg_input passportExpiry" readonly placeholder="YYYY-MM-DD" name="infant_passport_expiry[]" id="passportExpiry{{$passCount}}" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @php  $passCount++; @endphp
+                                            @endfor
+                                        @endif
+
+                                        <div class="tour_booking_form_box mt-3">
+                                            <h3>Contact Details</h3>
+                                            <div class="row form_area">
+                                                <!-- <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="first_name">Country Code</label>
+                                                        <input type="text"  class="form-control bg_input " name="country_code"  id="country_code" >
+                                                        <div class="error-div"></div>
+                                                    </div>
+                                                </div> -->
+                                                <div class="col-lg-6">
+                                                    <input type="hidden" name="mobile_code" id="mobile_code">
+                                                    <div class="form-group">
+                                                        <label for="first_name">Mobile No<span class="required">*</span></label>
+                                                        <input type="text"  class="form-control bg_input " autocomplete="none" placeholder="Mobile No" name="mobile_no"  id="mobile_no" >
+                                                        <div class="error-div"></div>
+                                                        <span id="valid-msg" class="hide">✓ Valid</span>
+                                                        <span id="error-msg" class="hide"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="last_name">Email<span class="required">*</span></label>
+                                                        <input type="text"  class="form-control bg_input" name="email" id="email"  placeholder="Email">
+                                                        <div class="error-div"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tour_booking_form_box mt-3">
+                                            <div class="form-check write_spical_check mt-3">
+                                                <input class="form-check-input" type="checkbox" value="" id="terms_conditions" name="terms_conditions">
+                                                <label class="form-check-label" for="flexCheckDefaultf1">
+                                                    I read and accept all <a href="terms-service.html">Terms and conditios</a>
+                                                </label>
+                                            </div>
+
+                                            <input type="hidden" name="fare_source_code" id="fare_source_code" value="{{$data['FareSourceCode']}}">
+                                            
+                                            <input type="hidden" name="session_id" id="session_id" value="{{ $data['session_id'] }}">
+                                            @if(isset($data['FareSourceCodeInbound']))
+                                                <input type="hidden" name="fare_source_code_inbound" id="fare_source_code_inbound" value="{{$data['FareSourceCodeInbound']}}">
+                                                <input type="hidden" name="direction" id="direction" value="Return">
+                                            @else
+                                                <input type="hidden" name="direction" id="direction" value="{{ $data['search_type'] }}">
+                                            @endif
+                                            <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
+                                            <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
+                                            <input type="hidden" name="adultCount" id="adultCount" value="{{$data['adultCount']}}">
+                                            <input type="hidden" name="childCount" id="childCount" value="{{$data['childCount']}}">
+                                            <input type="hidden" name="infantCount" id="infantCount" value="{{$data['infantCount']}}">
+
+                                        </div>
+                                        <div class="booking_btn float-right">
+                                            @if(Auth::check())
+                                                @php $balance = getAgentWalletBalance(Auth::user()->id);  @endphp
+                                                @if($balance >= $TotalFareMargin)
+                                                    <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
+                                                @else
+                                                    <div class='alert alert-danger mt-3' style="width: 300px;text-align: center;">Insufficient balance in wallet. </div>
+                                                @endif
+                                            @else
+                                                <button type="button" id="loginCheck" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
+                                            @endif
+                                        </div>
+                                    
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -1268,6 +1272,8 @@
         });
     }, 1000*60*0.2); 
 
+  
+
     $('#loginCheck').on('click', function () {
        $('#common_author-forms').modal('show');
     });
@@ -1461,7 +1467,17 @@
                 error.appendTo(element.parent("div"));
             },
             submitHandler: function(form,event) {
-                form.submit();
+                swal({
+                    title: "Are you sure?",
+                    text: "Do you want to proceed with this booking?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((isConfirmed) => {
+                    if (isConfirmed) {
+                        form.submit();
+                    }
+                });
             }
         });
     });
@@ -1477,9 +1493,11 @@
         var totalAmount = $('#total_amount').val();
         
         if(elemIdOut == "minusBag"){
+            if(addonTotal != 0){
+                var total = parseFloat(addonTotal) - parseFloat(price);
+                totalAmount = parseFloat(totalAmount) - parseFloat(price);
+            }
             var counterOut =  $(this).next('input').val();
-            var total = parseFloat(addonTotal) - parseFloat(price);
-            totalAmount = parseFloat(totalAmount) - parseFloat(price);
         }else{
             var counterOut =  $(this).prev('input').val();
             var total = parseFloat(addonTotal) + parseFloat(price);
@@ -1536,8 +1554,10 @@
 
         if(elemIdIn == "minusBagIn"){
             var counterIn = $(this).next('input').val();
-            var total = parseFloat(addonTotal) - parseFloat(price);
-            totalAmount = parseFloat(totalAmount) - parseFloat(price);
+            if(addonTotal != 0){
+                var total = parseFloat(addonTotal) - parseFloat(price);
+                totalAmount = parseFloat(totalAmount) - parseFloat(price);
+            }
         }else{
             var counterIn = $(this).prev('input').val();
             var total = parseFloat(addonTotal) + parseFloat(price);
