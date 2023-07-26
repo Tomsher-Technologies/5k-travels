@@ -175,8 +175,9 @@
                                                                     <div class="col-md-6">
                                                                         <div class="traveler-b-detl">
 
-                                                                            <h4>TRAVELLER {{ $loop->iteration }}
+                                                                            <h4>TRAVELLER 
                                                                                 ({{ ($pass->passenger_type =='ADT') ? "Adult" : (($pass->passenger_type =="CHD") ? "Child" : "Infant") }})
+                                                                                - <span class="head-travel">{{ ($pass->is_return == 0) ? "Onward Trip" : "Return Trip" }}</span>
                                                                             </h4>
                                                                             <div class="form-check-label">
                                                                                 <span
@@ -331,6 +332,10 @@
 @push('header')
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
 <style>
+.head-travel{
+    color: #1fba71;
+    font-weight: 600;
+}
 .cta_content{
     color: black;
 }

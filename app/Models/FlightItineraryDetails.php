@@ -27,7 +27,8 @@ class FlightItineraryDetails extends Model
         'operating_airline_code', 
         'res_book_desig_code', 
         'stop_quantity', 
-        'created_at'
+        'created_at',
+        'is_return'
     ];
 }
 

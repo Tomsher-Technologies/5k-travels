@@ -5629,7 +5629,39 @@ textarea {
 /* ==============================
      Flight Search Area
 ================================*/
-
+#return_trip .multi_city_flight_lists{
+    width: 80%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+#return_trip .flight_multis_area_wrapper:first-child {
+padding-bottom: 20px;
+    border-bottom: 1px solid #DDDDDD;
+}
+#return_trip .flight_multis_area_wrapper {
+padding-top: 20px;
+}
+#return_trip .flight_search_left {
+    padding: 0 20px 0 20px;
+}
+#return_trip .flight_search_middel{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+#return_trip .flight_search_right{
+    width: 20%;
+    vertical-align: middle;
+    display: grid;
+    align-content: center;
+}
+#return_trip .flight_search_items{
+    align-items: stretch;
+    }
+    
+  #return_trip  .flight_multis_area_wrapper{
+     justify-content: space-around;   
+        
+    }
 .flight_search_items {
     background: #FFFFFF;
     border: 1px solid #DDDDDD;
@@ -5637,6 +5669,7 @@ textarea {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    overflow: hidden;
 }
 
 .flight_search_item_wrappper {
@@ -5672,11 +5705,14 @@ textarea {
 
 .flight_search_destination h2 {
     font-weight: 700;
+    font-size: 20px;
+    line-height: 30px;
 }
 
 .flight_search_destination h3 {
     font-weight: 500;
     padding-top: 5px;
+    font-size: 15px;
 }
 
 .flight_search_destination h6 {
@@ -5734,7 +5770,25 @@ textarea {
 }
 
 .flight_search_right h2 {
-    padding-top: 10px;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    color: #2b6e4f;
+    letter-spacing: -0.9px;
+}
+.flight_search_right .crc{
+    font-size: 10px;
+}
+.flight_search_right h6 {
+    font-size: 12px;
+    text-align: center;
+    font-weight: 500;
+    cursor: pointer;
+    color: #585858;
+    background: #a9cf82;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-top: 10px;
 }
 
 .flight_search_right h2 sup {

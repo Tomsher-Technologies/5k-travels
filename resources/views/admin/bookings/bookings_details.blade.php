@@ -13,7 +13,7 @@
             <div class="col-md-12 col-sm-12 ">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h3 class="bold float-left">{{ ($bookings[0]->direction == "OneWay") ? 'One Way' : ( ($bookings[0]->direction == "Return") ? 'Round' : 'Multi City' ) }} Trip from {{ $bookings[0]->origin }} to {{ $bookings[0]->destination }}  <small class="bold"> &nbsp; &nbsp; Booked by {{ $bookings[0]->agent_name }}</small></h3>
+                        <h3 class="bold float-left">{{ ($bookings[0]->direction == "OneWay") ? 'One Way' : ( ($bookings[0]->direction == "Return") ? 'Round' : 'Multi City' ) }} Trip from {{ $bookings[0]->origin }} to {{ $bookings[0]->destination }}  <small class="bold"> &nbsp; &nbsp; Booked by {{ $bookings[0]->agent_name }} (Booking Id : {{ $bookings[0]->unique_booking_id }})</small></h3>
                         <!-- <a href="{{ route('agent.create') }}" class="btn back-btn" ><i class="fa fa-plus"></i> Create Agent</a> -->
                         <button class="btn back-btn" onclick="history.go(-1)"><i class="fa fa-long-arrow-left"></i> Back</button>
                         <div class="clearfix"></div>
@@ -168,8 +168,9 @@
                                                                             <div class="col-md-6">
                                                                                 <div class="traveler-b-detl">
 
-                                                                                    <h4>TRAVELLER {{ $loop->iteration }}
+                                                                                    <h4>TRAVELLER 
                                                                                         ({{ ($pass->passenger_type =='ADT') ? "Adult" : (($pass->passenger_type =="CHD") ? "Child" : "Infant") }})
+                                                                                        - <span class="head-travel">{{ ($pass->is_return == 0) ? "Onward Trip" : "Return Trip" }}</span>
                                                                                     </h4>
                                                                                     <div class="form-check-label">
                                                                                         <span
@@ -342,6 +343,12 @@
 @section('header')
 <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
+<style>
+.head-travel{
+    color: #1fba71;
+    font-weight: 600;
+}
+</style>
 @endsection
 
 @section('footer')
