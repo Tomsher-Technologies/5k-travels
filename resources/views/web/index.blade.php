@@ -256,12 +256,12 @@
                             <!-- <a href="tour-search.html" class="btn btn_theme btn_md">Find tours</a> -->
                         </div>
                         <div class="col-lg-6">
-                            <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-                                no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
-                                dolor sit amet, consetetur sadipscing elitr
-                                At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-                                no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
-                                dolor sit amet, consetetur sadipscing elitr </p>
+                            <p>5k travels is a Dubai-based privately owned online flight booking agency in the travel industry. 
+                                With an unwavering commitment to providing customers with limitless and unrestricted journeys, 
+                                our company strives to become the globally recognized and trusted leader among e-commerce tourism 
+                                companies. We value your trust and aim to become your go-to platform for all your flight booking 
+                                needs. At 5k Travels, we invite you to embark on an exhilarating journey with us as we assist you 
+                                in exploring the world, one flight at a time. </p>
                         </div>
 
 
