@@ -110,14 +110,14 @@
                         <div class="tour_search_type">
                             @isset($data['airlines'])
                             @foreach($data['airlines'] as $airKey => $airValue)
-
+                            @php  $flightKey = isset($data['flightData'][$airKey]) ? $data['flightData'][$airKey] : [];  @endphp
                             <div class="form-check">
                                 <input class="form-check-input airlineFilter"
                                     {{ (in_array($airKey, $airlineFilter)) ? 'checked="checked"' : '' }} type="checkbox"
                                     value="{{$airKey}}" id="flexCheckDefaults1">
                                 <label class="form-check-label" for="flexCheckDefaults1">
                                     <span class="area_flex_one">
-                                        <span>{{ $data['flightData'][$airKey]['AirLineName'] }}</span>
+                                        <span>{{ isset($flightKey['AirLineName']) ? $flightKey['AirLineName'] : '' }}</span>
                                         <span>{{ $airValue }}</span>
                                     </span>
                                 </label>
@@ -185,7 +185,7 @@
                                             <div class="col-lg-12">
                                                 <div class="flight_logo" style="display:flex; padding: 10px;">
                                                     <img class="flight-logo-img"
-                                                        src="{{ $data['flightData'][$firstFlightSegment['MarketingAirlineCode']]['AirLineLogo'] }}"
+                                                        src="{{ isset($data['flightData'][$firstFlightSegment['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightSegment['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
                                                         alt="img">
                                                     <div class="flight-details" style="    margin-left: 10px;">
                                                         <h4 id="depFlight{{$loop->iteration}}">{{ $firstFlightSegment['MarketingAirlineName'] }} </h4>
@@ -301,7 +301,7 @@
                                             <div class="col-lg-12">
                                                 <div class="flight_logo" style="display:flex; padding: 10px;">
                                                     <img class="flight-logo-img"
-                                                        src="{{ $data['flightData'][$firstFlightSegmentIn['MarketingAirlineCode']]['AirLineLogo'] }}"
+                                                        src="{{ isset($data['flightData'][$firstFlightSegmentIn['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightSegmentIn['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
                                                         alt="img">
                                                     <div class="flight-details" style="    margin-left: 10px;">
                                                         <h4 id="returnFlight{{$loop->iteration}}">{{ $firstFlightSegmentIn['MarketingAirlineName'] }}

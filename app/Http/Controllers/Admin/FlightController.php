@@ -57,7 +57,7 @@ class FlightController extends Controller
 
     public function storeAirport(){
         ini_set('max_execution_time', 400);
-        $response = Http::withOptions($this->options)->post('https://travelnext.works/api/aeroVE5/airport_list', [
+        $response = Http::withOptions($this->options)->post(config('global.api_base_url').'airport_list', [
                         "user_id"=> config('global.api_user_id'),
                         "user_password"=> config('global.api_user_password'),
                         "access"=> config('global.api_access'),
@@ -73,7 +73,7 @@ class FlightController extends Controller
 
     public function storeAirlines(){
         ini_set('max_execution_time', 400);
-        $response = Http::withOptions($this->options)->post('https://travelnext.works/api/aeroVE5/airline_list', [
+        $response = Http::withOptions($this->options)->post(config('global.api_base_url').'airline_list', [
                         "user_id"=> config('global.api_user_id'),
                         "user_password"=> config('global.api_user_password'),
                         "access"=> config('global.api_access'),
