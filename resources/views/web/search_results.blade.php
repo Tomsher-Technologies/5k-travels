@@ -117,12 +117,12 @@
                         <div class="tour_search_type">
                             @isset($data['airlines'])
                                 @foreach($data['airlines'] as $airKey => $airValue)
-                                    @php  $flightKey = $data['flightData'][$airKey];  @endphp
+                                    @php  $flightKey = isset($data['flightData'][$airKey]) ? $data['flightData'][$airKey] : [];  @endphp
                                 <div class="form-check">
                                     <input class="form-check-input airlineFilter" {{ (in_array($airKey, $airlineFilter)) ? 'checked="checked"' : '' }} type="checkbox" value="{{$airKey}}" id="flexCheckDefaults1">
                                     <label class="form-check-label" for="flexCheckDefaults1">
                                         <span class="area_flex_one">
-                                            <span>{{ $flightKey['AirLineName'] }}</span>
+                                            <span>{{ isset($flightKey['AirLineName']) ? $flightKey['AirLineName'] : '' }}</span>
                                             <span>{{ $airValue }}</span>
                                         </span>
                                     </label>
@@ -198,7 +198,7 @@
                                                 <div class="flight_multis_area_wrapper">
                                                     <div class="flight_search_left">
                                                         <div class="flight_logo">
-                                                            <img src="{{ $data['flightData'][$firstFlightSegment['MarketingAirlineCode']]['AirLineLogo'] }}"
+                                                            <img src="{{ isset($data['flightData'][$firstFlightSegment['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightSegment['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
                                                                 alt="img">
                                                             <div class="flight-details">
                                                                 <h4>{{ $firstFlightSegment['MarketingAirlineName'] }}
@@ -258,7 +258,7 @@
                                                         <div class="flight_multis_area_wrapper">
                                                             <div class="flight_search_left">
                                                                 <div class="flight_logo">
-                                                                    <img src="{{ $data['flightData'][$firstFlightInSegment['MarketingAirlineCode']]['AirLineLogo'] }}"
+                                                                    <img src="{{ isset($data['flightData'][$firstFlightInSegment['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightInSegment['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
                                                                         alt="img">
                                                                     <div class="flight-details">
                                                                         <h4>{{ $firstFlightInSegment['MarketingAirlineName'] }}
@@ -319,7 +319,7 @@
                                                     <div class="flight_multis_area_wrapper">
                                                         <div class="flight_search_left">
                                                             <div class="flight_logo">
-                                                                <img src="{{ $data['flightData'][$FlightSegment['MarketingAirlineCode']]['AirLineLogo'] }}"
+                                                                <img src="{{ (isset($data['flightData'][$FlightSegment['MarketingAirlineCode']])) ? $data['flightData'][$FlightSegment['MarketingAirlineCode']]['AirLineLogo'] : '' }}"
                                                                     alt="img">
                                                                 <div class="flight-details">
                                                                     <h4>{{ $FlightSegment['MarketingAirlineName'] }}
