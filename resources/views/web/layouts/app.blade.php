@@ -149,12 +149,12 @@
                                                         aria-controls="register" aria-selected="false"><i
                                                             class="fas fa-edit"></i> Register</button>
                                                 </li>
-                                                <li class="nav-item " role="presentation">
-                                                    <button class="nav-link" id="forgot-password-tab"
-                                                        data-bs-toggle="tab" data-bs-target="#forgot-password"
-                                                        type="button" role="tab" aria-controls="forgot-password"
-                                                        aria-selected="false"><i class="fas fa-user"></i> Forgot Password</button>
-                                                </li>
+                                                <!--<li class="nav-item " role="presentation">-->
+                                                <!--    <button class="nav-link" id="forgot-password-tab"-->
+                                                <!--        data-bs-toggle="tab" data-bs-target="#forgot-password"-->
+                                                <!--        type="button" role="tab" aria-controls="forgot-password"-->
+                                                <!--        aria-selected="false"><i class="fas fa-user"></i> Forgot Password</button>-->
+                                                <!--</li>-->
 
                                             </ul>
                                         </div>
@@ -172,7 +172,18 @@
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <input type="password" class="form-control" name="password" placeholder="Enter password" />
-                                                                    <a href="#"  >Forgot password?</a>
+                                                                    
+                                                                     
+                                                                     
+                                                                     
+                                                                            
+                                                                     
+                                                        
+                                                        
+                                                                    <!--<a href="#"  >Forgot password?</a>-->
+                                                                    
+                                                                    
+                                                                    
                                                                 </div>
                                                                 <div id="errors-list"></div>
                                                                 <div class="common_form_submit">
@@ -247,7 +258,32 @@
                                                 </div>
                                             </div>
 
-                                            <div class="tab-pane fade" id="forgot-password" role="tabpanel" aria-labelledby="forgot-password-tab">
+                                          
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    
+                    
+                           <ul class="nav nav-tabs" role="tablist">
+                                                
+                                                <li class="nav-item " role="presentation">
+                                                    <button class="nav-link" id="forgot-password-tab"
+                                                        data-bs-toggle="tab" data-bs-target="#forgot-password"
+                                                        type="button" role="tab" aria-controls="forgot-password"
+                                                        aria-selected="false"><i class="fas fa-user"></i> Forgot Password</button>
+                                                </li>
+
+                                            </ul>
+                                            
+                                             <div class="tab-content" id="myTabContent">
+                                              <div class="tab-pane fade" id="forgot-password" role="tabpanel" aria-labelledby="forgot-password-tab">
                                                 <!--  Common Author Area -->
                                                 <div id="common_author_area">
                                                     <div class="common_author_boxed">
@@ -272,16 +308,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-                <!-- Modal footer -->
-                <div class="modal-footer">
+                                             </div>
+                                                       
+                    
+                    
+                    
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                 </div>
 
