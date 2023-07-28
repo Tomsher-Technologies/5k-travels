@@ -360,7 +360,7 @@
 }(jQuery));
 
 $(document).ready(function () {
-    jQuery(".preloader").fadeOut(200);
+    // jQuery(".preloader").fadeOut(200);
     $('#dashboard_dropdowns').on('click', (function () {
         $('#show_dropdown_item').slideToggle("slow");
     })
