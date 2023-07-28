@@ -70,7 +70,7 @@
 
 <body>
     <!-- preloader Area -->
-    <div class="preloader">
+    <div class="preloaderold">
         <div class="d-table">
             <div class="d-table-cell">
                 <div class="lds-spinner">
