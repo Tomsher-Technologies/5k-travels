@@ -219,7 +219,7 @@
                                                                     <label class="form-check-label" for="flexCheckDefaultf1"> Direct Flight Only </label>
                                                                 </div>
                                                                
-                                                                <button class="btn btn_theme btn_md" type="submit" onclick="return oneWayCheckFilter()">Show flights</button>
+                                                                <button class="btn btn_theme btn_md show_flights" type="submit" onclick="return oneWayCheckFilter()">Show flights</button>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -371,7 +371,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="top_form_search_button">
-                                                            <button class="btn btn_theme btn_md" onclick="return returnCheckFilter()">Show flights</button>
+                                                            <button class="btn btn_theme btn_md show_flights" onclick="return returnCheckFilter()">Show flights</button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -565,7 +565,7 @@
                                                         </div>
                                             
                                                         <div class="top_form_search_button">
-                                                            <button class="btn btn_theme btn_md" onclick=" return multiCheckFilter()">Show flights</button>
+                                                            <button class="btn btn_theme btn_md show_flights" onclick=" return multiCheckFilter()">Show flights</button>
                                                         </div>
                                                     </form>
                                                 </div>

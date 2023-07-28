@@ -184,6 +184,7 @@ $("#oFromForm").validate({
         }
     },
     submitHandler: function(form) {
+        $('.ajaxloader').css('display','block');
         form.submit();
     }
 });
@@ -351,6 +352,7 @@ $("#rForm").validate({
         }
     },
     submitHandler: function(form) {
+        $('.ajaxloader').css('display','block');
         form.submit();
     }
 });
@@ -447,6 +449,7 @@ $("#mForm").validate({
         }
     },
     submitHandler: function(form) {
+        $('.ajaxloader').css('display','block');
         form.submit();
     }
 });
