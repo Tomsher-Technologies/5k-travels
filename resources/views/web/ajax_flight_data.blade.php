@@ -43,7 +43,7 @@
                                 <div class="flightDetailsInfo col-sm-12">
                                     <div class="flightDetailsRow  col-sm-12">
                                         <p class="makeFlex hrtlCenter appendBottom20 gap-x-10">
-                                            <span class="icon32 bgProperties" style="background-image: url('{{ $airlineData[0]['AirLineLogo'] }}');"></span><span>
+                                            <span class="icon32 bgProperties" style="background-image: url('{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo']  : '' }}');"></span><span>
                                                 <span color="#000000"><b>{{ $outGoingSegment['MarketingAirlineName'] }}</b></span>
                                                 <span color="#6d7278">{{ $airlineCode }} | {{ $outGoingSegment['FlightNumber']}}</span>
                                             </span>
@@ -132,7 +132,7 @@
                                     <div class="flightDetailsInfo col-sm-12">
                                         <div class="flightDetailsRow  col-sm-12">
                                             <p class="makeFlex hrtlCenter appendBottom20 gap-x-10">
-                                                <span class="icon32 bgProperties" style="background-image: url('{{ $airlineDataIn[0]['AirLineLogo'] }}');"></span><span>
+                                                <span class="icon32 bgProperties" style="background-image: url('{{  isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineLogo'] : '' }}');"></span><span>
                                                     <span color="#000000"><b>{{ $inComingSegment['MarketingAirlineName'] }}</b></span>
                                                     <span color="#6d7278">{{ $airlineCodeIn }} | {{ $inComingSegment['FlightNumber']}}</span>
                                                 </span>
@@ -220,7 +220,7 @@
                             <div class="flightDetailsInfo col-sm-12">
                                 <div class="flightDetailsRow  col-sm-12">
                                     <p class="makeFlex hrtlCenter appendBottom20 gap-x-10">
-                                        <span class="icon32 bgProperties" style="background-image: url('{{ $airlineData[0]['AirLineLogo'] }}');"></span><span>
+                                        <span class="icon32 bgProperties" style="background-image: url('{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}');"></span><span>
                                             <span color="#000000"><b>{{ $outGoingSegment['MarketingAirlineName'] }}</b></span>
                                             <span color="#6d7278">{{ $airlineCode }} | {{ $outGoingSegment['FlightNumber']}}</span>
                                         </span>
