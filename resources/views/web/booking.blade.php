@@ -96,7 +96,7 @@
                                                     <div class="col-auto col-sm-8">
                                                         <div class="d-flex items-center mb-15">
                                                             <div class="w-28 d-flex justify-center mr-15"><img
-                                                                    src="{{ $airlineData[0]['AirLineLogo'] }}" alt="image"></div>
+                                                                    src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="image"></div>
                                                             <div class="text-14 text-light-1">{{ $outGoingFLightSegment['MarketingAirlineName'] }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}</div>
                                                         </div>
                                                         <div class="relative z-0">
@@ -239,7 +239,7 @@
                                                             <div class="col-auto col-sm-8">
                                                                 <div class="d-flex items-center mb-15">
                                                                     <div class="w-28 d-flex justify-center mr-15"><img
-                                                                            src="{{ $airlineDataIn[0]['AirLineLogo'] }}" alt="image"></div>
+                                                                            src="{{ isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineLogo'] : '' }}" alt="image"></div>
                                                                     <div class="text-14 text-light-1">{{ $incomingFlightSegment['MarketingAirlineName'] }} {{ $airlineCodeIn }} | {{ $incomingFlightSegment['FlightNumber']}}</div>
                                                                 </div>
                                                                 <div class="relative z-0">
@@ -367,7 +367,7 @@
                                                         <div class="col-auto col-sm-8">
                                                             <div class="d-flex items-center mb-15">
                                                                 <div class="w-28 d-flex justify-center mr-15"><img
-                                                                        src="{{ $airlineData[0]['AirLineLogo'] }}" alt="image"></div>
+                                                                        src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="image"></div>
                                                                 <div class="text-14 text-light-1">{{ $outGoingFLightSegment['MarketingAirlineName'] }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}</div>
                                                             </div>
                                                             <div class="relative z-0">

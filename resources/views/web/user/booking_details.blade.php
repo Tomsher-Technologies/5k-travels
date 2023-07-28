@@ -160,8 +160,8 @@
                                                             <div class="row y-gap-10 justify-between">
                                                                 <div class="col-auto">
                                                                     <div class="d-flex items-center mb-15">
-                                                                        <div class="flight_logo d-flex justify-center mr-15"><img src="{{ $airlineData[0]['AirLineLogo'] }}" alt="image"></div>
-                                                                        <div class="text-14 text-light-1">{{$airlineData[0]['AirLineName']}} {{$flights->flight_number}}
+                                                                        <div class="flight_logo d-flex justify-center mr-15"><img src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] :'' }}" alt="image"></div>
+                                                                        <div class="text-14 text-light-1">{{isset($airlineData[0]) ? $airlineData[0]['AirLineName'] : '' }} {{$flights->flight_number}}
                                                                         </div>
                                                                     </div>
                                                                     <div class="relative z-0">
