@@ -14,9 +14,9 @@
                     <div class="flight_multis_area_wrapper">
                         <div class="flight_search_left">
                             <div class="flight_logo">
-                                <img src="{{ $airlineData[0]['AirLineLogo'] }}" alt="img">
+                                <img src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="img">
                                 <div class="flight-details">
-                                    <h4> {{ $airlineData[0]['AirLineName'] }} </h4>
+                                    <h4> {{ isset($airlineData[0]) ? $airlineData[0]['AirLineName'] : ''}} </h4>
                                     <h6> {{ $segment['FlightNumber']  }}</h6>
                                 </div>
                             </div>
