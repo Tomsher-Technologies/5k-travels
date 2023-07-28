@@ -57,12 +57,12 @@
                                     style="padding: 12px 5px; vertical-align: middle ;text-align: center; border: 1px solid #eee;background-color: #eee;">
                                     <div
                                         style="height: 64px;width: 64px;display: flex; align-items: center;justify-content: center;border-radius: 6px; margin: auto; ">
-                                        <img src="{{ $airlineData[0]['AirLineLogo'] }}" alt="" height="38">
+                                        <img src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="" height="38">
 
                                     </div>
                             
                                     <h6 style="font-size: 15px; margin: 0px;font-weight: 500; font-family: 'Poppins', sans-serif;">
-                                    {{$airlineData[0]['AirLineName']}}</h6>
+                                    {{isset($airlineData[0]) ? $airlineData[0]['AirLineName'] : ''}}</h6>
                                     <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px;">
                                     {{$flights->flight_number}}</p>
                                     <p style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 6px;">
