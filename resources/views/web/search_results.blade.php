@@ -176,6 +176,8 @@
                            
                             @if($data['flightDetails'])
                                 @foreach($data['flightDetails'] as $fdata)
+                                
+                            
 
                                 <div class="flight_search_item_wrappper">
                                     <div class="flight_search_items">
@@ -193,20 +195,25 @@
                                                     $lastFlight = last($OriginDestinationOptionsOutbound);
                                                     $firstFlightSegment = $firstFlight['FlightSegment'];
                                                     $lastFlightSegment = $lastFlight['FlightSegment'];
+
+                                                    $firstFlightSegmentAirlineCode = $firstFlightSegment['MarketingAirlineCode'];
                                                 @endphp
 
                                                 <div class="flight_multis_area_wrapper">
-                                                    <div class="flight_search_left">
-                                                        <div class="flight_logo">
-                                                            <img src="{{ isset($data['flightData'][$firstFlightSegment['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightSegment['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
+                                                    
+                                                     <div class="flight_logo">
+                                                            <img src="{{ isset($data['flightData'][$firstFlightSegmentAirlineCode]) ? $data['flightData'][$firstFlightSegmentAirlineCode]['AirLineLogo'] : ''}}"
                                                                 alt="img">
                                                             <div class="flight-details">
-                                                                <h4>{{ $firstFlightSegment['MarketingAirlineName'] }}
+                                                                <h4>{{ isset($data['flightData'][$firstFlightSegmentAirlineCode]) ? $data['flightData'][$firstFlightSegmentAirlineCode]['AirLineName'] : '' }}
                                                                 </h4>
-                                                                <h6>{{ $firstFlightSegment['MarketingAirlineCode'] }}
+                                                                <h6>{{ $firstFlightSegmentAirlineCode }}
                                                                     {{ $firstFlightSegment['FlightNumber']}}</h6>
                                                             </div>
                                                         </div>
+                                                        
+                                                    <div class="flight_search_left">
+                                                       
                                                         <div class="flight_search_destination">
                                                             <p>From</p>
                                                             <span>{{ date('d M, Y', strtotime($firstFlightSegment['DepartureDateTime'])) }}</span>
@@ -229,6 +236,12 @@
                                                             <p>{{ convertToHoursMins($fdata['totalDuration']) }} </p>
 
                                                         </div>
+                                                        
+                                                       
+                                                    </div>
+                                                    
+                                                       <div class="flight_search_third">
+                                                        
                                                         <div class="flight_search_destination">
                                                             <p>To</p>
                                                             <span>{{ date('d M, Y', strtotime($lastFlightSegment['ArrivalDateTime'])) }}</span>
@@ -239,7 +252,7 @@
                                                             <h6>{{ $data['airports'][$lastFlightSegment['ArrivalAirportLocationCode']]['AirportName'] }}
                                                             </h6>
                                                         </div>
-                                                    </div>
+                                                         </div>
                                                 </div>
 
                                                 @isset($fdata['OriginDestinationOptionsInbound'])
@@ -254,19 +267,21 @@
 
                                                             $firstFlightInSegment = $firstFlightIn['FlightSegment'];
                                                             $lastFlightInSegment = $lastFlightIn['FlightSegment'];
+                                                            $firstFlightInSegmentAirlineCode = $firstFlightInSegment['MarketingAirlineCode'];
                                                         @endphp
                                                         <div class="flight_multis_area_wrapper">
-                                                            <div class="flight_search_left">
-                                                                <div class="flight_logo">
-                                                                    <img src="{{ isset($data['flightData'][$firstFlightInSegment['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightInSegment['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
+                                                             <div class="flight_logo">
+                                                                    <img src="{{ isset($data['flightData'][$firstFlightInSegmentAirlineCode]) ? $data['flightData'][$firstFlightInSegmentAirlineCode]['AirLineLogo'] : ''}}"
                                                                         alt="img">
                                                                     <div class="flight-details">
-                                                                        <h4>{{ $firstFlightInSegment['MarketingAirlineName'] }}
+                                                                        <h4>{{ isset($data['flightData'][$firstFlightInSegmentAirlineCode]) ? $data['flightData'][$firstFlightInSegmentAirlineCode]['AirLineName'] : '' }}
                                                                         </h4>
-                                                                        <h6>{{ $firstFlightInSegment['MarketingAirlineCode'] }}
+                                                                        <h6>{{ $firstFlightInSegmentAirlineCode }}
                                                                             {{ $firstFlightInSegment['FlightNumber']}}</h6>
                                                                     </div>
                                                                 </div>
+                                                            <div class="flight_search_left">
+                                                               
                                                                 <div class="flight_search_destination">
                                                                     <p>From</p>
                                                                     <span>{{ date('d M, Y', strtotime($firstFlightInSegment['DepartureDateTime'])) }}</span>
@@ -289,7 +304,14 @@
                                                                     <p>{{ convertToHoursMins($fdata['totalDurationIn']) }} </p>
 
                                                                 </div>
-                                                                <div class="flight_search_destination">
+                                                                
+                                                               
+                                                                
+                                                                
+                                                            </div>
+                                                            
+                                                             <div class="flight_search_third">
+                                                             <div class="flight_search_destination">
                                                                     <p>To</p>
                                                                     <span>{{ date('d M, Y', strtotime($lastFlightInSegment['ArrivalDateTime'])) }}</span>
                                                                     <h2>{{ date('H:i', strtotime($lastFlightInSegment['ArrivalDateTime'])) }}
@@ -299,7 +321,9 @@
                                                                     <h6>{{ $data['airports'][$lastFlightInSegment['ArrivalAirportLocationCode']]['AirportName'] }}
                                                                     </h6>
                                                                 </div>
-                                                            </div>
+                                                                 </div>
+                                                                
+                                                                
                                                         </div>
                                                     @else
                                                         <div class="flight_multis_area_wrapper offset-lg-6">
@@ -315,19 +339,23 @@
                                                 @foreach($OriginDestinationOptionsOutbound as $multiOut)
                                                     @php    
                                                         $FlightSegment = $multiOut['FlightSegment']; 
+                                                        $FlightSegmentAirlineCode = $FlightSegment['MarketingAirlineCode'];
                                                     @endphp
                                                     <div class="flight_multis_area_wrapper">
-                                                        <div class="flight_search_left">
-                                                            <div class="flight_logo">
-                                                                <img src="{{ (isset($data['flightData'][$FlightSegment['MarketingAirlineCode']])) ? $data['flightData'][$FlightSegment['MarketingAirlineCode']]['AirLineLogo'] : '' }}"
+                                                        
+                                                         <div class="flight_logo">
+                                                                <img src="{{ (isset($data['flightData'][$FlightSegmentAirlineCode])) ? $data['flightData'][$FlightSegmentAirlineCode]['AirLineLogo'] : '' }}"
                                                                     alt="img">
                                                                 <div class="flight-details">
-                                                                    <h4>{{ $FlightSegment['MarketingAirlineName'] }}
+                                                                    <h4>{{ (isset($data['flightData'][$FlightSegmentAirlineCode])) ? $data['flightData'][$FlightSegmentAirlineCode]['AirLineName'] : ''  }}
                                                                     </h4>
-                                                                    <h6>{{ $FlightSegment['MarketingAirlineCode'] }}
+                                                                    <h6>{{ $FlightSegmentAirlineCode }}
                                                                         {{ $FlightSegment['FlightNumber']}}</h6>
                                                                 </div>
                                                             </div>
+                                                            
+                                                        <div class="flight_search_left">
+                                                           
                                                             <div class="flight_search_destination">
                                                                 <p>From</p>
                                                                 <span>{{ date('d M, Y', strtotime($FlightSegment['DepartureDateTime'])) }}</span>
@@ -347,6 +375,10 @@
                                                                 <p>{{ convertToHoursMins($FlightSegment['JourneyDuration']) }} </p>
                                                                 
                                                             </div>
+                                                           
+                                                        </div>
+                                                        
+                                                          <div class="flight_search_third">
                                                             <div class="flight_search_destination">
                                                                 <p>To</p>
                                                                 <span>{{ date('d M, Y', strtotime($FlightSegment['ArrivalDateTime'])) }}</span>
@@ -357,7 +389,7 @@
                                                                 <h6>{{ $data['airports'][$FlightSegment['ArrivalAirportLocationCode']]['AirportName'] }}
                                                                 </h6>
                                                             </div>
-                                                        </div>
+                                                            </div>
                                                     </div>
                                                 @endforeach
                                             @endif

@@ -97,7 +97,15 @@
                                                         <div class="d-flex items-center mb-15">
                                                             <div class="w-28 d-flex justify-center mr-15"><img
                                                                     src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="image"></div>
-                                                            <div class="text-14 text-light-1">{{ $outGoingFLightSegment['MarketingAirlineName'] }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}</div>
+                                                            <div class="text-14 text-light-1">{{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}
+                                                            <span class="fontSize12">(
+                                                                {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
+
+                                                                {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
+                                                            )</span>
+
+
+                                                            </div>
                                                         </div>
                                                         <div class="relative z-0">
                                                             <div class="border-line-2"></div>
@@ -114,11 +122,21 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="d-flex items-center mt-15">
+                                                            <div class="d-flex items-center  mt-3 mb-3">
                                                                 <div class="w-28 d-flex justify-center mr-15"><img
                                                                         src="{{ asset('assets/img/icon/plane.svg') }}" alt="image">
                                                                 </div>
-                                                                <div class="text-14 text-light-1">{{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
+                                                                <div class="text-14 text-light-1">
+                                                                    {{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}
+                                                                    <br> 
+                                                                    @php 
+                                                                        if(isset($outGoing['SeatsRemaining'])){
+                                                                            echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
+                                                                        }
+
+                                                                    @endphp
+
+                                                                </div>
                                                             </div>
                                                             <div class="d-flex items-center mt-15">
                                                                 <div class="w-28 d-flex justify-center mr-15">
@@ -240,7 +258,16 @@
                                                                 <div class="d-flex items-center mb-15">
                                                                     <div class="w-28 d-flex justify-center mr-15"><img
                                                                             src="{{ isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineLogo'] : '' }}" alt="image"></div>
-                                                                    <div class="text-14 text-light-1">{{ $incomingFlightSegment['MarketingAirlineName'] }} {{ $airlineCodeIn }} | {{ $incomingFlightSegment['FlightNumber']}}</div>
+                                                                    <div class="text-14 text-light-1">
+                                                                        {{ isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineName']  : '' }} {{ $airlineCodeIn }} | {{ $incomingFlightSegment['FlightNumber']}}
+                                                                        <span class="fontSize12">(
+                                                                            {{ isset($inComing['ResBookDesigCode']) ? $inComing['ResBookDesigCode'].'-' : '' }}
+
+                                                                            {{ isset($inComing['ResBookDesigText']) ? $inComing['ResBookDesigText'] : '' }}
+                                                                        )
+                                                                        </span>
+
+                                                                    </div>
                                                                 </div>
                                                                 <div class="relative z-0">
                                                                     <div class="border-line-2"></div>
@@ -257,11 +284,21 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="d-flex items-center mt-15">
+                                                                    <div class="d-flex items-center  mt-3 mb-3">
                                                                         <div class="w-28 d-flex justify-center mr-15"><img
                                                                                 src="{{ asset('assets/img/icon/plane.svg') }}" alt="image">
                                                                         </div>
-                                                                        <div class="text-14 text-light-1">{{ convertToHoursMins($incomingFlightSegment['JourneyDuration']) }}</div>
+                                                                        <div class="text-14 text-light-1">
+                                                                            {{ convertToHoursMins($incomingFlightSegment['JourneyDuration']) }}
+                                                                            <br> 
+                                                                            @php 
+                                                                                if(isset($inComing['SeatsRemaining'])){
+                                                                                    echo '<span class="seat-remaining">(Seats Remaining - '.$inComing['SeatsRemaining']['Number'].')</span>';
+                                                                                }
+
+                                                                            @endphp
+
+                                                                        </div>
                                                                     </div>
                                                                     <div class="d-flex items-center mt-15">
                                                                         <div class="w-28 d-flex justify-center mr-15">
@@ -368,7 +405,16 @@
                                                             <div class="d-flex items-center mb-15">
                                                                 <div class="w-28 d-flex justify-center mr-15"><img
                                                                         src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="image"></div>
-                                                                <div class="text-14 text-light-1">{{ $outGoingFLightSegment['MarketingAirlineName'] }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}</div>
+                                                                <div class="text-14 text-light-1">
+                                                                    {{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}
+                                                                    <span class="fontSize12">(
+                                                                        {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
+
+                                                                        {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
+                                                                    )
+                                                                    </span>
+
+                                                                </div>
                                                             </div>
                                                             <div class="relative z-0">
                                                                 <div class="border-line-2"></div>
@@ -386,11 +432,21 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="d-flex items-center mt-15">
+                                                                <div class="d-flex items-center  mt-3 mb-3">
                                                                     <div class="w-28 d-flex justify-center mr-15"><img
                                                                             src="{{ asset('assets/img/icon/plane.svg') }}" alt="image">
                                                                     </div>
-                                                                    <div class="text-14 text-light-1">{{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}</div>
+                                                                    <div class="text-14 text-light-1">
+                                                                        {{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}
+                                                                        <br> 
+                                                                        @php 
+                                                                            if(isset($outGoing['SeatsRemaining'])){
+                                                                                echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
+                                                                            }
+
+                                                                        @endphp
+
+                                                                    </div>
                                                                 </div>
                                                                 <div class="d-flex items-center mt-15">
                                                                     <div class="w-28 d-flex justify-center mr-15">

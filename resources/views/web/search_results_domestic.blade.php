@@ -179,17 +179,19 @@
                                         $lastFlight = last($OriginDestinationOptionsOutbound);
                                         $firstFlightSegment = $firstFlight['FlightSegment'];
                                         $lastFlightSegment = $lastFlight['FlightSegment'];
+
+                                        $firstFlightSegmentAirlineCode  = $firstFlightSegment['MarketingAirlineCode'];
                                         @endphp
 
                                         <div class="flight_multis_area_wrapper">
                                             <div class="col-lg-12">
                                                 <div class="flight_logo" style="display:flex; padding: 10px;">
                                                     <img class="flight-logo-img"
-                                                        src="{{ isset($data['flightData'][$firstFlightSegment['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightSegment['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
+                                                        src="{{ isset($data['flightData'][$firstFlightSegmentAirlineCode]) ? $data['flightData'][$firstFlightSegmentAirlineCode]['AirLineLogo'] : ''}}"
                                                         alt="img">
                                                     <div class="flight-details" style="    margin-left: 10px;">
-                                                        <h4 id="depFlight{{$loop->iteration}}">{{ $firstFlightSegment['MarketingAirlineName'] }} </h4>
-                                                        <h6>{{ $firstFlightSegment['MarketingAirlineCode'] }}
+                                                        <h4 id="depFlight{{$loop->iteration}}">{{ isset($data['flightData'][$firstFlightSegmentAirlineCode]) ? $data['flightData'][$firstFlightSegmentAirlineCode]['AirLineName'] : '' }} </h4>
+                                                        <h6>{{ $firstFlightSegmentAirlineCode }}
                                                             {{ $firstFlightSegment['FlightNumber']}}</h6>
                                                     </div>
                                                 </div>
@@ -295,18 +297,20 @@
                                         $lastFlightIn = last($OriginDestinationOptionsInbound);
                                         $firstFlightSegmentIn = $firstFlightIn['FlightSegment'];
                                         $lastFlightSegmentIn = $lastFlightIn['FlightSegment'];
+
+                                        $firstFlightSegmentInAirlineCode = $firstFlightSegmentIn['MarketingAirlineCode'];
                                         @endphp
 
                                         <div class="flight_multis_area_wrapper">
                                             <div class="col-lg-12">
                                                 <div class="flight_logo" style="display:flex; padding: 10px;">
                                                     <img class="flight-logo-img"
-                                                        src="{{ isset($data['flightData'][$firstFlightSegmentIn['MarketingAirlineCode']]) ? $data['flightData'][$firstFlightSegmentIn['MarketingAirlineCode']]['AirLineLogo'] : ''}}"
+                                                        src="{{ isset($data['flightData'][$firstFlightSegmentInAirlineCode]) ? $data['flightData'][$firstFlightSegmentInAirlineCode]['AirLineLogo'] : ''}}"
                                                         alt="img">
                                                     <div class="flight-details" style="    margin-left: 10px;">
-                                                        <h4 id="returnFlight{{$loop->iteration}}">{{ $firstFlightSegmentIn['MarketingAirlineName'] }}
+                                                        <h4 id="returnFlight{{$loop->iteration}}">{{ isset($data['flightData'][$firstFlightSegmentInAirlineCode]) ? $data['flightData'][$firstFlightSegmentInAirlineCode]['AirLineName'] : '' }}
                                                         </h4>
-                                                        <h6>{{ $firstFlightSegmentIn['MarketingAirlineCode'] }}
+                                                        <h6>{{ $firstFlightSegmentInAirlineCode }}
                                                             {{ $firstFlightSegmentIn['FlightNumber']}}</h6>
                                                     </div>
                                                 </div>
