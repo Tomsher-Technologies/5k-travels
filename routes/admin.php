@@ -77,6 +77,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         /* ------------------- Flights -----------------*/
         Route::get('/flights/airports', [FlightController::class, 'storeAirport'])->name('flights.airports');
         Route::get('/flights/airlines', [FlightController::class, 'storeAirlines'])->name('flights.airlines');
+        Route::get('/flights/airlines/update', [FlightController::class, 'updateAirlineImages'])->name('flights.airlines.update');
 
         /* ------------------- General Settings -----------------*/
         Route::get('/settings/general', [HomeController::class, 'generalSettings'])->name('settings.general');

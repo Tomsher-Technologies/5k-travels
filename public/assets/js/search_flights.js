@@ -579,7 +579,7 @@ $(document).on('click','.viewFlightDetails',function(){
                         text: "Flights fare may have changed. Please refresh the page.", 
                         icon: "warning"
                     }).then(function() {
-                        window.location.reload();
+                        // window.location.reload();
                     });
                 }
                
@@ -622,7 +622,7 @@ $(document).on('click','.viewDomFlightDetails',function(){
                             text: "Flights fare may have changed. Please refresh the page.", 
                             icon: "warning"
                         }).then(function() {
-                            window.location.reload();
+                            // window.location.reload();
                         });
                     }
                    
@@ -653,7 +653,7 @@ $(document).on('click','.viewDomFlightDetails',function(){
                             text: "Flights fare may have changed. Please refresh the page.", 
                             icon: "warning"
                         }).then(function() {
-                            window.location.reload();
+                            // window.location.reload();
                         });
                     }
                    

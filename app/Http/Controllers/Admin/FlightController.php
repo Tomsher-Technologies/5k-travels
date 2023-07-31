@@ -86,5 +86,19 @@ class FlightController extends Controller
         }
         echo 'Airlines saved successfully';
     }
+
+    public function updateAirlineImages(){
+        ini_set('max_execution_time', 400);
+        $result = Airlines::where('id','>',7)->get();
+        foreach($result as $res){
+            $filename = $res['AirLineCode'].'.gif';
+            $img = $_SERVER['DOCUMENT_ROOT'].'/assets/images/airlines/'.$filename;
+            $imglink = '/assets/images/airlines/'.$filename;
+            file_put_contents($img, file_get_contents($res['AirLineLogo']));
+            
+            $user = Airlines::where('id',$res['id'])->update(['AirLineLogo' => $imglink]);
+        }
+        echo 'Airlines saved successfully';
+    }
    
 }
