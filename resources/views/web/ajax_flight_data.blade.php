@@ -44,8 +44,15 @@
                                     <div class="flightDetailsRow  col-sm-12">
                                         <p class="makeFlex hrtlCenter appendBottom20 gap-x-10">
                                             <span class="icon32 bgProperties" style="background-image: url('{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo']  : '' }}');"></span><span>
-                                                <span color="#000000"><b>{{ $outGoingSegment['MarketingAirlineName'] }}</b></span>
+                                                <span color="#000000"><b>{{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }}</b></span>
                                                 <span color="#6d7278">{{ $airlineCode }} | {{ $outGoingSegment['FlightNumber']}}</span>
+
+                                                <span class="fontSize12">(
+                                                    {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
+
+                                                    {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
+                                                )
+                                                </span>
                                             </span>
                                         </p>
                                         <div class="makeFlex flightDtlInfo  col-sm-12">
@@ -56,7 +63,14 @@
                                                     <p  class="fontSize12 blackText boldFont appendBottom8">{{ date('d M, Y', strtotime($outGoingSegment['DepartureDateTime'])) }}</p>
                                                     <p class="fontSize12">{{ $deptAirportData[0]['City'] }}, {{ $deptAirportData[0]['Country'] }}</p>
                                                 </div>
-                                                <div class="airlineDtlDuration fontSize12  col-sm-4">{{ convertToHoursMins($outGoingSegment['JourneyDuration']) }}
+                                                <div class="text-center fontSize12  col-sm-4">{{ convertToHoursMins($outGoingSegment['JourneyDuration']) }}
+                                                    <br> 
+                                                    @php 
+                                                        if(isset($outGoing['SeatsRemaining'])){
+                                                            echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
+                                                        }
+
+                                                    @endphp
                                                     <div class="relative fliStopsSep">
                                                         <p class="fliStopsSepLine"
                                                             style="border-top: 3px solid rgb(81, 226, 194);">
@@ -133,8 +147,15 @@
                                         <div class="flightDetailsRow  col-sm-12">
                                             <p class="makeFlex hrtlCenter appendBottom20 gap-x-10">
                                                 <span class="icon32 bgProperties" style="background-image: url('{{  isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineLogo'] : '' }}');"></span><span>
-                                                    <span color="#000000"><b>{{ $inComingSegment['MarketingAirlineName'] }}</b></span>
+                                                    <span color="#000000"><b>{{ isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineName']  : '' }}</b></span>
                                                     <span color="#6d7278">{{ $airlineCodeIn }} | {{ $inComingSegment['FlightNumber']}}</span>
+
+                                                    <span class="fontSize12">(
+                                                        {{ isset($InComing['ResBookDesigCode']) ? $InComing['ResBookDesigCode'].'-' : '' }}
+
+                                                        {{ isset($InComing['ResBookDesigText']) ? $InComing['ResBookDesigText'] : '' }}
+                                                    )
+                                                    </span>
                                                 </span>
                                             </p>
                                             <div class="makeFlex flightDtlInfo  col-sm-12">
@@ -146,6 +167,15 @@
                                                         <p class="fontSize12">{{ $deptAirportDataIn[0]['City'] }}, {{ $deptAirportDataIn[0]['Country'] }}</p>
                                                     </div>
                                                     <div class="airlineDtlDuration fontSize12  col-sm-4">{{ convertToHoursMins($inComingSegment['JourneyDuration']) }}
+                                                        <br>
+                                                        @php 
+                                                            if(isset($InComing['SeatsRemaining'])){
+                                                                echo '<span class="seat-remaining">(Seats Remaining - '.$InComing['SeatsRemaining']['Number'].')</span>';
+                                                            }
+
+                                                        @endphp
+
+                                                    
                                                         <div class="relative fliStopsSep">
                                                             <p class="fliStopsSepLine"
                                                                 style="border-top: 3px solid rgb(81, 226, 194);">
@@ -221,8 +251,15 @@
                                 <div class="flightDetailsRow  col-sm-12">
                                     <p class="makeFlex hrtlCenter appendBottom20 gap-x-10">
                                         <span class="icon32 bgProperties" style="background-image: url('{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}');"></span><span>
-                                            <span color="#000000"><b>{{ $outGoingSegment['MarketingAirlineName'] }}</b></span>
+                                            <span color="#000000"><b>{{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }}</b></span>
                                             <span color="#6d7278">{{ $airlineCode }} | {{ $outGoingSegment['FlightNumber']}}</span>
+                                            <span class="fontSize12">(
+                                                    {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
+
+                                                    {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
+                                                )
+                                            </span>
+
                                         </span>
                                     </p>
                                     <div class="makeFlex flightDtlInfo  col-sm-12">
@@ -234,6 +271,14 @@
                                                 <p class="fontSize12">{{ $deptAirportData[0]['City'] }}, {{ $deptAirportData[0]['Country'] }}</p>
                                             </div>
                                             <div class="airlineDtlDuration fontSize12  col-sm-4">{{ convertToHoursMins($outGoingSegment['JourneyDuration']) }}
+                                                <br> 
+                                                    @php 
+                                                        if(isset($outGoing['SeatsRemaining'])){
+                                                            echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
+                                                        }
+
+                                                    @endphp
+
                                                 <div class="relative fliStopsSep">
                                                     <p class="fliStopsSepLine"
                                                         style="border-top: 3px solid rgb(81, 226, 194);">
