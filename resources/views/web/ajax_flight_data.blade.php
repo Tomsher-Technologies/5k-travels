@@ -47,11 +47,8 @@
                                                 <span color="#000000"><b>{{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }}</b></span>
                                                 <span color="#6d7278">{{ $airlineCode }} | {{ $outGoingSegment['FlightNumber']}}</span>
 
-                                                <span class="fontSize12">(
-                                                    {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
-
-                                                    {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
-                                                )
+                                                <span class="fontSize12">
+                                                    ({{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'] : '' }})
                                                 </span>
                                             </span>
                                         </p>
@@ -150,11 +147,8 @@
                                                     <span color="#000000"><b>{{ isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineName']  : '' }}</b></span>
                                                     <span color="#6d7278">{{ $airlineCodeIn }} | {{ $inComingSegment['FlightNumber']}}</span>
 
-                                                    <span class="fontSize12">(
-                                                        {{ isset($InComing['ResBookDesigCode']) ? $InComing['ResBookDesigCode'].'-' : '' }}
-
-                                                        {{ isset($InComing['ResBookDesigText']) ? $InComing['ResBookDesigText'] : '' }}
-                                                    )
+                                                    <span class="fontSize12">
+                                                        ({{ isset($InComing['ResBookDesigCode']) ? $InComing['ResBookDesigCode'] : '' }})
                                                     </span>
                                                 </span>
                                             </p>
@@ -253,11 +247,8 @@
                                         <span class="icon32 bgProperties" style="background-image: url('{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}');"></span><span>
                                             <span color="#000000"><b>{{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }}</b></span>
                                             <span color="#6d7278">{{ $airlineCode }} | {{ $outGoingSegment['FlightNumber']}}</span>
-                                            <span class="fontSize12">(
-                                                    {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
-
-                                                    {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
-                                                )
+                                            <span class="fontSize12">
+                                                ({{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'] : '' }})
                                             </span>
 
                                         </span>

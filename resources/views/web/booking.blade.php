@@ -77,7 +77,7 @@
                                                         @php $cabinClass = $CabinClassCode; @endphp
                                                     @endif
                                                     <div class="col-auto">
-                                                        <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}}</div>
+                                                        <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}} {{ isset($outGoing['ResBookDesigCode']) ? '('.$outGoing['ResBookDesigCode'].')' : '' }}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -98,11 +98,7 @@
                                                             <div class="w-28 d-flex justify-center mr-15"><img
                                                                     src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="image"></div>
                                                             <div class="text-14 text-light-1">{{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}
-                                                            <span class="fontSize12">(
-                                                                {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
-
-                                                                {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
-                                                            )</span>
+                                                            <span class="fontSize12"></span>
 
 
                                                             </div>
@@ -247,7 +243,7 @@
                                                                 @php $cabinClass = $cabinClassIn; @endphp
                                                             @endif
                                                             <div class="col-auto">
-                                                                <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}}</div>
+                                                                <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}} {{ isset($inComing['ResBookDesigCode']) ? '('.$inComing['ResBookDesigCode'].')' : '' }}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -260,11 +256,7 @@
                                                                             src="{{ isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineLogo'] : '' }}" alt="image"></div>
                                                                     <div class="text-14 text-light-1">
                                                                         {{ isset($airlineDataIn[0]) ? $airlineDataIn[0]['AirLineName']  : '' }} {{ $airlineCodeIn }} | {{ $incomingFlightSegment['FlightNumber']}}
-                                                                        <span class="fontSize12">(
-                                                                            {{ isset($inComing['ResBookDesigCode']) ? $inComing['ResBookDesigCode'].'-' : '' }}
-
-                                                                            {{ isset($inComing['ResBookDesigText']) ? $inComing['ResBookDesigText'] : '' }}
-                                                                        )
+                                                                        <span class="fontSize12">
                                                                         </span>
 
                                                                     </div>
@@ -385,7 +377,7 @@
                                                             @php $cabinClass = $CabinClassCode; @endphp
                                                         @endif
                                                         <div class="col-auto">
-                                                            <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}}</div>
+                                                            <div class="text-14 text-light-1">Cabin Class: {{$cabinClass}} {{ isset($outGoing['ResBookDesigCode']) ? '('.$outGoing['ResBookDesigCode'].')' : '' }}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -407,11 +399,7 @@
                                                                         src="{{ isset($airlineData[0]) ? $airlineData[0]['AirLineLogo'] : '' }}" alt="image"></div>
                                                                 <div class="text-14 text-light-1">
                                                                     {{ isset($airlineData[0]) ? $airlineData[0]['AirLineName']  : '' }} {{ $airlineCode }} | {{ $outGoingFLightSegment['FlightNumber']}}
-                                                                    <span class="fontSize12">(
-                                                                        {{ isset($outGoing['ResBookDesigCode']) ? $outGoing['ResBookDesigCode'].'-' : '' }}
-
-                                                                        {{ isset($outGoing['ResBookDesigText']) ? $outGoing['ResBookDesigText'] : '' }}
-                                                                    )
+                                                                    <span class="fontSize12">
                                                                     </span>
 
                                                                 </div>
