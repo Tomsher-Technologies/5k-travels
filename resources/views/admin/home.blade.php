@@ -31,35 +31,48 @@
         </div>
 
         <div class="row" style="margin-bottom: 2%;">
-            <div class="animated flipInY col-lg-2 col-md-3 col-sm-6  ">
-                <div class="tile-stats">
-                    <div class="icon"><i class="fa fa-plane"></i> </div>
-                    <div class="count" id="booking_count">0</div>
+            
+            
+     <div class="col-xl-4"><div class="mc-float-card lg purple"><h3  class="count" id="booking_count">0</h3><p>Bookings</p><i class="fa fa-plane"></i></div></div>
+     
+     
+     
+     <div class="col-xl-4"><div class="mc-float-card lg green"><h3 class="count" id="user_count">0</h3><p>New Users</p><i class="fa fa-users"></i> </div></div>
+     
+     <div class="col-xl-4"> <div class="mc-float-card lg red"><h3 class="count" id="agent_count">0</h3><p>New Agents </p><i class="fa fa-user"></i></div></div>
+           
+           
+            <!--<div class="animated flipInY col-lg-2 col-md-3 col-sm-6  ">-->
+            <!--    <div class="tile-stats">-->
+            <!--        <div class="icon"><i class="fa fa-plane"></i> </div>-->
+            <!--        <div class="count" id="booking_count">0</div>-->
 
-                    <h3>Bookings</h3>
-                    <!-- <p>Lorem ipsum psdea itgum rixt.</p> -->
-                </div>
-            </div>
+            <!--        <h3>Bookings</h3>-->
+                  
+            <!--    </div>-->
+            <!--</div>-->
+            
+            
 
-            <div class="animated flipInY col-lg-2 col-md-3 col-sm-6  ">
-                <div class="tile-stats">
-                    <div class="icon"><i class="fa fa-users"></i> </div>
-                    <div class="count" id="user_count">0</div>
+            <!--<div class="animated flipInY col-lg-2 col-md-3 col-sm-6  ">-->
+            <!--    <div class="tile-stats">-->
+            <!--        <div class="icon"><i class="fa fa-users"></i> </div>-->
+            <!--        <div class="count" id="user_count">0</div>-->
 
-                    <h3>New Users</h3>
-                    <!-- <p>Lorem ipsum psdea itgum rixt.</p> -->
-                </div>
-            </div>
+            <!--        <h3>New Users</h3>-->
 
-            <div class="animated flipInY col-lg-2 col-md-3 col-sm-6  ">
-                <div class="tile-stats">
-                    <div class="icon"><i class="fa fa-user"></i> </div>
-                    <div class="count" id="agent_count">0</div>
+            <!--    </div>-->
+            <!--</div>-->
 
-                    <h3>New Agents</h3>
-                    <!-- <p>Lorem ipsum psdea itgum rixt.</p> -->
-                </div>
-            </div>
+            <!--<div class="animated flipInY col-lg-2 col-md-3 col-sm-6  ">-->
+            <!--    <div class="tile-stats">-->
+            <!--        <div class="icon"><i class="fa fa-user"></i> </div>-->
+            <!--        <div class="count" id="agent_count">0</div>-->
+
+            <!--        <h3>New Agents</h3>-->
+            
+            <!--    </div>-->
+            <!--</div>-->
 
 
         </div>

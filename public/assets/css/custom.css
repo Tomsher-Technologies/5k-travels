@@ -184,6 +184,7 @@ label{
   .tile-stats .icon i {
         margin: 9px;
         font-size: 38px;
+        
     }
 
     .daterangepicker .ranges li.active {
@@ -247,3 +248,67 @@ label{
 .bold{
     font-weight: 600 !important;
 }
+
+
+.mc-float-card.sm {
+    padding: 20px
+}
+
+.mc-float-card.sm h3 {
+    font-size: 22px;
+    margin-bottom: 4px
+}
+
+.mc-float-card.sm p {
+    font-size: 14px
+}
+
+.mc-float-card.md {
+    padding: 24px
+}
+
+.mc-float-card.md h3 {
+    font-size: 24px;
+    margin-bottom: 6px
+}
+
+.mc-float-card.md p {
+    font-size: 15px
+}
+
+.mc-float-card.lg {
+    padding: 28px
+}
+
+.mc-float-card.lg h3 {
+    font-size: 26px;
+    margin-bottom: 8px
+}
+
+.mc-float-card.lg p {
+    font-size: 16px
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

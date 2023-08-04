@@ -592,7 +592,7 @@ function getSelectedData(){
 
     var url = "{{ route('flight.booking') }}";
     url = url+"?search_type="+search_type+"&session_id="+session_id+"&FareSourceCode="+fare_code_dep+"&FareSourceCodeIn="+fare_code_return;
-    console.log('url   ========================== '+url);
+
     $('#stickyButton').attr('href',url);
 }
 
