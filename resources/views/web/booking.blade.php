@@ -1047,7 +1047,7 @@
                                             <div class="form-check write_spical_check mt-3">
                                                 <input class="form-check-input" type="checkbox" value="" id="terms_conditions" name="terms_conditions">
                                                 <label class="form-check-label" for="flexCheckDefaultf1">
-                                                    I read and accept all <a href="terms-service.html">Terms and conditios</a>
+                                                    I read and accept all <a href="#">Terms and conditios</a>
                                                 </label>
                                             </div>
 
@@ -1498,6 +1498,7 @@
                     dangerMode: true,
                 }).then((isConfirmed) => {
                     if (isConfirmed) {
+                        $('.ajaxloader').css('display','block');
                         form.submit();
                     }
                 });

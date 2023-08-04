@@ -91,7 +91,7 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-1.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -112,7 +112,7 @@
                             </a>
                         </div>
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-2.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -135,7 +135,7 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-3.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -162,7 +162,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-4.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -187,7 +187,7 @@
                         <div class="row">
                             <div class="col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="holiday_small_boxed">
-                                    <a href="tour-details.html">
+                                    <a href="#">
                                         <img src="{{ asset('assets/img/holiday-img/holiday-5.png') }}" alt="img">
                                         <div class="holiday_small_box_content">
                                             <div class="holiday_inner_content">
@@ -210,7 +210,7 @@
                             </div>
                             <div class="col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="holiday_small_boxed">
-                                    <a href="tour-details.html">
+                                    <a href="#">
                                         <img src="{{ asset('assets/img/holiday-img/holiday-6.png') }}" alt="img">
                                         <div class="holiday_small_box_content">
                                             <div class="holiday_inner_content">
