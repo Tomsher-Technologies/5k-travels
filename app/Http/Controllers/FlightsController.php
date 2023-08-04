@@ -765,7 +765,7 @@ class FlightsController extends Controller
 
         if(!isset($result['AirRevalidateResponse']['AirRevalidateResultInbound'])){
             $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
-            if($IsValid == 1 || $IsValid == true){
+            if($IsValid == 1 || $IsValid == 'true'){
                 $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
                 $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
                 if(isset($FareItineraries['FareItinerary'])){
@@ -935,7 +935,7 @@ class FlightsController extends Controller
             }
         }else{
             $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
-             if($IsValid == 1 || $IsValid == true){
+             if($IsValid == 1 || $IsValid == 'true'){
                 $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
                 $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
                 if(isset($FareItineraries['FareItinerary'])){
@@ -1033,7 +1033,7 @@ class FlightsController extends Controller
             }
 
             $IsValidIn = $result['AirRevalidateResponse']['AirRevalidateResultInbound']['IsValid'];
-            if($IsValidIn == 1 || $IsValidIn == true){
+            if($IsValidIn == 1 || $IsValidIn == 'true'){
                 $FareItinerariesIn = $result['AirRevalidateResponse']['AirRevalidateResultInbound']['FareItineraries'];
                 $ExtraServicesIn = $result['AirRevalidateResponse']['AirRevalidateResultInbound']['ExtraServices'];
                 if(isset($FareItinerariesIn['FareItinerary'])){
@@ -1180,7 +1180,7 @@ class FlightsController extends Controller
         $bagCount = 0;
 
         $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
-        if($IsValid == 1 || $IsValid == true){
+        if($IsValid == 1 || $IsValid == 'true'){
             $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
             $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
             if(isset($FareItineraries['FareItinerary'])){
@@ -1475,7 +1475,7 @@ class FlightsController extends Controller
                     // print_r($ticketOrderRes);
                 
                     $ticketOrderResSuccess = $ticketOrderRes['AirOrderTicketRS']['TicketOrderResult']['Success'];
-                    if($ticketOrderResSuccess == "true" || $ticketOrderResSuccess == "1"){
+                    if($ticketOrderResSuccess == 'true' || $ticketOrderResSuccess == "1"){
                         $tripDetails = $this->getTripDetails($bookingId);
                         $tripDetails = json_decode($tripDetails, true);
                         // echo '<pre>';
@@ -1884,7 +1884,7 @@ class FlightsController extends Controller
         // echo '<pre>';
         // print_r($result);
         $IsValid = $result['AirRevalidateResponse']['AirRevalidateResult']['IsValid'];
-        if($IsValid == 1 || $IsValid == true){
+        if($IsValid == 1 || $IsValid == 'true'){
             $FareItineraries = $result['AirRevalidateResponse']['AirRevalidateResult']['FareItineraries'];
             $ExtraServices = $result['AirRevalidateResponse']['AirRevalidateResult']['ExtraServices'];
             if(isset($FareItineraries['FareItinerary'])){
@@ -1932,7 +1932,7 @@ class FlightsController extends Controller
                         $result = $response->getBody()->getContents();
                         $result = json_decode($result, true);
                         $CancelBookingResult = $result['CancelBookingResponse']['CancelBookingResult'];
-                        if( $CancelBookingResult['Success'] == true){
+                        if( $CancelBookingResult['Success'] == 'true'){
                             FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_request' => 1,'is_cancelled' => 1]);
                             $bookData = getBookingDataByUniqueId($uniqueBookId);
                             $this->sendCancelMail($bookData);
@@ -1987,7 +1987,7 @@ class FlightsController extends Controller
         $TotalVoidingFee = $TotalRefundAmount = 0;
         if(!isset($result['Errors'])){
             $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
-            if( $VoidQuoteResult['Success'] == true){
+            if( $VoidQuoteResult['Success'] == 'true'){
                 $data['UniqueID'] = $VoidQuoteResult['UniqueID'];
                 $data['ptrUniqueID'] = $VoidQuoteResult['ptrUniqueID'];
                 if(isset($VoidQuoteResult['VoidQuotes'])){
@@ -2053,7 +2053,7 @@ class FlightsController extends Controller
         $TotalRefundFee = $TotalRefundAmount = 0;
         if(!isset($result['Errors'])){
             $RefundQuoteResult = $result['RefundQuoteResponse']['RefundQuoteResult'];
-            if( $RefundQuoteResult['Success'] == true){
+            if( $RefundQuoteResult['Success'] == 'true'){
                 $ptrUniqueId = $RefundQuoteResult['ptrUniqueID'];
                 if($ptrUniqueId != ''){
                     $responseCheck = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
@@ -2070,7 +2070,7 @@ class FlightsController extends Controller
 
                     if(!isset($resultCheck['Errors'])){
                         $PtrResult = $resultCheck['PtrResponse']['PtrResult'];
-                        if( $PtrResult['Success'] == true){
+                        if( $PtrResult['Success'] == 'true'){
                             $PtrDetails = (isset($PtrResult['PtrDetails'][0])) ? $PtrResult['PtrDetails'][0] : [];
                             if($PtrDetails){
                                 $data['UniqueID'] = $PtrDetails['UniqueID'];
@@ -2152,7 +2152,7 @@ class FlightsController extends Controller
         $TotalVoidingFee = $TotalRefundAmount = 0;
         if(!isset($result['Errors'])){
             $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
-            if( $VoidQuoteResult['Success'] == true){
+            if( $VoidQuoteResult['Success'] == 'true'){
                 $data['UniqueID'] = $VoidQuoteResult['UniqueID'];
                 $data['ptrUniqueID'] = $VoidQuoteResult['ptrUniqueID'];
                 if(isset($VoidQuoteResult['VoidQuotes'])){
@@ -2219,7 +2219,7 @@ class FlightsController extends Controller
         // die;
         if(!isset($result['Errors'])){
             $VoidQuoteResult = $result['VoidQuoteResponse']['VoidQuoteResult'];
-            if( $VoidQuoteResult['Success'] == true){
+            if( $VoidQuoteResult['Success'] == 'true'){
                 FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_fee' => $cancel_fee,'refund_amount' => $cancel_refund,'cancel_request' => 1,'cancel_ptr' => $VoidQuoteResult['ptrUniqueID']]);
                 $msg = ['status' => true,'msg' => 'Cancel request send successfully'];
             }else{
@@ -2251,7 +2251,7 @@ class FlightsController extends Controller
 
         if(isset($result['PtrResponse'])){
             $PtrResult = $result['PtrResponse']['PtrResult'];
-            if($PtrResult['Success'] == true){
+            if($PtrResult['Success'] == 'true'){
                 if(isset($PtrResult['PtrDetails'][0])){
                     $PtrDetails = $PtrResult['PtrDetails'][0];
                     if($PtrDetails['PtrStatus'] == 'Completed'){
@@ -2329,7 +2329,7 @@ class FlightsController extends Controller
 
                     if(!isset($resultCheck['Errors'])){
                         $PtrResult = $resultCheck['PtrResponse']['PtrResult'];
-                        if( $PtrResult['Success'] == true){
+                        if( $PtrResult['Success'] == 'true'){
                             $PtrDetails = (isset($PtrResult['PtrDetails'][0])) ? $PtrResult['PtrDetails'][0] : [];
                             if($PtrDetails){
                                 $data['UniqueID'] = $PtrDetails['UniqueID'];
@@ -2412,7 +2412,7 @@ class FlightsController extends Controller
         if(!isset($result['Errors'])){
             // $RefundResult = $result['RefundResponse']['RefundResult'];
             $RefundResult = $result['ReissueResponse']['ReissueResult'];
-            if( $RefundResult['Success'] == true){
+            if( $RefundResult['Success'] == 'true'){
                 FlightBookings::where('unique_booking_id', $uniqueBookId)->update(['cancel_fee' => $cancel_fee,'refund_amount' => $cancel_refund,'cancel_request' => 1,'cancel_ptr' => $RefundResult['ptrUniqueID']]);
                 $msg = ['status' => true,'msg' => (isset($RefundResult['Message']) && $RefundResult['Message'] != '') ? $RefundResult['Message'] : 'Cancel request send successfully'];
             }else{
@@ -2492,7 +2492,7 @@ class FlightsController extends Controller
         // die;
         if(isset($result['ReissueQuoteResponse']['ReissueQuoteResult'])){
             $ReissueQuoteResult = $result['ReissueQuoteResponse']['ReissueQuoteResult'];
-            if(isset($ReissueQuoteResult['Success']) && $ReissueQuoteResult['Success'] == true){
+            if(isset($ReissueQuoteResult['Success']) && $ReissueQuoteResult['Success'] == 'true'){
                 if($ReissueQuoteResult['ptrUniqueID'] != ''){
                     $ptrUniqueId = $ReissueQuoteResult['ptrUniqueID'];
                     FlightBookings::where('id', $id)->update(['reissue_quote_ptr' => $ptrUniqueId]);
@@ -2511,7 +2511,7 @@ class FlightsController extends Controller
                     // die;
                     if(isset($resultStatus['PtrResponse']['PtrResult']['Success'])) {
                         $PtrResult = $resultStatus['PtrResponse']['PtrResult'];
-                        if($PtrResult['Success'] == true){
+                        if($PtrResult['Success'] == 'true'){
                             $PtrDetails = $resultStatus['PtrResponse']['PtrResult']['PtrDetails'][0];
                             if(isset($PtrDetails['RequestedPreferences'])){
                                 $viewData = view('web.user.reschedule_data', compact('PtrDetails','uniqueBookId','ptrUniqueId'))->render();
@@ -2547,7 +2547,7 @@ class FlightsController extends Controller
                 $resultStatus = json_decode($resultStatus, true);
                 if(isset($resultStatus['PtrResponse']['PtrResult']['Success'])) {
                     $PtrResult = $resultStatus['PtrResponse']['PtrResult'];
-                    if($PtrResult['Success'] == true){
+                    if($PtrResult['Success'] == 'true'){
                         $PtrDetails = $resultStatus['PtrResponse']['PtrResult']['PtrDetails'][0];
                         if(isset($PtrDetails['RequestedPreferences'])){
                             $viewData = view('web.user.reschedule_data', compact('PtrDetails','uniqueBookId','ptrUniqueId'))->render();
@@ -2595,7 +2595,7 @@ class FlightsController extends Controller
         if(!isset($result['Errors'])){
             // $RefundResult = $result['RefundResponse']['RefundResult'];
             $ReissueResult = $result['ReissueResponse']['ReissueResult'];
-            if( $ReissueResult['Success'] == true){
+            if( $ReissueResult['Success'] == 'true'){
                 FlightBookings::where('unique_booking_id', $uniqueID)->update(['reissue_request' => 1,'reissue_ptr' => $ReissueResult['ptrUniqueID']]);
                 $msg = ['status' => true,'msg' => (isset($ReissueResult['Message']) && $ReissueResult['Message'] != '') ? $ReissueResult['Message'] : 'Reissue request send successfully'];
             }else{
@@ -2628,7 +2628,7 @@ class FlightsController extends Controller
 
         if(isset($result['PtrResponse'])){
             $PtrResult = $result['PtrResponse']['PtrResult'];
-            if($PtrResult['Success'] == true){
+            if($PtrResult['Success'] == 'true'){
                 if(isset($PtrResult['PtrDetails'][0])){
                     $PtrDetails = $PtrResult['PtrDetails'][0];
                     if($PtrDetails['PtrStatus'] == 'Completed'){

@@ -124,14 +124,7 @@
                                                                 </div>
                                                                 <div class="text-14 text-light-1">
                                                                     {{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}
-                                                                    <br> 
-                                                                    @php 
-                                                                        if(isset($outGoing['SeatsRemaining'])){
-                                                                            echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
-                                                                        }
-
-                                                                    @endphp
-
+                                                                    
                                                                 </div>
                                                             </div>
                                                             <div class="d-flex items-center mt-15">
@@ -282,14 +275,7 @@
                                                                         </div>
                                                                         <div class="text-14 text-light-1">
                                                                             {{ convertToHoursMins($incomingFlightSegment['JourneyDuration']) }}
-                                                                            <br> 
-                                                                            @php 
-                                                                                if(isset($inComing['SeatsRemaining'])){
-                                                                                    echo '<span class="seat-remaining">(Seats Remaining - '.$inComing['SeatsRemaining']['Number'].')</span>';
-                                                                                }
-
-                                                                            @endphp
-
+                                                                            
                                                                         </div>
                                                                     </div>
                                                                     <div class="d-flex items-center mt-15">
@@ -426,14 +412,7 @@
                                                                     </div>
                                                                     <div class="text-14 text-light-1">
                                                                         {{ convertToHoursMins($outGoingFLightSegment['JourneyDuration']) }}
-                                                                        <br> 
-                                                                        @php 
-                                                                            if(isset($outGoing['SeatsRemaining'])){
-                                                                                echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
-                                                                            }
-
-                                                                        @endphp
-
+                                                                       
                                                                     </div>
                                                                 </div>
                                                                 <div class="d-flex items-center mt-15">
@@ -1081,7 +1060,7 @@
                                             @else
                                                 <input type="hidden" name="direction" id="direction" value="{{ $data['search_type'] }}">
                                             @endif
-                                            <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || $data['IsPassportMandatory'] == true) ? 'true' : 'false'}}">
+                                            <input type="hidden" name="IsPassportMandatory" id="IsPassportMandatory" value="{{ ($data['IsPassportMandatory'] == 1 || ($data['IsPassportMandatory'] == true || $data['IsPassportMandatory'] == 'true')) ? 'true' : 'false'}}">
                                             <input type="hidden" name="FareType" id="FareType" value="{{$data['FareType']}}">
                                             <input type="hidden" name="adultCount" id="adultCount" value="{{$data['adultCount']}}">
                                             <input type="hidden" name="childCount" id="childCount" value="{{$data['childCount']}}">
