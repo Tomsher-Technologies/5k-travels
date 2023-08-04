@@ -391,7 +391,7 @@ class HomeController extends Controller
             header('Content-Type: application/vnd.ms-excel');
             header('Content-Disposition: attachment;filename="Flight_Bookings_'.date('d-m-Y').'.xls"');
             header('Cache-Control: max-age=0');
-            ob_end_clean();
+            // ob_end_clean();
             $Excel_writer->save('php://output');
             exit();
         } catch (Exception $e) {

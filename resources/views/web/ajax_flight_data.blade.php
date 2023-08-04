@@ -61,13 +61,7 @@
                                                     <p class="fontSize12">{{ $deptAirportData[0]['City'] }}, {{ $deptAirportData[0]['Country'] }}</p>
                                                 </div>
                                                 <div class="text-center fontSize12  col-sm-4">{{ convertToHoursMins($outGoingSegment['JourneyDuration']) }}
-                                                    <br> 
-                                                    @php 
-                                                        if(isset($outGoing['SeatsRemaining'])){
-                                                            echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
-                                                        }
-
-                                                    @endphp
+                                                    
                                                     <div class="relative fliStopsSep">
                                                         <p class="fliStopsSepLine"
                                                             style="border-top: 3px solid rgb(81, 226, 194);">
@@ -161,15 +155,7 @@
                                                         <p class="fontSize12">{{ $deptAirportDataIn[0]['City'] }}, {{ $deptAirportDataIn[0]['Country'] }}</p>
                                                     </div>
                                                     <div class="airlineDtlDuration fontSize12  col-sm-4">{{ convertToHoursMins($inComingSegment['JourneyDuration']) }}
-                                                        <br>
-                                                        @php 
-                                                            if(isset($InComing['SeatsRemaining'])){
-                                                                echo '<span class="seat-remaining">(Seats Remaining - '.$InComing['SeatsRemaining']['Number'].')</span>';
-                                                            }
-
-                                                        @endphp
-
-                                                    
+                                                        
                                                         <div class="relative fliStopsSep">
                                                             <p class="fliStopsSepLine"
                                                                 style="border-top: 3px solid rgb(81, 226, 194);">
@@ -262,14 +248,7 @@
                                                 <p class="fontSize12">{{ $deptAirportData[0]['City'] }}, {{ $deptAirportData[0]['Country'] }}</p>
                                             </div>
                                             <div class="airlineDtlDuration fontSize12  col-sm-4">{{ convertToHoursMins($outGoingSegment['JourneyDuration']) }}
-                                                <br> 
-                                                    @php 
-                                                        if(isset($outGoing['SeatsRemaining'])){
-                                                            echo '<span class="seat-remaining">(Seats Remaining - '.$outGoing['SeatsRemaining']['Number'].')</span>';
-                                                        }
-
-                                                    @endphp
-
+                                               
                                                 <div class="relative fliStopsSep">
                                                     <p class="fliStopsSepLine"
                                                         style="border-top: 3px solid rgb(81, 226, 194);">
