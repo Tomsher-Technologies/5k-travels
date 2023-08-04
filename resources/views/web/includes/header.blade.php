@@ -26,10 +26,10 @@
                                 <li><a href="#common_author-forms" data-bs-toggle="modal"
                                     data-bs-target="#common_author-forms">Login</a></li>
                             @endif
-
+                            @if(Route::currentRouteName() != 'flight.booking')
                             <li>
                                 <div class="dropdown language-option">
-                                @php
+                                    @php
                                         if(Session::has('user_currency') && Session::get('user_currency') == 'USD'){
                                             $currency = 'USD';
                                         }elseif(Session::has('user_currency') && Session::get('user_currency') == 'AFN'){
@@ -60,6 +60,7 @@
                                     </div>
                                 </div>
                             </li>
+                            @endif
                         </ul>
                     </div>
                 </div>

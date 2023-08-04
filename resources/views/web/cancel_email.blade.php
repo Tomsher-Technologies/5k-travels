@@ -2,7 +2,7 @@
         <div
             style="padding: 1.5rem; display: flex;gap: 8px; align-items: center; justify-content: space-between;flex-wrap: wrap;">
             <div>
-                <a href="index.html"><img src="{{ asset('assets/img/logo.png') }}" alt="" height="24"></a>
+                <a href="{{ route('home') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="" height="24"></a>
             </div>
             <div style="display: flex;gap: 6px;">
                 <p style="margin-bottom: 0px; font-size: 14px;font-weight: 500;margin-top: 0px;"><span
