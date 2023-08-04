@@ -132,12 +132,12 @@ class FlightsController extends Controller
 
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
        
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'availability', [
-                                                    "user_id"=> config('global.api_user_id'),
-                                                    "user_password"=> config('global.api_user_password'),
-                                                    "access"=> config('global.api_access'),
-                                                    "ip_address"=> config('global.api_ip_address'),
-                                                    "requiredCurrency"=> (Session::has('user_currency') ? Session::get('user_currency') : config('global.api_requiredCurrency')),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'availability', [
+                                                    "user_id"=> env('API_USER_ID'),
+                                                    "user_password"=> env('API_USER_PASSWORD'),
+                                                    "access"=> env('API_ACCESS'),
+                                                    "ip_address"=> env('API_IP_ADDRESS'),
+                                                    "requiredCurrency"=> (Session::has('user_currency') ? Session::get('user_currency') : env('API_REQUIRED_CURRENCY')),
                                                     "journeyType"=> $request->search_type,
                                                     "OriginDestinationInfo"=> $originDestinationInfo,
                                                     "class"=> $cabinClass,
@@ -751,7 +751,7 @@ class FlightsController extends Controller
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
         $data['countries'] = Countries::orderBy('name','ASC')->get();
        
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'revalidate', $apiKeys);
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'revalidate', $apiKeys);
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
         // echo '<pre>';
@@ -1133,7 +1133,7 @@ class FlightsController extends Controller
         // echo '<pre>';
         // print_r($data);
         // die;
-        $responseFare = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'fare_rules', $apiKeys);
+        $responseFare = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'fare_rules', $apiKeys);
         $resultFare = $responseFare->getBody()->getContents();
         $resultFare = json_decode($resultFare, true);
 
@@ -1167,7 +1167,7 @@ class FlightsController extends Controller
         $data['id'] = $request->id;
         $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData(); 
        
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'revalidate', $apiKeys);
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'revalidate', $apiKeys);
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
         // echo '<pre>';
@@ -1458,7 +1458,7 @@ class FlightsController extends Controller
         // echo '<pre>';
         // print_r($data);
         // die;
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'booking', $data);
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'booking', $data);
 
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
@@ -1572,11 +1572,11 @@ class FlightsController extends Controller
     }
 
     public function ticketOrder($bookingId){
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'ticket_order', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'ticket_order', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $bookingId
                     ]);
 
@@ -1585,11 +1585,11 @@ class FlightsController extends Controller
     }
 
     public function getTripDetails($bookingId){
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'trip_details', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'trip_details', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $bookingId
                     ]);
 
@@ -1878,7 +1878,7 @@ class FlightsController extends Controller
             "session_id" => $request->session_id,
             "fare_source_code" => $request->fare_source_code
         ];
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'revalidate', $apiKeys);
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'revalidate', $apiKeys);
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
         // echo '<pre>';
@@ -1922,11 +1922,11 @@ class FlightsController extends Controller
                             $msg = $this->refundQuoteCall($uniqueBookId,$book_Id);
                         }
                     }else{
-                        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'cancel', [
-                            "user_id"=> config('global.api_user_id'),
-                            "user_password"=> config('global.api_user_password'),
-                            "access"=> config('global.api_access'),
-                            "ip_address"=> config('global.api_ip_address'),
+                        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'cancel', [
+                            "user_id"=> env('API_USER_ID'),
+                            "user_password"=> env('API_USER_PASSWORD'),
+                            "access"=> env('API_ACCESS'),
+                            "ip_address"=> env('API_IP_ADDRESS'),
                             "UniqueID"=> $uniqueBookId
                         ]);
                         $result = $response->getBody()->getContents();
@@ -1972,11 +1972,11 @@ class FlightsController extends Controller
         // die;
         // echo $uniqueBookId; 
         $data['id'] = $id;
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket_quote', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'void_ticket_quote', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "paxDetails" => $paxDetails
                     ]);
@@ -2037,11 +2037,11 @@ class FlightsController extends Controller
         // die;
         // echo $uniqueBookId; 
         $data['id'] = $id;
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund_quote', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'refund_quote', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "paxDetails" => $paxDetails
                     ]);
@@ -2056,11 +2056,11 @@ class FlightsController extends Controller
             if( $RefundQuoteResult['Success'] == 'true'){
                 $ptrUniqueId = $RefundQuoteResult['ptrUniqueID'];
                 if($ptrUniqueId != ''){
-                    $responseCheck = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+                    $responseCheck = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'search_post_ticket_status', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "ptrUniqueID" => $ptrUniqueId
                     ]);
@@ -2137,11 +2137,11 @@ class FlightsController extends Controller
         // die;
         // echo $uniqueBookId; 
         $data['id'] = $id;
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket_quote', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'void_ticket_quote', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "paxDetails" => $paxDetails
                     ]);
@@ -2202,11 +2202,11 @@ class FlightsController extends Controller
                 
         // echo '<pre>';
        
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'void_ticket', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'void_ticket', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "paxDetails" => $paxDetails,
                         "remark" => "Kindly void booking."
@@ -2235,11 +2235,11 @@ class FlightsController extends Controller
         $uniqueId = $request->id;
         $ptrUniqueId = $request->ptr;
 
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
-            "user_id"=> config('global.api_user_id'),
-            "user_password"=> config('global.api_user_password'),
-            "access"=> config('global.api_access'),
-            "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'search_post_ticket_status', [
+            "user_id"=> env('API_USER_ID'),
+            "user_password"=> env('API_USER_PASSWORD'),
+            "access"=> env('API_ACCESS'),
+            "ip_address"=> env('API_IP_ADDRESS'),
             "UniqueID"=> $uniqueId,
             "ptrUniqueID" => $ptrUniqueId
         ]);
@@ -2295,11 +2295,11 @@ class FlightsController extends Controller
         // die;
         // echo $uniqueBookId; 
         $data['id'] = $id;
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund_quote', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'refund_quote', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "paxDetails" => $paxDetails
                     ]);
@@ -2315,11 +2315,11 @@ class FlightsController extends Controller
             if($RefundQuoteResult['Success'] == 'true'){
                 $ptrUniqueId = $RefundQuoteResult['ptrUniqueID'];
                 if($ptrUniqueId != ''){
-                    $responseCheck = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+                    $responseCheck = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'search_post_ticket_status', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "ptrUniqueID" => $ptrUniqueId
                     ]);
@@ -2394,11 +2394,11 @@ class FlightsController extends Controller
                 
         // echo '<pre>';
        
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'refund', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'refund', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "paxDetails" => $paxDetails,
                         "remark" => "Kindly void booking."
@@ -2476,11 +2476,11 @@ class FlightsController extends Controller
         // print_r($paxDetails);
         // print_r($OriginDestinationInfo);
         //    die;
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'reissue_ticket_quote', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'reissue_ticket_quote', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "paxDetails" => $paxDetails,
                         "OriginDestinationInfo" => $OriginDestinationInfo
@@ -2496,11 +2496,11 @@ class FlightsController extends Controller
                 if($ReissueQuoteResult['ptrUniqueID'] != ''){
                     $ptrUniqueId = $ReissueQuoteResult['ptrUniqueID'];
                     FlightBookings::where('id', $id)->update(['reissue_quote_ptr' => $ptrUniqueId]);
-                    $responseStatus = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+                    $responseStatus = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'search_post_ticket_status', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $uniqueBookId,
                         "ptrUniqueID" => $ptrUniqueId
                     ]);
@@ -2534,11 +2534,11 @@ class FlightsController extends Controller
             $reissue_quote_ptr = FlightBookings::where('id', $id)->pluck('reissue_quote_ptr');
             if($reissue_quote_ptr[0] != ''){
                 $ptrUniqueId = $reissue_quote_ptr[0];
-                $responseStatus = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
-                    "user_id"=> config('global.api_user_id'),
-                    "user_password"=> config('global.api_user_password'),
-                    "access"=> config('global.api_access'),
-                    "ip_address"=> config('global.api_ip_address'),
+                $responseStatus = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'search_post_ticket_status', [
+                    "user_id"=> env('API_USER_ID'),
+                    "user_password"=> env('API_USER_PASSWORD'),
+                    "access"=> env('API_ACCESS'),
+                    "ip_address"=> env('API_IP_ADDRESS'),
                     "UniqueID"=> $uniqueBookId,
                     "ptrUniqueID" => $ptrUniqueId
                 ]);
@@ -2576,11 +2576,11 @@ class FlightsController extends Controller
         $uniqueID = $request->uniqueID ;
         // echo '<pre>';
        
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'reissue_ticket', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'reissue_ticket', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID" => $uniqueID,
                         "ptrUniqueID" => $ptrUniqueID,
                         "PreferenceOption" => $preference,
@@ -2612,11 +2612,11 @@ class FlightsController extends Controller
         $uniqueId = $request->uniqueid;
         $ptrUniqueId = $request->ptr;
         $details['oldId'] = $id;
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'search_post_ticket_status', [
-            "user_id"=> config('global.api_user_id'),
-            "user_password"=> config('global.api_user_password'),
-            "access"=> config('global.api_access'),
-            "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'search_post_ticket_status', [
+            "user_id"=> env('API_USER_ID'),
+            "user_password"=> env('API_USER_PASSWORD'),
+            "access"=> env('API_ACCESS'),
+            "ip_address"=> env('API_IP_ADDRESS'),
             "UniqueID"=> $uniqueId,
             "ptrUniqueID" => $ptrUniqueId
         ]);

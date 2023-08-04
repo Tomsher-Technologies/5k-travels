@@ -487,11 +487,11 @@ class HomeController extends Controller
     }
 
     public function getTripDetails($bookingId){
-        $response = Http::timeout(300)->withOptions($this->options)->post(config('global.api_base_url').'trip_details', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address'),
+        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'trip_details', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS'),
                         "UniqueID"=> $bookingId
                     ]);
 
@@ -502,11 +502,11 @@ class HomeController extends Controller
     public function search(){
         
         $response = Http::withOptions($this->options)->post('https://travelnext.works/api/aeroVE5/availability', [
-                                "user_id"=> config('global.api_user_id'),
-                                "user_password"=> config('global.api_user_password'),
-                                "access"=> config('global.api_access'),
-                                "ip_address"=> config('global.api_ip_address'),
-                                "requiredCurrency"=> config('global.api_requiredCurrency'),
+                                "user_id"=> env('API_USER_ID'),
+                                "user_password"=> env('API_USER_PASSWORD'),
+                                "access"=> env('API_ACCESS'),
+                                "ip_address"=> env('API_IP_ADDRESS'),
+                                "requiredCurrency"=> env('API_REQUIRED_CURRENCY'),
                                 "journeyType"=> "OneWay",
                                 "OriginDestinationInfo"=>
                                 [
