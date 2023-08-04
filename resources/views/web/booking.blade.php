@@ -1083,8 +1083,7 @@
                                                 @else
                                                     <div class='alert alert-danger mt-3' style="width: 300px;text-align: center;">Insufficient balance in wallet. </div>
                                                 @endif
-                                                {{ $TotalFareMargin }}
-                                            {{ $usdAmount }}
+                                                
                                             @else
                                                 <button type="button" id="loginCheck" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
                                             @endif
