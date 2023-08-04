@@ -180,7 +180,7 @@ if (! function_exists('getCurrencyValue')) {
                                     ->amount(1)
                                     ->get();
         }
-        return number_format(($oneCurrency), 4, '.', '');
+        return number_format(($oneCurrency), 6, '.', '');
     }
 }
 
