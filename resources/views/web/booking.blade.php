@@ -1068,16 +1068,28 @@
 
                                         </div>
                                         <div class="booking_btn float-right">
+                                            
                                             @if(Auth::check())
-                                                @php $balance = getAgentWalletBalance(Auth::user()->id);  @endphp
-                                                @if($balance >= $TotalFareMargin)
+                                                @php 
+                                                    $usdAmount = $TotalFareMargin;
+                                                    $balance = getAgentWalletBalance(Auth::user()->id);  
+                                                    if($currencyCode != 'USD'){
+                                                        $oneCurrency = getCurrencyValue($currencyCode);
+                                                        $usdAmount = number_format(($TotalFareMargin*$oneCurrency), 2, '.', '');
+                                                    }
+                                                @endphp
+                                                @if($balance >= $usdAmount)
                                                     <button type="submit" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
                                                 @else
                                                     <div class='alert alert-danger mt-3' style="width: 300px;text-align: center;">Insufficient balance in wallet. </div>
                                                 @endif
+                                                {{ $TotalFareMargin }}
+                                            {{ $usdAmount }}
                                             @else
                                                 <button type="button" id="loginCheck" class="btn btn_theme btn_lg mt-30">Continue to Payment</button>
                                             @endif
+
+                                           
                                         </div>
                                     
                                 </div>
