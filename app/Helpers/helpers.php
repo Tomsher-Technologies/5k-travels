@@ -154,6 +154,16 @@ if (! function_exists('getAirlineData')) {
     function getAirlineData($code) {
         $details = Airlines::select('*')->where('AirLineCode',$code)
                         ->get()->toArray();
+        if(isset($details[0])){
+            $details = $details;
+        }else{
+            $details[] = array(
+                "id" => "",
+                "AirLineCode"=>$code,
+                "AirLineName"=>$code,
+                "AirLineLogo"=>''
+            );
+        }
                         // echo '<pre>';
                         // print_r($details);die;
         return $details;
@@ -164,6 +174,18 @@ if (! function_exists('getAirportData')) {
     function getAirportData($code) {
         $details = Airports::select('*')->where('AirportCode',$code)
                         ->get()->toArray();
+        if(isset($details[0])){
+            $details = $details;
+        }else{
+            $details[] = array(
+                "id" => "",
+                "AirportCode"=>$code,
+                "AirportName"=>$code,
+                "City"=>'',
+                "Country"=>'',
+                "CountryCode"=>''
+            );
+        }
                         // echo '<pre>';
                         // print_r($details);die;
         return $details;
