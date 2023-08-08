@@ -595,7 +595,8 @@ $(document).on('click','.viewDomFlightDetails',function(){
                         id : $(this).attr('data-id'),
                         session_id : $(this).attr('data-session_id'),
                         search_type : $(this).attr('data-search_type'),
-                        fareCode : $(this).attr('data-fareCode')
+                        fareCode : $(this).attr('data-fareCode'),
+                        type : type
                     }  
 
     if(type == 'return'){

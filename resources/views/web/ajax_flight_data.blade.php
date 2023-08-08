@@ -1,25 +1,31 @@
 <div class="flight_show_down_wrapper" style="display:block;">
     <!-- Nav tabs -->
+    @php 
+        $marginData = $data['margins'];
+        $totalmargin = $marginData['totalmargin'];
+        if($data['type'] == 'departure'){
+            $type = 'd';
+        }else{
+            $type ='r' ;
+        }
+    @endphp
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
-                data-bs-target="#flight_details_{{$data['id']}}" type="button" role="tab" aria-controls="home"
+                data-bs-target="#flight_details_{{$type}}_{{$data['id']}}" type="button" role="tab" aria-controls="home"
                 aria-selected="true">Flight Details</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
-                data-bs-target="#fare_details_{{$data['id']}}" type="button" role="tab"
+                data-bs-target="#fare_details_{{$type}}_{{$data['id']}}" type="button" role="tab"
                 aria-controls="profile" aria-selected="false">Fare Summary</button>
         </li>
     </ul>
-    @php 
-        $marginData = $data['margins'];
-        $totalmargin = $marginData['totalmargin'];
-    @endphp
+   
     <!-- Tab panes -->
     <div class="tab-content" id="ex1-content">
         @isset($data['flightsOutgoing'])
-            <div class="tab-pane fade show active" id="flight_details_{{$data['id']}}" role="tabpanel" aria-labelledby="ex1-tab-1" >
+            <div class="tab-pane fade show active" id="flight_details_{{$type}}_{{$data['id']}}" role="tabpanel" aria-labelledby="ex1-tab-1" >
                 @if($data['search_type'] != 'Circle')
                     @isset($data['flightsOutgoing'])
                         @php  
@@ -288,7 +294,7 @@
                     @endforeach
                 @endif
             </div>
-            <div class="tab-pane" id="fare_details_{{$data['id']}}" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="tab-pane" id="fare_details_{{$type}}_{{$data['id']}}" role="tabpanel" aria-labelledby="profile-tab">
                 <div id="flightDetailsTab-29-tabpane-2" aria-labelledby="flightDetailsTab-29-tab-2" role="tabpanel" aria-hidden="false" class="fade tab-pane active show">
                     <div class="flightDetails">
                         <p class="flightDetailsHead">Fare Breakup</p>

@@ -1165,6 +1165,7 @@ class FlightsController extends Controller
         }
         $data['search_type'] = $request->search_type;
         $data['id'] = $request->id;
+        $data['type'] = isset($request->type) ? $request->type : 'departure';
         $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData(); 
        
         $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL').'revalidate', $apiKeys);
