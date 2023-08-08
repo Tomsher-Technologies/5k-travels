@@ -249,7 +249,7 @@
                                             
                                         </div>
                                     </div>
-                                    <div class="tour_detail_right_sidebar mt-1 col-sm-6">
+                                    <div class="tour_detail_right_sidebar mt-1 col-sm-4">
                                         <div class="tour_details_right_boxed">
                                             <div class="tour_details_right_box_heading">
                                                 <h3>Booking amount</h3>
