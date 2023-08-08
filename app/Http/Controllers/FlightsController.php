@@ -212,7 +212,7 @@ class FlightsController extends Controller
                                 // if($flightSegment[$i]['FlightSegment']['DepartureAirportLocationCode'] == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
                                     $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $flightSegment[$i]['FlightSegment']['DepartureDateTime']);
                                     $layover[$DepartureAirportLocationCode] = $timeInMin;
-                                    $layover['place'][] = $data['airports'][$DepartureAirportLocationCode]['City'];
+                                    $layover['place'][] = isset($data['airports'][$DepartureAirportLocationCode]) ? $data['airports'][$DepartureAirportLocationCode]['City'] : $DepartureAirportLocationCode;
                                     $layover['duration'][] = $timeInMin;                                
                                 // }
                             }
@@ -336,7 +336,7 @@ class FlightsController extends Controller
 
                                         $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $newFlightSegment['DepartureDateTime']);
                                         $layover[$DepartureAirportLocationCode] = $timeInMin;
-                                        $layover['place'][] = $data['airports'][$DepartureAirportLocationCode]['City'];
+                                        $layover['place'][] = isset($data['airports'][$DepartureAirportLocationCode]) ? $data['airports'][$DepartureAirportLocationCode]['City'] : $DepartureAirportLocationCode;
                                         $layover['duration'][] = $timeInMin;    
                                     // }
                                 }
@@ -452,7 +452,7 @@ class FlightsController extends Controller
 
                                         $timeInMinIn = getTimeDiffInMInutes($flightSegmentIn[$j-1]['FlightSegment']['ArrivalDateTime'], $jFlightSegment['DepartureDateTime']);
                                         $layoverIn[$jFlightSegment['DepartureAirportLocationCode']] = $timeInMinIn;
-                                        $layoverIn['place'][] = $data['airports'][$jFlightSegment['DepartureAirportLocationCode']]['City'];
+                                        $layoverIn['place'][] = isset($data['airports'][$jFlightSegment['DepartureAirportLocationCode']]) ? $data['airports'][$jFlightSegment['DepartureAirportLocationCode']]['City'] : $jFlightSegment['DepartureAirportLocationCode'];
                                         $layoverIn['duration'][] = $timeInMinIn;                               
                                     // }
                                 }
@@ -586,7 +586,7 @@ class FlightsController extends Controller
 
                                         $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $iFlightSegment['DepartureDateTime']);
                                         $layover[$iFlightSegment['DepartureAirportLocationCode']] = $timeInMin;
-                                        $layover['place'][] = $data['airports'][$iFlightSegment['DepartureAirportLocationCode']]['City'];
+                                        $layover['place'][] = isset($data['airports'][$iFlightSegment['DepartureAirportLocationCode']]) ? $data['airports'][$iFlightSegment['DepartureAirportLocationCode']]['City'] : $iFlightSegment['DepartureAirportLocationCode'];
                                         $layover['duration'][] = $timeInMin;    
                                     // }
                                 }
@@ -625,7 +625,7 @@ class FlightsController extends Controller
 
                                             $timeInMin = getTimeDiffInMInutes($flightSegment[$j-1]['FlightSegment']['ArrivalDateTime'], $jFlightSegment['DepartureDateTime']);
                                             $layoverIn[$jFlightSegment['DepartureAirportLocationCode']] = $timeInMin;
-                                            $layoverIn['place'][] = $data['airports'][$jFlightSegment['DepartureAirportLocationCode']]['City'];
+                                            $layoverIn['place'][] = isset($data['airports'][$jFlightSegment['DepartureAirportLocationCode']]) ? $data['airports'][$jFlightSegment['DepartureAirportLocationCode']]['City'] : $jFlightSegment['DepartureAirportLocationCode'];
                                             $layoverIn['duration'][] = $timeInMin;                               
                                         // }
                                     }
@@ -827,7 +827,7 @@ class FlightsController extends Controller
                                         // if($i_DepartureAirportCode == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
                                             $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $i_FlightSegment['DepartureDateTime']);
                                             $layover[$i_DepartureAirportCode] = $timeInMin;
-                                            $layover['place'][] = $data['airports'][$i_DepartureAirportCode]['City'];
+                                            $layover['place'][] = isset($data['airports'][$i_DepartureAirportCode]) ? $data['airports'][$i_DepartureAirportCode]['City'] : $i_DepartureAirportCode;
                                             $layover['duration'][] = $timeInMin;                                
                                         // }
                                     }
@@ -860,7 +860,7 @@ class FlightsController extends Controller
                                         // if($in_DepartureAirportCode == $flightSegmentIn[$in-1]['FlightSegment']['ArrivalAirportLocationCode']){
                                             $timeInMin = getTimeDiffInMInutes($flightSegmentIn[$in-1]['FlightSegment']['ArrivalDateTime'], $in_FlightSegment['DepartureDateTime']);
                                             $layoverIn[$in_DepartureAirportCode] = $timeInMin;
-                                            $layoverIn['place'][] = $data['airports'][$in_DepartureAirportCode]['City'];
+                                            $layoverIn['place'][] = isset($data['airports'][$in_DepartureAirportCode]) ? $data['airports'][$in_DepartureAirportCode]['City'] : $in_DepartureAirportCode;
                                             $layoverIn['duration'][] = $timeInMin;                                
                                         // }
                                     }
@@ -997,7 +997,7 @@ class FlightsController extends Controller
                                         // if($i_DepartureAirportCode == $flightSegment[$i-1]['FlightSegment']['ArrivalAirportLocationCode']){
                                             $timeInMin = getTimeDiffInMInutes($flightSegment[$i-1]['FlightSegment']['ArrivalDateTime'], $i_FlightSegment['DepartureDateTime']);
                                             $layover[$i_DepartureAirportCode] = $timeInMin;
-                                            $layover['place'][] = $data['airports'][$i_DepartureAirportCode]['City'];
+                                            $layover['place'][] = isset($data['airports'][$i_DepartureAirportCode]) ? $data['airports'][$i_DepartureAirportCode]['City'] : $i_DepartureAirportCode;
                                             $layover['duration'][] = $timeInMin;                                
                                         // }
                                     }
@@ -1095,7 +1095,7 @@ class FlightsController extends Controller
                                         // if($in_DepartureAirportCode == $flightSegmentIn[$in-1]['FlightSegment']['ArrivalAirportLocationCode']){
                                             $timeInMinIn = getTimeDiffInMInutes($flightSegmentIn[$in-1]['FlightSegment']['ArrivalDateTime'], $in_FlightSegment['DepartureDateTime']);
                                             $layoverIn[$in_DepartureAirportCode] = $timeInMinIn;
-                                            $layoverIn['place'][] = $data['airports'][$in_DepartureAirportCode]['City'];
+                                            $layoverIn['place'][] = isset($data['airports'][$in_DepartureAirportCode]) ? $data['airports'][$in_DepartureAirportCode]['City'] : $in_DepartureAirportCode;
                                             $layoverIn['duration'][] = $timeInMinIn;                                
                                         // }
                                     }

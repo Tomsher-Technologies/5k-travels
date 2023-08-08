@@ -205,9 +205,9 @@
                                                         {{ date('H:i', strtotime($firstFlightSegment['DepartureDateTime'])) }}
                                                     </h3>
                                                     <h5 class="bold overflow-text">
-                                                        {{ $data['airports'][$firstFlightSegment['DepartureAirportLocationCode']]['City'] }}
+                                                        {{ isset($data['airports'][$firstFlightSegment['DepartureAirportLocationCode']]) ? $data['airports'][$firstFlightSegment['DepartureAirportLocationCode']]['City'] : $firstFlightSegment['DepartureAirportLocationCode'] }}
                                                     </h5>
-                                                    <h6>{{ $data['airports'][$firstFlightSegment['DepartureAirportLocationCode']]['AirportName'] }}
+                                                    <h6>{{ isset($data['airports'][$firstFlightSegment['DepartureAirportLocationCode']]) ? $data['airports'][$firstFlightSegment['DepartureAirportLocationCode']]['AirportName'] : '' }}
                                                     </h6>
                                                 </div>
                                                 
@@ -230,9 +230,9 @@
                                                         {{ date('H:i', strtotime($lastFlightSegment['ArrivalDateTime'])) }}
                                                     </h3>
                                                     <h5 class="bold overflow-text">
-                                                        {{ $data['airports'][$lastFlightSegment['ArrivalAirportLocationCode']]['City'] }}
+                                                        {{ isset($data['airports'][$lastFlightSegment['ArrivalAirportLocationCode']]) ? $data['airports'][$lastFlightSegment['ArrivalAirportLocationCode']]['City'] : $lastFlightSegment['ArrivalAirportLocationCode']}}
                                                     </h5>
-                                                    <h6>{{ $data['airports'][$lastFlightSegment['ArrivalAirportLocationCode']]['AirportName'] }}
+                                                    <h6>{{ isset($data['airports'][$lastFlightSegment['ArrivalAirportLocationCode']]) ? $data['airports'][$lastFlightSegment['ArrivalAirportLocationCode']]['AirportName'] :''}}
                                                     </h6>
                                                 </div>
                                             </div>
@@ -325,9 +325,9 @@
                                                         {{ date('H:i', strtotime($firstFlightSegmentIn['DepartureDateTime'])) }}
                                                     </h3>
                                                     <h5 class="bold overflow-text">
-                                                        {{ $data['airports'][$firstFlightSegmentIn['DepartureAirportLocationCode']]['City'] }}
+                                                        {{ isset($data['airports'][$firstFlightSegmentIn['DepartureAirportLocationCode']]) ? $data['airports'][$firstFlightSegmentIn['DepartureAirportLocationCode']]['City'] : $firstFlightSegmentIn['DepartureAirportLocationCode'] }}
                                                     </h5>
-                                                    <h6>{{ $data['airports'][$firstFlightSegmentIn['DepartureAirportLocationCode']]['AirportName'] }}
+                                                    <h6>{{ isset($data['airports'][$firstFlightSegmentIn['DepartureAirportLocationCode']]) ? $data['airports'][$firstFlightSegmentIn['DepartureAirportLocationCode']]['AirportName'] : '' }}
                                                     </h6>
                                                 </div>
 
@@ -348,9 +348,9 @@
                                                         {{ date('H:i', strtotime($lastFlightSegmentIn['ArrivalDateTime'])) }}
                                                     </h3>
                                                     <h5 class="bold overflow-text">
-                                                        {{ $data['airports'][$lastFlightSegmentIn['ArrivalAirportLocationCode']]['City'] }}
+                                                        {{ isset($data['airports'][$lastFlightSegmentIn['ArrivalAirportLocationCode']]) ? $data['airports'][$lastFlightSegmentIn['ArrivalAirportLocationCode']]['City'] : $lastFlightSegmentIn['ArrivalAirportLocationCode'] }}
                                                     </h5>
-                                                    <h6>{{ $data['airports'][$lastFlightSegmentIn['ArrivalAirportLocationCode']]['AirportName'] }}
+                                                    <h6>{{ isset($data['airports'][$lastFlightSegmentIn['ArrivalAirportLocationCode']]) ? $data['airports'][$lastFlightSegmentIn['ArrivalAirportLocationCode']]['AirportName'] :''}}
                                                     </h6>
                                                 </div>
                                             </div>

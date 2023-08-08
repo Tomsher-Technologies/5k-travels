@@ -168,7 +168,7 @@
                                                         <div class="flightLayoverOuter">
                                                             <div class="flightLayover mmtConnectLayover">
                                                                 <div class="makeFlex fontSize14">
-                                                                    <p> <span style="color: #5d8f3a;">Change of planes</span> <b>{{ convertToHoursMins($data['layovers'][$outArrAirCode]) }}</b> Layover in {{ $data['airports'][$outArrAirCode]['City'] }}</p>
+                                                                    <p> <span style="color: #5d8f3a;">Change of planes</span> <b>{{ convertToHoursMins($data['layovers'][$outArrAirCode]) }}</b> Layover in {{ isset($data['airports'][$outArrAirCode]) ? $data['airports'][$outArrAirCode]['City'] : $outArrAirCode }}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -610,7 +610,7 @@
                                                 
                                             @endphp
                                             @if(isset($data['extraBaggage']['outGoing']))
-                                                <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($outFrom != '') ? $data['airports'][$outFrom]['AirportName'] : '' }} -> {{ ($outTo != '') ?  $data['airports'][$outTo]['AirportName'] : '' }}</h4>
+                                                <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($outFrom != '' && isset($data['airports'][$outFrom])) ? $data['airports'][$outFrom]['AirportName'] : $outFrom }} -> {{ ($outTo != '' && isset($data['airports'][$outTo])) ?  $data['airports'][$outTo]['AirportName'] : $outTo }}</h4>
                                                 <table>
                                                 @php 
                                                     $bout = 0; 
@@ -659,7 +659,7 @@
                                             @endif
 
                                             @if(isset($data['extraBaggage']['inComing']))
-                                                <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($inFrom != '') ? $data['airports'][$inFrom]['AirportName'] : '' }} -> {{ ($inTo != '') ? $data['airports'][$inTo]['AirportName'] : '' }}</h4>
+                                                <h4 class="fareRule-heading"><i class="fa fa-suitcase"></i>&nbsp;{{ ($inFrom != '' && isset($data['airports'][$inFrom])) ? $data['airports'][$inFrom]['AirportName'] : $inFrom }} -> {{ ($inTo != '' && isset($data['airports'][$inTo])) ? $data['airports'][$inTo]['AirportName'] : $inTo }}</h4>
                                                 <table>
                                                 @php 
                                                     $bin = 0; 
@@ -730,7 +730,7 @@
                                                 @endphp
 
                                                 @if(($fromCity != '') && ($toCity != ''))
-                                                    <h4 class="fareRule-heading"><i class="fa fa-plane"></i>&nbsp;{{  $data['airports'][$fromCity]['AirportName'] }} -> {{  $data['airports'][$toCity]['AirportName'] }}</h4>
+                                                    <h4 class="fareRule-heading"><i class="fa fa-plane"></i>&nbsp;{{  isset($data['airports'][$fromCity]) ? $data['airports'][$fromCity]['AirportName'] : $fromCity }} -> {{  isset($data['airports'][$toCity]) ? $data['airports'][$toCity]['AirportName'] : $toCity }}</h4>
                                                 @endif
                                                 <h5> {!! $farerule['FareRule']['Category'] !!} </h5>
                                                 {!! $farerule['FareRule']['Rules'] !!}
