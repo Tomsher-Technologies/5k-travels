@@ -280,7 +280,7 @@
 </section>
 
 <!-- Our partners Area -->
-<section id="our_partners_four" class="section_padding">
+<!-- <section id="our_partners_four" class="section_padding">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -322,7 +322,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> -->
 
 
 
