@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <!-- Title -->
-    <title>{{ env('APP_NAME') }} - @yield('title') </title>
+    <title>5k Travels : Flight Booking Agency | B2B Online </title>
+    <meta name="description" content="Discover seamless flight booking solutions with 5k Travels, your trusted flight booking agency. Book now & save.">
+    <link rel="canonical" href="https://5ktravels.com/" />
     <!-- Bootstrap css -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
     <!-- animate css -->
@@ -32,33 +34,9 @@
     <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
     @stack('header')
     <style>
-
-.ui-widget-content {
-    color: #333;
-    z-index: 1000;
-    padding: 0;
-    margin: 0;
-    font-size: 1rem;
-    list-style: none;
-    background-color: #fff;
-    border: 1px solid rgba(0,0,0,.15) !important;
-    border-radius: 0.25rem;
-    transition: none !important;
-}
         .ui-menu .ui-menu-item-wrapper {
             position: relative;
             padding: 0 !important;
-            margin: 0px !important;
-        }
-
-        .ui-state-active{
-            transition: none !important;
-        }
-
-        .ui-menu .ui-menu-item-wrapper:hover{
-            background-color: #ddd !important;
-            color: #fff;
-            transition: none !important;
         }
         ul.ui-menu{
             width: 350px !important;
@@ -66,10 +44,8 @@
             overflow: auto;
         }
         .ui-menu-item{
-            /* height: 55px; */
-            font-family: 'Manrope', sans-serif;
-          
-       }
+            height: 55px;
+        }
         .ui-state-active:hover{
             background:transparent;
             color: black;
@@ -294,13 +270,13 @@
                     </section>
                 </div>
                 <!-- Modal footer -->
-                <div class="modal-footer log-for">
+                <div class="modal-footer">
                     
                     
                            <ul class="nav nav-tabs" role="tablist">
                                                 
-                                                <li class="nav-item forgot-password-tab" role="presentation">
-                                                    <button class="nav-link " id="forgot-password-tab"
+                                                <li class="nav-item " role="presentation">
+                                                    <button class="nav-link" id="forgot-password-tab"
                                                         data-bs-toggle="tab" data-bs-target="#forgot-password"
                                                         type="button" role="tab" aria-controls="forgot-password"
                                                         aria-selected="false"><i class="fas fa-user"></i> Forgot Password</button>
