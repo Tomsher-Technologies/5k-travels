@@ -61,6 +61,68 @@ Default CSS
     --paragraph-color: #818090;
     --bg-color: #F3F6FD;
     --transition: .4s all ease-in-out;
+
+
+    --tw-border-spacing-x: 0;
+    --tw-border-spacing-y: 0;
+    --tw-translate-x: 0;
+    --tw-translate-y: 0;
+    --tw-rotate: 0;
+    --tw-skew-x: 0;
+    --tw-skew-y: 0;
+    --tw-scale-x: 1;
+    --tw-scale-y: 1;
+    --tw-pan-x: ;
+    --tw-pan-y: ;
+    --tw-pinch-zoom: ;
+    --tw-scroll-snap-strictness: proximity;
+    --tw-gradient-from-position: ;
+    --tw-gradient-via-position: ;
+    --tw-gradient-to-position: ;
+    --tw-ordinal: ;
+    --tw-slashed-zero: ;
+    --tw-numeric-figure: ;
+    --tw-numeric-spacing: ;
+    --tw-numeric-fraction: ;
+    --tw-ring-inset: ;
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-color: rgba(59,130,246,.5);
+    --tw-ring-offset-shadow: 0 0 #0000;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-colored: 0 0 #0000;
+    --tw-blur: ;
+    --tw-brightness: ;
+    --tw-contrast: ;
+    --tw-grayscale: ;
+    --tw-hue-rotate: ;
+    --tw-invert: ;
+    --tw-saturate: ;
+    --tw-sepia: ;
+    --tw-drop-shadow: ;
+    --tw-backdrop-blur: ;
+    --tw-backdrop-brightness: ;
+    --tw-backdrop-contrast: ;
+    --tw-backdrop-grayscale: ;
+    --tw-backdrop-hue-rotate: ;
+    --tw-backdrop-invert: ;
+    --tw-backdrop-opacity: ;
+    --tw-backdrop-saturate: ;
+    --tw-backdrop-sepia:;
+    --shadow-primary: 0px 4px 10px rgba(37, 47, 63, 0.1);
+    --shadow-light: 0 2px 6px 0 rgba(0, 0, 0, 0.05);
+    --shadow-dark: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
+    --shadow-1: 0px 6px 34px rgba(215, 216, 222, 0.41);
+    --shadow-slide-item: 0px 0 10px 0 rgba(215, 216, 222, 0.20);
+    --shadow-2: 0 15px 34px 0 rgba(175, 181, 204, 0.32);
+    --shadow-3: 0 5px 15px 0 rgba(85, 74, 101, 0.37);
+    --shadow-5: 0px 20px 70px 0px rgba(0, 0, 0, 0.1);
+    --shadow-7: 0px 15px 30px -2px rgba(0, 0, 0, 0.1);
+    --shadow-8: -5px 18px 60px 0 rgba(210, 210, 234, 0.4);
+    --shadow-9: 0 13px 48px 0 rgba(215, 216, 222, 0.44);
+    --shadow-10: 0 13px 14px 0 rgba(129, 104, 145, 0.05);
+    --shadow-11: 0 0 10px 0 rgba(0, 0, 0, 0.06);
 }
 
 html,
@@ -181,11 +243,37 @@ ul li {
 } */
 
 .form-control {
-    height: 50px;
+    /* height: 50px; */
     border: none;
     /* box-shadow: 0px 1px 13px 0px #0000000d; */
     padding: 10px 22px;
     font-size: 16px;
+}
+
+
+.booking_tour_form input, .booking_tour_form textarea,.booking_tour_form input,.booking_tour_form textarea,.booking_tour_form select {
+    /* width: 100% !important;. */
+    background-color: transparent !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    line-height: 23px !important;
+
+    font-size: 14px !important;
+    color: #6b7385 !important;
+    margin-bottom: 15px !important;
+}
+
+
+.form-check-input{
+    background-color: #fff;
+    border: 2px solid #e6e3f1;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+.form-check-input:checked {
+    background-color: #1fba71;
+    border-color: #1fba71;
 }
 
 .form-control:focus {
@@ -491,13 +579,13 @@ ul li {
 
 
 .btn_md {
-    padding: 12px 35px;
-    font-size: 18px;
+    padding: 10px 20px;
+    font-size: 15px;
 }
 
 .btn_sm {
-    font-size: 14px;
-    padding: 5px 18px;
+    font-size: 13px;
+    padding: 5px 10px;
 }
 
 .btn_navber {
@@ -580,6 +668,11 @@ ul li {
 
 }
 
+#theme_search_form .container{
+    padding: 0px;
+}
+
+
 .theme_search_form_area {
 
     box-shadow: 4px 14px 28px rgba(0, 0, 0, 0.1);
@@ -639,21 +732,17 @@ ul li {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 1);
     /* background: #8b3eea17; */
-    padding: 10px 10px 10px 20px;
+    padding: 15px 10px;
     border-radius: 10px;
-    height: 100%;
+    /* height: 100%; */
     position: relative;
 }
 
-.form_search_date{
-        height: 100%;
-    
-}
 
 .plan_icon_posation {
     position: absolute;
-    top: 20px;
-    right: 30px;
+    top: 10px;
+    right: 10px;
 }
 
 .plan_icon_posation i {
@@ -662,7 +751,7 @@ ul li {
 
 .range_plan {
     position: absolute;
-    left: -37px;
+    left: -31px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -683,11 +772,11 @@ ul li {
 
 .range_plan i {
     background: #ecffd9;
-    font-size: 24px;
-    width: 50px;
-    height: 50px;
+    font-size: 17px;
+    width: 35px;
+    height: 35px;
     text-align: center;
-    line-height: 46px;
+    line-height: 30px;
     border-radius: 50%;
     border: 3px solid #fff;
     color: var(--main-color);
@@ -703,11 +792,12 @@ ul li {
 
 .flight_Search_boxed p {
     font-size: 14px;
+    line-height: 15px;
 }
 
 .flight_Search_boxed input {
-    font-size: 22px;
-    width: 87%;
+    font-size: 20px;
+    width: 100%;
     border: none;
     background: transparent;
     font-weight: 500;
@@ -745,7 +835,7 @@ ul li {
     border: none;
     background: transparent;
     padding: 0;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 500;
 }
 
@@ -754,13 +844,13 @@ ul li {
 }
 
 .dropdown_passenger_area .dropdown-menu.show {
-    transform: translate(-56%, 70px) !important;
+    /* transform: translate(-56%, 70px) !important; */
 }
 
 .dropdown_passenger_area .dropdown-menu {
     z-index: 1000;
-    min-width: 350px;
-    padding: 15px 20px;
+    min-width: 300px;
+    padding: 10px 10px;
     font-size: 1rem;
     color: #212529;
     text-align: left;
@@ -771,10 +861,25 @@ ul li {
     border-radius: 0.25rem;
 }
 
+
+
+.cabin-list{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+}
+
+
+
+
+
+
 .traveller-calulate-persons .passengers .passengers-types .passengers-type {
     display: flex;
     align-items: center;
-    padding: 8px 16px;
+    padding: 5px 10px;
     justify-content: space-between;
 }
 
@@ -805,7 +910,7 @@ ul li {
 }
 
 .traveller-calulate-persons .passengers .passengers-types {
-    padding-top: 15px;
+    padding-top: 10px;
 }
 
 .traveller-calulate-persons .passengers h6 {
@@ -815,18 +920,19 @@ ul li {
 }
 
 .traveller-calulate-persons .cabin-selection {
-    padding-top: 10px;
+    /* padding-top: 10px;
     border-top: 1px solid #c7c7cc;
-    margin-top: 20px;
+    margin-top: 20px; */
 }
 
 .traveller-calulate-persons .label-select-btn {
-    display: flex;
+    /* display: flex; */
     justify-content: space-between;
     align-items: center;
     width: 100%;
     margin-bottom: 10px;
-    padding: 10px 10px;
+    padding: 5px 10px;
+    border: 1px solid #eee;
 }
 
 .traveller-calulate-persons .label-select-btn:hover {
@@ -845,7 +951,7 @@ ul li {
 }
 
 .traveller-calulate-persons .cabin-selection h6 {
-    padding: 15px 0;
+    padding: 10px 0;
     font-size: 16px;
     font-weight: 500;
     color: var(--main-color);
@@ -853,7 +959,7 @@ ul li {
 
 .top_form_search_button {
     display: flex;
-    margin-top: 30px;
+    margin-top: 10px;
     justify-content: space-between;
 }
 
@@ -1397,6 +1503,11 @@ ul li {
     background: #dbf9ef;
     padding: 70px 0;
 }
+
+#cta_area .form-control{
+    margin-bottom: 0px !important;
+}
+
 
 .cta_left {
     display: flex;
@@ -2765,6 +2876,11 @@ ul li {
         width: 120px;
 }
 
+.navbar-area.is-sticky .nav-item a{
+    color: #fff !important;
+}
+
+
 /* ==========================
         News v4 Page
 ============================*/
@@ -3415,6 +3531,7 @@ ul li {
     border-radius: 6px;
     padding: 20px 15px;
     margin-bottom: 30px;
+    box-shadow: var(--shadow-1);
 }
 
 .left_side_search_heading h5 {
@@ -3501,7 +3618,8 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 
 .area_flex_one span {
     color: var(--black-color);
-    font-weight: 500;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .tour_details_right_boxed {
@@ -4085,7 +4203,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .form-control {
-    height: 55px;
+    /* height: 55px; */
     border: 1px solid #ddd;
     padding: 10px 22px;
     font-size: 16px;
@@ -5653,44 +5771,46 @@ textarea {
     margin-right: 0;
 }
 
+
+
+/* #one_way_trip .flight_multis_area_wrapper:first-child {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+#one_way_trip .flight_multis_area_wrapper {
+    justify-content: space-around;
+}
+#one_way_trip .flight_multis_area_wrapper {
+    padding-top: 20px;
+} */
+
 /* ==============================
      Flight Search Area
 ================================*/
-#return_trip .multi_city_flight_lists{
-    width: 80%;
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-#return_trip .flight_multis_area_wrapper:first-child {
-padding-bottom: 20px;
-    border-bottom: 1px solid #DDDDDD;
-}
-#return_trip .flight_multis_area_wrapper {
-padding-top: 20px;
-}
-#return_trip .flight_search_left {
-    padding: 0 20px 0 20px;
-}
-#return_trip .flight_search_middel{
-    padding-left: 20px;
-    padding-right: 20px;
-}
+
+
+
 .flight_search_right{
     /*width: 20%;*/
     vertical-align: middle;
     display: grid;
     align-content: center;
 }
+
+
 #return_trip .flight_search_items{
-    align-items: stretch;
-    }
+    padding: 10px 0px 10px 5px;
+}
+
+#return_trip .flight_multis_area_wrapper{
+    padding-top: 10px;
+}
+
+
     
-  #return_trip  .flight_multis_area_wrapper{
-     justify-content: space-around;   
-        
-    }
 .flight_search_items {
-    padding-left: 25px;
+    padding-left: 15px;
     background: #FFFFFF;
     border: 1px solid #DDDDDD;
     border-radius: 12px;
@@ -5703,6 +5823,11 @@ padding-top: 20px;
     -ms-grid-columns: 70% 30%;
     grid-template-columns: 74% 24%;
     gap: 2%;
+    --tw-shadow: 0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);
+    --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color),0 8px 10px -6px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow);
+
+
 }
 
 .flight_search_item_wrappper {
@@ -5734,7 +5859,7 @@ padding-top: 20px;
     display: grid;
     -ms-grid-columns: 1fr 120px 1fr 120px 1fr;
     grid-template-columns: repeat(4, 1fr);
-    grid-gap: 20px;
+    grid-gap: 15px;
 }
 
 .flight_search_destination {
@@ -5878,6 +6003,19 @@ padding-top: 20px;
     border: 1px solid #d7d6d6;
     border-radius: 10px;
     padding: 0px 20px;
+    margin-top: 25px;
+    --tw-shadow: 0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);
+    --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color),0 8px 10px -6px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow);
+}
+
+.flight_policy_refund .nav-tabs .nav-link{
+    color: #000; 
+}
+
+.flight_policy_refund .nav-tabs .nav-link.active{
+   color: #fff; 
+   background-color: #1fba71;
 }
 
 .airline-details {
@@ -7161,3 +7299,54 @@ padding-top: 20px;
         z-index: 99999;
     } */
 /* Jisha End */
+
+
+.modal-footer.log-for{
+
+    display: block;
+
+}
+
+
+.modal-footer.log-for .common_author_boxed{
+padding: 10px 0px;
+}
+
+.forgot-password-tab button{
+    background-color: transparent !important;
+    border: none !important;
+    color: #fff;
+}
+
+.log-for .nav-tabs {
+        border-bottom: 0px solid #dee2e6;
+        justify-content: center;
+    }
+
+
+.forgot-password-tab button:hover{
+    color: #dddddd;
+}
+
+.nav-tabs .nav-link.active{
+    color: #fff;
+}
+
+.modal-footer.log-for .common_author_form form{
+    display: flex;
+    align-items: center;
+}
+
+.modal-footer.log-for .common_author_form form .form-group{
+    width: 100%; 
+}
+
+.modal-footer.log-for .common_author_form form .form-group .form-control{
+    padding: 10px 15px;
+    
+    height: 48px
+}
+
+.modal-footer.log-for .common_author_form form .common_form_submit{
+    padding-top: 0px;
+}

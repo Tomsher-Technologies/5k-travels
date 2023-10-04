@@ -115,14 +115,14 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-lg-4  col-md-6 col-sm-12 col-12">
+                                                            <div class="col-lg-2  col-md-6 col-sm-12 col-12">
                                                                 <div class="form_search_date">
                                                                     <div class="flight_Search_boxed date_flex_area">
                                                                         <div class="Journey_date">
                                                                             <p>Journey date</p>
                                                                             <input type="date" value="" class="travel_date" id="oDate" name="oDate">
                                                                             <span class="place-label day_label oDate_label" id=""></span>
-                                                                        </div>
+                                                                        </div>                                                                      
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -423,6 +423,7 @@
                                                                                     <input type="date" value="" class="travel_date" id="mDate0" name="mDate[]">
                                                                                     <span class="place-label day_label mDate_label" id=""></span>
                                                                                 </div>
+                                                                                
                                                                             </div>
                                                                         </div>
                                                                     </div>

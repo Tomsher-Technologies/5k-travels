@@ -20,12 +20,12 @@
         position: inherit;
     }
     .flight_Search_boxed input {
-        font-size: 18px;
-        width: 70%;
+        font-size: 14px;
+        width: 100%;
     }
 
     .dropdown_passenger_area button {
-        font-size: 18px;
+        font-size: 16px;
     }
     .banner_four_text h1 {
         font-size: 60px;
@@ -183,7 +183,7 @@
     }
 
     .flight_Search_boxed {
-        margin-bottom: 30px;
+        margin-bottom: 10px;
     }
 
     .imagination_boxed {
@@ -237,6 +237,15 @@
 }
 
 @media (max-width: 767px) {
+
+    .banner_bootom_four{
+        padding-top: 10px;
+    }
+
+ 
+    .theme_search_form_area{
+        padding: 20px 10px; 
+    }
     .cruise_content_bottom_wrapper {
         display: inherit;
         padding-top: 13px;
@@ -345,6 +354,7 @@
 
     .theme_search_form_tabbtn .nav-tabs {
         justify-content: center;
+        margin-bottom: 10px;
     }
 
     .copyright_right {
@@ -372,7 +382,7 @@
     }
 
     #home_one_banner {
-        padding: 160px 0 155px 0;
+        padding: 20px 0 40px 0;
     }
 
     .section_heading_center h2 {
@@ -381,7 +391,7 @@
     }
 
     #theme_search_form {
-        margin-top: 50px;
+        margin-top: 20px;
     }
 
     .tour_details_heading_wrapper {
@@ -611,10 +621,10 @@
 
 @media (max-width: 480px) {
     .banner_four_text h1 {
-        font-size: 42px;
+        font-size: 30px;
         font-weight: 500;
-        padding-top: 9px;
-        line-height: 60px;
+        padding-top: 10px;
+        line-height: 41px;
     }
     .booking_success_arae {
         display: initial;
