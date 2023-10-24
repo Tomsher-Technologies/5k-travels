@@ -8,11 +8,11 @@
                     <div class="footer_first_area">
                         <div class="footer_inquery_area">
                             <h5>Call 24/7 for any help</h5>
-                            <h3> <a href="tel:+00-123-456-789">+971 123 4567</a></h3>
+                            <h3> <a href="tel:+971507966883">+971 50 796 6883</a></h3>
                         </div>
                         <div class="footer_inquery_area">
                             <h5>Mail to our support team</h5>
-                            <h3> <a href="mailto:support@domain.com">5k@info.com</a></h3>
+                            <h3> <a href="mailto:info@5ktravels.com">info@5ktravels.com</a></h3>
                         </div>
                         <div class="footer_inquery_area">
                             <h5>Follow us on</h5>
@@ -93,7 +93,7 @@
             <div class="row align-items-center">
                 <div class="co-lg-6 col-md-6 col-sm-12 col-12">
                     <div class="copyright_left">
-                        <p>Copyright © 2022 All Rights Reserved</p>
+                        <p>Copyright © <?php echo date("Y"); ?> All Rights Reserved</p>
                     </div>
                 </div>
                 <div class="co-lg-6 col-md-6 col-sm-12 col-12">
