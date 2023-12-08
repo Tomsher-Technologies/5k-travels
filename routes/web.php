@@ -18,11 +18,11 @@ use App\Http\Controllers\Auth\LoginController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('change-currency/{currency}',[HomeController::class, 'changeCurrency'])->name('change-currency');
+Route::get('change-currency/{currency}', [HomeController::class, 'changeCurrency'])->name('change-currency');
 
-Route::get('search-airports',[HomeController::class,'searchAirports'])->name('search-airports');
+Route::get('search-airports', [HomeController::class, 'searchAirports'])->name('search-airports');
 
-Route::get('autocomplete-airports',[HomeController::class,'autocompleteAirports'])->name('autocomplete-airports');
+Route::get('autocomplete-airports', [HomeController::class, 'autocompleteAirports'])->name('autocomplete-airports');
 
 Route::get('/flights/search', [FlightsController::class, 'search'])->name('flight.search');
 
@@ -36,7 +36,7 @@ Route::get('/flights/revalidate', [FlightsController::class, 'revalidate'])->nam
 Route::get('/flight-view-details', [FlightsController::class, 'fightViewDetails'])->name('flight-view-details');
 
 Route::post('web-post-login', [LoginController::class, 'postLogin'])->name('web.login.post');
-Route::post('post-registration', [LoginController::class, 'postRegistration'])->name('register.post'); 
+Route::post('post-registration', [LoginController::class, 'postRegistration'])->name('register.post');
 Route::post('web.forgot.password', [LoginController::class, 'submitForgetPassword'])->name('web.forgot.password');
 
 Route::get('reset-password/{token}', [LoginController::class, 'showResetPasswordForm'])->name('reset.password.get');
@@ -46,7 +46,7 @@ Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logou
 
 
 
-Route::group(['middleware' => ['auth','web']], function () {
+Route::group(['middleware' => ['auth', 'web']], function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
     Route::get('/booking-details/{type}/{id}', [HomeController::class, 'bookingDetails'])->name('booking-details');
 
@@ -63,7 +63,7 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::post('/subagent-store', [HomeController::class, 'storeSubAgent'])->name('subagent.store');
     Route::get('/subagent-edit/{agent}', [HomeController::class, 'editSubAgent'])->name('subagent.edit');
     Route::post('/subagent-update', [HomeController::class, 'updateSubAgent'])->name('subagent.update');
-    Route::post('/subagent-delete/', [HomeController::class, 'deleteSubAgent'])->name('subagent.delete');
+    Route::post('/subagent-delete', [HomeController::class, 'deleteSubAgent'])->name('subagent.delete');
     Route::get('/subagent-view/{agent}', [HomeController::class, 'viewSubAgent'])->name('subagent.view');
     Route::post('/agent-profile-update', [HomeController::class, 'updateAgentProfile'])->name('agent.profile.update');
     Route::get('/agent-profile', [HomeController::class, 'viewAgentProfile'])->name('agent.profile');
@@ -79,4 +79,3 @@ Route::group(['middleware' => ['auth','web']], function () {
     Route::post('/send-reschedule-request', [FlightsController::class, 'sendRescheduleRequest'])->name('send-reschedule-request');
     Route::get('/flights/reissue_prtStatus', [FlightsController::class, 'reissuePtrStatusCheck'])->name('flight.reissue_prtStatus');
 });
-

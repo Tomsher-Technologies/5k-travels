@@ -344,8 +344,5 @@
 <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
 <script src="{{ asset('assets/js/search_flights.js') }}"></script>
 
-<script  type="text/javascript">
-   
-</script>
 
 @endpush

@@ -53,7 +53,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('/flightbooking-counts', [HomeController::class, 'flightbookingCounts'])->name('flightbooking-counts');
 
         /* ------------------- Agents -----------------*/
-        Route::get('/agent/', [AgentsController::class, 'index'])->name('agent.index');
+        Route::get('/agent', [AgentsController::class, 'index'])->name('agent.index');
         Route::get('/agent/create', [AgentsController::class, 'create'])->name('agent.create');
         Route::post('/agent/store', [AgentsController::class, 'store'])->name('agent.store');
         Route::get('/agent/edit/{agent}', [AgentsController::class, 'edit'])->name('agent.edit');
@@ -65,7 +65,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('/agent/graph', [AgentsController::class, 'agentGraph'])->name('agent.graph');
         
         /* ------------------- Users -----------------*/
-        Route::get('/user/', [UserController::class, 'index'])->name('user.index');
+        Route::get('/user', [UserController::class, 'index'])->name('user.index');
         Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
         Route::post('/user/store', [UserController::class, 'store'])->name('user.store');
         Route::get('/user/edit/{user}', [UserController::class, 'edit'])->name('user.edit');

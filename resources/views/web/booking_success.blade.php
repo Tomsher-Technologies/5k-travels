@@ -349,7 +349,5 @@
 </style>
 @endpush
 @push('footer')
-<script type="text/javascript">
 
-</script>
 @endpush

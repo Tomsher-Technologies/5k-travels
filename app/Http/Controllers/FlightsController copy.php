@@ -60,10 +60,10 @@ class FlightsController extends Controller
         $data['flightData'] = Airlines::get()->keyBy('AirLineCode')->toArray();
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
 
-        $flight_logic_controller = new FlightLogicController();
-        $flight_logic_result = $flight_logic_controller->search($request, $data);
+        $con = new FlightLogicController();
+        $res = $con->search($request,$data);
 
-        extract($flight_logic_result);
+        extract($res);
 
         $data['search_type'] = $request->search_type;
         $data['non_stop'] = $non_stop;

@@ -1,0 +1,1 @@
+php artisan serve --host 5k.local
