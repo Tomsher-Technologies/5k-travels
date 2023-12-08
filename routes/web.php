@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\FlightsApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,9 @@ Route::post('reset-password', [LoginController::class, 'submitResetPasswordForm'
 // Logout Routes...
 Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logout');
 
+
+Route::get('/search-flights', [FlightsApiController::class, 'searchFlights'])->name('search-flights');
+Route::get('/authorize', [FlightsApiController::class, 'getToken'])->name('authorize');
 
 
 Route::group(['middleware' => ['auth', 'web']], function () {

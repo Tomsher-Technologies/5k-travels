@@ -7,6 +7,7 @@ use App\Models\FlightBookings;
 use App\Models\Airlines;
 use App\Models\Airports;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Write code on Method
@@ -225,5 +226,38 @@ if (! function_exists('getBookingDataByUniqueId')) {
     }
 }
 
+function generateApiToken(){
+    $data = [
+        "client_id"=> env('FLY_DUBAI_CLIENT_ID_TEST'),
+        "client_secret"=> env('FLY_DUBAI_CLIENT_SECRET_TEST'),
+        "grant_type"=> 'password',
+        "password"=> env('FLY_DUBAI_PASSWORD_TEST'),
+        "scope"=> 'res',
+        "username" =>  env('FLY_DUBAI_USERNAME_TEST'),
+    ];
+   
+    $response = Http::timeout(300)->withOptions(['verify'=>false])->asForm()->post(env('FLY_DUBAI_API_URL_TEST').'authenticate', $data);
+    $result = $response->getBody()->getContents();
+    $res = json_decode($result);
 
+    $nowTime = strtotime(date("Y-m-d H:i:s"));
+    $expiryTime = date("Y-m-d H:i:s", strtotime('+2399 seconds', $nowTime));
+    session(['api_token' => $res->access_token]);
+    session(['api_token_expiry' => $expiryTime]);
+    session()->save();
+    
+    return $res->access_token;
+}
+
+ function getToken(){
+    if (session()->has('api_token') && session()->has('api_token_expiry')) {
+        if(session('api_token_expiry') > date("Y-m-d H:i:s")){
+            return session('api_token');
+        }else{
+            return generateApiToken();
+        }
+    }else{
+        return generateApiToken();
+    }
+}
 
