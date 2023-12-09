@@ -107,13 +107,10 @@ class FlightsApiController extends Controller
             'Accept-Encoding' => 'gzip, deflate',
             'Authorization' => 'bearer '.$apiToken
         ])->post(env('FLY_DUBAI_API_URL_TEST').'pricing/flightswithfares', $data);
-        echo $result = $response->getBody()->getContents();
+        $result = $response->getBody()->getContents();
 
         $resultData = json_decode($result);
-        echo '<pre>';
-        print_r($resultData);
-        die;
-
+        // dd($result);
     }
 
    

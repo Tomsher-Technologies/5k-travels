@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Providers\FlightLogicController;
+use App\Http\Controllers\Providers\FlyDubaiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Airports;
@@ -60,31 +61,34 @@ class FlightsController extends Controller
         $data['flightData'] = Airlines::get()->keyBy('AirLineCode')->toArray();
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
 
-        $flight_logic_controller = new FlightLogicController();
-        $flight_logic_result = $flight_logic_controller->search($request, $data);
+        // $flight_logic_controller = new FlightLogicController();
+        // $flight_logic_result = $flight_logic_controller->search($request, $data);
 
-        extract($flight_logic_result);
 
-        $data['search_type'] = $request->search_type;
-        $data['non_stop'] = $non_stop;
-        $data['one_stop'] = $one_stop;
-        $data['two_stop'] = $two_stop;
-        $data['three_stop'] = $three_stop;
-        $data['refund'] = $refund;
-        $data['no_refund'] = $no_refund;
-        $data['session_id'] = $no_refund;
+        $fly_dubai_con = new FlyDubaiController();
+        $fly_dubai_res = $fly_dubai_con->search($request);
+        // extract($flight_logic_result);
 
-        $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData();
-        if ($request->search_type == 'Return' && isset($result['AirSearchResponse']['AirSearchResultInbound'])) {
-            $data['totalCount'] = count($flights) + count($flightsIn);
-            $data['flightDetails'] = $flights;
-            $data['flightDetailsInbound'] = $flightsIn;
-            return  view('web.search_results_domestic', compact('data'));
-        } else {
-            $data['totalCount'] = count($flights);
-            $data['flightDetails'] = $flights;
-            return  view('web.search_results', compact('data'));
-        }
+        // $data['search_type'] = $request->search_type;
+        // $data['non_stop'] = $non_stop;
+        // $data['one_stop'] = $one_stop;
+        // $data['two_stop'] = $two_stop;
+        // $data['three_stop'] = $three_stop;
+        // $data['refund'] = $refund;
+        // $data['no_refund'] = $no_refund;
+        // $data['session_id'] = $no_refund;
+
+        // $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData();
+        // if ($request->search_type == 'Return' && isset($result['AirSearchResponse']['AirSearchResultInbound'])) {
+        //     $data['totalCount'] = count($flights) + count($flightsIn);
+        //     $data['flightDetails'] = $flights;
+        //     $data['flightDetailsInbound'] = $flightsIn;
+        //     return  view('web.search_results_domestic', compact('data'));
+        // } else {
+        //     $data['totalCount'] = count($flights);
+        //     $data['flightDetails'] = $flights;
+        //     return  view('web.search_results', compact('data'));
+        // }
     }
 
     public function booking(Request $request)

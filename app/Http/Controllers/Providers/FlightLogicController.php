@@ -33,7 +33,6 @@ class FlightLogicController extends Controller
         $cabinClass = '';
 
         if ($request->search_type == 'OneWay') {
-            Session::put('flight_search_oneway', $request->all());
             $originDestinationInfo[] = [
                 "departureDate" => $request->oDate,
                 "airportOriginCode" => $request->oFrom,
@@ -53,7 +52,6 @@ class FlightLogicController extends Controller
                 $isFilter = 1;
             }
         } elseif ($request->search_type == 'Return') {
-            Session::put('flight_search_return', $request->all());
             $originDestinationInfo[] = [
                 "departureDate" => $request->rDate,
                 "returnDate" => $request->rReturnDate,
@@ -73,8 +71,6 @@ class FlightLogicController extends Controller
                 $isFilter = 1;
             }
         } elseif ($request->search_type == 'Circle') {
-            Session::put('flight_search_multi', $request->all());
-
             $multiCount = count($request->mFrom);
             for ($i = 0; $i < $multiCount; $i++) {
                 $originDestinationInfo[] = [
