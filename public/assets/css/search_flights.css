@@ -302,3 +302,7 @@ animation-timing-function: linear;
 .padding-1rem{
     padding: 1rem !important;
 }
+
+.flydubai .airlineInfo {
+    width: 100%;
+}
