@@ -265,7 +265,14 @@
                                 </div>
 
 
+
+
+
+                                
+
+
                                 <div class="flight_policy_refund collapse" id="detialsDomDepView_{{$loop->iteration}}">
+
 
                                 </div>
                             </div>

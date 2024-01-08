@@ -207,13 +207,13 @@
 }
 .flightLayover {
     border-radius: 4px;
-    background-color: rgb(169 207 130 / 20%);
+    background-color: #f7f7fe;
     padding: 5px 10px;
     display: inline-block;
     position: relative;
     color: #ff4d2a;
     font-size: calc(var(--font-scale, 1)*12px);
-    box-shadow: #ccc 0 5px 16px;
+    /* box-shadow: #ccc 0 5px 16px; */
 }
 .mmtConnectLayover {
     color: #4a4a4a!important;
