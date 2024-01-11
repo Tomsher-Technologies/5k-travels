@@ -5810,12 +5810,12 @@ textarea {
 
     
 .flight_search_items {
+    margin-bottom: -5px;
+    margin-top: 15px;
     padding-left: 15px;
     background: #FFFFFF;
     border: 1px solid #DDDDDD;
     border-radius: 12px;
-    /*display: flex;*/
-    /*justify-content: space-between;*/
     align-items: center;
     overflow: hidden;
         display: -ms-grid;
@@ -7386,7 +7386,7 @@ only screen and (min-width: 576px) and (max-width: 767px),
 }
 
 .pricing__style-2 .pricing__header {
-    background-color: #F5F5F8;
+    /* background-color: #F5F5F8; */
     border-radius: 0;
 }
 
@@ -7400,20 +7400,22 @@ only screen and (min-width: 576px) and (max-width: 767px),
 
 .pricing__style-2 .pricing__header-content {
     border-radius: 0;
+    background-color: #F5F5F8;
 }
 
 .pricing__header-content {
+    height: 55px;
     position: relative;
-    padding: 20px 30px;
+    padding: 12px 20px;
     border-top: 1px solid rgba(4, 18, 31, 0.08);
     border-right: 1px solid rgba(4, 18, 31, 0.08);
-    height: 100%;
+    /* height: 100%; */
     border-top-left-radius: 41px;
 }
 
 .pricing__header-title {
     font-weight: 600;
-    font-size: 25px;
+    font-size: 20px;
     letter-spacing: -0.01em;
     color: #04121f;
 
@@ -7470,10 +7472,11 @@ only screen and (min-width: 576px) and (max-width: 767px),
 }
 
 .pricing__feature-item-wrapper {
-    border: 1px solid rgba(4, 18, 31, 0.08);
+    height: 100%;
+    /* border: 1px solid rgba(4, 18, 31, 0.08); */
     border-top: 0;
-    border-bottom-left-radius: 41px;
-    border-bottom-right-radius: 41px;
+    /* border-bottom-left-radius: 41px; */
+    /* border-bottom-right-radius: 41px; */
 }
 
 .pricing__popular-2 {
@@ -7512,14 +7515,15 @@ only screen and (min-width: 576px) and (max-width: 767px),
 }
 
 .pricing__top-7 {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    width: 33.33%;
+    /* padding-top: 10px; */
+    /* padding-bottom: 10px; */
+    height: 55px;
+    /* width: 33.33%; */
     border-right: 1px solid rgba(4, 18, 31, 0.08);
 }
 
 .pricing__tag-7 {
-    margin-bottom: 5px;
+    margin-bottom: 0px;
 }
 
 .pricing__style-2 .pricing__tag-7 span {
@@ -7533,8 +7537,8 @@ only screen and (min-width: 576px) and (max-width: 767px),
 }
 
 .pricing__title-7 {
-    font-weight: 600;
-    font-size: 25px;
+    font-weight: bold;
+    font-size: 20px;
     color: #04121f;
     margin-bottom: 5px;
 }
@@ -7552,7 +7556,9 @@ only screen and (min-width: 576px) and (max-width: 767px),
 
 .pricing__feature-info-content {
     padding: 15px 25px;
-    border-right: 1px solid rgba(4, 18, 31, 0.08);
+    height: 50px;
+    /* border-right: 1px solid rgba(4, 18, 31, 0.08); */
+    border-bottom: 1px solid rgba(4, 18, 31, 0.08);
 }
 
 .pricing__feature-info-details {
@@ -7625,11 +7631,12 @@ only screen and (min-width: 576px) and (max-width: 767px),
 }
 
 .pricing__feature-info-available {
-    width: 33.33%;
+    height: 50px;
+    /* width: 33.33%; */
     line-height: 1;
-    height: 100%;
-    padding: 15px 25px;
-    border-right: 1px solid rgba(4, 18, 31, 0.08);
+    /* height: 100%; */
+    padding: 10px 25px;
+    border: 1px solid rgba(4, 18, 31, 0.08);
 }
 
 .pricing__style-2 .tp-btnr-border-2 {
