@@ -601,8 +601,8 @@
 
 
 <div class="pricing__feature-info-wrapper">
-<div class="pricing__feature-info-available text-center">
-    <p>
+<div class="pricing__feature-info-available pricing__feature-info-available2  text-center">
+   <p>
         <span class="done">
             <svg width="11" height="9" viewBox="0 0 11 9" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
@@ -611,8 +611,15 @@
                     stroke-linejoin="round" />
             </svg>
         </span>
-    </p>
+        </p>
+        <div class="pricing__feature-info-tooltip2 transition-3">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, pariatur tempore veritatis vel in deleniti repellendus. Eos id nulla cum hic! Quasi sapiente quibusdam unde, culpa repudiandae recusandae molestias ut!</p>
+        </div>
+    
 </div>
+
+
+
 
 </div>
 
@@ -621,17 +628,24 @@
 
 
 <div class="pricing__feature-info-wrapper">
-<div class="pricing__feature-info-available text-center">
+<div class="pricing__feature-info-available pricing__feature-info-available2 text-center">
+   
     <p>
         <span class="cross">
-            <svg width="10" height="11" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="10" height="11" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M11 1L1 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 </path>
                 <path d="M1 1L11 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 </path>
             </svg>
         </span>
-    </p>
+        </p>
+        <div class="pricing__feature-info-tooltip2 transition-3">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, pariatur tempore veritatis vel in deleniti repellendus. Eos id nulla cum hic! Quasi sapiente quibusdam unde, culpa repudiandae recusandae molestias ut!</p>
+        </div>
+
+
+
 </div>
 </div>
 
@@ -746,22 +760,22 @@
 
 
 
-                
-                <div class="pricing__feature-info-wrapper">
-                    <div class="pricing__feature-info-available text-center">
-                        <p>
-                            <span class="done">
-                                <svg width="11" height="9" viewBox="0 0 11 9" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.5451 1.27344L3.9201 7.04884L1.36328 4.42366"
-                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                        </p>
-                    </div>
-                </div>
-
+                <div class="pricing__feature-info-available pricing__feature-info-available2  text-center">
+   <p>
+        <span class="done">
+            <svg width="11" height="9" viewBox="0 0 11 9" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.5451 1.27344L3.9201 7.04884L1.36328 4.42366"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </span>
+        </p>
+        <div class="pricing__feature-info-tooltip2 transition-3">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem, pariatur tempore veritatis vel in deleniti repellendus. Eos id nulla cum hic! Quasi sapiente quibusdam unde, culpa repudiandae recusandae molestias ut!</p>
+        </div>
+    
+</div>
                 
                 <div class="pricing__feature-info-wrapper">
                     <div class="pricing__feature-info-available text-center">
@@ -778,6 +792,7 @@
                     </div>
                 </div>
 
+               
                 <div class="pricing__feature-info-wrapper">
                     <div class="pricing__feature-info-available text-center">
                         <p>
@@ -792,6 +807,7 @@
                         </p>
                     </div>
                 </div>
+
             </div>
 
 

@@ -7579,6 +7579,13 @@ only screen and (min-width: 576px) and (max-width: 767px),
 }
 
 
+
+
+
+
+
+
+
 .pricing__feature-info-content:hover .pricing__feature-info-tooltip {
     visibility: visible;
     opacity: 1;
@@ -7619,6 +7626,67 @@ only screen and (min-width: 576px) and (max-width: 767px),
     -o-transform: rotate(45deg) translateY(50%);
     transform: rotate(45deg) translateY(50%);
 }
+
+
+
+
+
+
+
+
+
+
+.pricing__feature-info-available2:hover .pricing__feature-info-tooltip2 {
+    visibility: visible;
+    opacity: 1;
+    top: 13px;
+
+}
+
+.pricing__feature-info-tooltip2 {
+    position: relative;
+    top: -50px;
+    left: -29px;
+    min-width: 286px;
+    background-color: #ffffff;
+    padding: 13px 20px 15px;
+    border-radius: 14px;
+    box-shadow: 0px 10px 30px rgba(4, 11, 17, 0.14);
+    visibility: hidden;
+    opacity: 0;
+}
+
+.pricing__feature-info-tooltip2 p {
+    font-size: 14px;
+    line-height: 1.43;
+    color: #525258;
+    margin-bottom: 0;
+}
+
+.pricing__feature-info-tooltip2::after {
+    position: absolute;
+    content: "";
+    left: 46%;
+    top: -15px;
+    width: 18px;
+    height: 18px;
+    background-color: #ffF;
+    -webkit-transform: rotate(45deg) translateY(50%);
+    -moz-transform: rotate(45deg) translateY(50%);
+    -ms-transform: rotate(45deg) translateY(50%);
+    -o-transform: rotate(45deg) translateY(50%);
+    transform: rotate(45deg) translateY(50%);
+}
+
+
+
+
+
+
+
+
+
+
 
 .pricing__feature-info-text p {
     font-size: 15px;
