@@ -4562,7 +4562,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 
 .faqs_main_item {
-    margin-top: 30px;
+    /* margin-top: 30px; */
 }
 
 .faqs_main_item .accordion-item {
@@ -4590,10 +4590,13 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 
 .faqs_main_item .accordion-header {
     border: 1px solid #e5e5e5;
+    padding: 1rem;
 }
 
+
+
 .faqs_main_item button:focus {
-    box-shadow: -4px -5px 14px rgba(0, 0, 0, 0.08), 5px 8px 16px rgba(0, 0, 0, 0.08);
+    /* box-shadow: -4px -5px 14px rgba(0, 0, 0, 0.08), 5px 8px 16px rgba(0, 0, 0, 0.08); */
     border: none;
 }
 
@@ -4626,6 +4629,1221 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
     font-size: 30px;
     font-weight: 500;
 }
+
+
+
+
+.meal-selector input[type=radio] {
+    display: none;
+  }
+  .meal-selector input[type=radio]:not(:disabled) ~ label {
+    cursor: pointer;
+  }
+  .meal-selector input[type=radio]:disabled ~ label {
+    color: #bcc2bf;
+    border-color: #bcc2bf;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  
+  .meal-selector label {
+    height: 100%;
+    display: block;
+    background: white;
+    border: 2px solid #20df80;
+    border-radius: 20px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    /* box-shadow: 0px 3px 10px -2px rgba(161, 170, 166, 0.5); */
+    position: relative;
+  }
+
+
+  .meal-selector h2{
+    font-size: 20px;
+    /* margin-top: 40px; */
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .meal-box-w{
+    margin-top: 20px;
+
+  }
+  
+  .meal-selector input[type=radio]:checked + label {
+    background: #1fba71;
+    color: white;
+    /* box-shadow: 0px 0px 20px #1fba71; */
+  }
+  .meal-selector input[type=radio]:checked + label::after {
+    color: #3d3f43;
+    font-family: FontAwesome;
+    border: 2px solid #1dc973;
+    content: "";
+    font-size: 24px;
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    text-align: center;
+    border-radius: 50%;
+    background: white;
+    /* box-shadow: 0px 2px 5px -2px rgba(0, 0, 0, 0.25); */
+  }
+  
+
+
+
+  @media only screen and (min-width: 601px) {
+    .timepicker-modal {
+      max-width: 600px;
+    }
+
+    .timepicker-container.modal-content {
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+      flex-direction: row;
+    }
+
+    .timepicker-text-container {
+      top: 32%;
+    }
+
+    .timepicker-display-am-pm {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      text-align: center;
+      margin-top: 1.2rem;
+    }
+  }
+
+
+
+ .seat-number{
+    color: #000;
+    font-size: 10px;
+    line-height: 10px;
+ }
+
+
+  /* .gt-seat-eco:before {
+    content: "";
+    color: #3cb2e4;
+  } */
+
+  .gt-seat-business svg path{
+    /* content: ""; */
+    color: #e8453f !important;
+    fill: #e8453f !important;
+  }
+
+
+  .gt-seat-standard svg path{
+    /* content: ""; */
+    color: #3cb2e4 !important;
+    fill: #3cb2e4 !important;
+  }
+
+  .seatnot-available svg path{
+    fill: #ddd !important;
+    
+  }
+
+
+
+
+
+  .gt-seat-business.seat-selected>svg path{
+
+    fill: #1fba71 !important;
+  }
+
+
+  .gt-seat-standard.seat-selected>svg path{
+
+    fill: #1fba71 !important;
+  }
+
+
+
+
+  
+
+  .left {
+    display: flex;
+    float: left !important;
+    gap: 10px;
+}
+
+
+.right {
+    display: flex;
+    float: left !important;
+    gap: 10px;
+}
+
+
+
+  .seat-available:before {
+    color: #e8453f !important;
+  }
+
+  .seatnot-available:before {
+    color: #c5cccf !important;
+  }
+
+  .seat-selected svg path {
+    fill: #3cb2e4  !important;
+  }
+
+
+  .gt-seat-eco.seat-extra-legroom svg path{
+    fill: #e8453f !important;
+  }
+
+
+
+
+  .gt-seat-eco.standard-seat  svg path{
+    fill: #3cb2e4 !important;
+  }
+
+
+.seat-available svg path{
+    fill: #434343 !important;
+    
+}
+
+
+
+
+
+
+
+
+
+  .seat-sbl:before {
+    color: #e8453f !important;
+  }
+
+  .seat-bl:before {
+    color: #ffa200 !important;
+  }
+
+  .seat-ec:before {
+    color: #3cb2e4 !important;
+  }
+
+  .bookyour-seat {
+    background-color: #eee;
+    display: inline-block;
+    width: 100%;
+    padding: 30px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+  }
+
+  @media (max-width: 768px) {
+    .bookyour-seat {
+      padding: 10px;
+    }
+  }
+
+  .bookyour-seat header {
+    margin-bottom: 30px;
+    text-align: left;
+    display: block;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat header {
+      /* margin-bottom: 50px; */
+    }
+  }
+
+  @media (min-width: 992px) {
+    .bookyour-seat header {
+      /* margin-bottom: 20px; */
+      text-align: left;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat header {
+      /* margin-bottom: 120px; */
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .bookyour-seat header {
+      margin-bottom: 2e0px;
+    }
+  }
+
+  .bookyour-seat header h4 {
+    font-size: 20px;
+
+    font-weight: bold;
+    text-transform: capitalize;
+    color: #000;
+    line-height: 20px;
+    margin-bottom: 20px;
+    margin-top: 0px;
+  }
+
+
+  .bookyour-seat header h3 {
+    font-size: 20px;
+
+    font-weight: 500;
+    text-transform: capitalize;
+    color: #222;
+    line-height: 20px;
+    margin-bottom: 20px;
+    margin-top: 0px;
+  }
+
+  .bookyour-seat header span {
+    font-size: 12px;
+
+    font-weight: 400;
+    text-transform: capitalize;
+    color: #767676;
+    line-height: 20px;
+    display: block;
+  }
+
+  .bookyour-seat .seat-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .seat-info {
+      justify-content: space-around;
+      flex-direction: row;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .seat-info {
+      justify-content: space-between;
+    }
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .seat-info ul {
+      width: 48%;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .seat-info ul {
+      width: 45%;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .seat-info ul {
+      width: auto;
+    }
+  }
+
+  .bookyour-seat .seat-info .chk-available li {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    color: #868686;
+    font-size: 13px;
+    text-transform: capitalize;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .seat-info .chk-available li {
+      margin-bottom: 15px;
+      flex-direction: row-reverse;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .seat-info .chk-available li {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .seat-info .chk-available li {
+      flex-direction: row;
+      margin-bottom: 30px;
+      font-size: 15px;
+    }
+  }
+
+  .bookyour-seat .seat-info .chk-available li i {
+    font-size: 32px;
+    margin-left: 0px;
+    margin-right: 15px;
+    width: 35px;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .seat-info .chk-available li i {
+      margin-left: 20px;
+      margin-right: 0px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .seat-info .chk-available li i {
+      font-size: 38px;
+      margin-left: 20px;
+      margin-right: 0px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .seat-info .chk-available li i {
+      font-size: 42px;
+      margin-right: 20px;
+      margin-left: 0px;
+    }
+  }
+
+  .bookyour-seat .seat-info .seat-type li {
+    display: flex;
+    align-items: center;
+    color: #868686;
+    font-size: 13px;
+    text-transform: capitalize;
+    margin-bottom: 10px;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .seat-info .seat-type li {
+      margin-bottom: 15px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .seat-info .seat-type li {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .seat-info .seat-type li {
+      margin-bottom: 30px;
+      font-size: 15px;
+    }
+  }
+
+  .bookyour-seat .seat-info .seat-type li:last-child {
+    margin-bottom: 0px;
+  }
+
+  .bookyour-seat .seat-info .seat-type li i {
+    font-size: 32px;
+    margin-right: 20px;
+    width: 35px;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .seat-info .seat-type li i {
+      font-size: 38px;
+      margin-right: 20px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .seat-info .seat-type li i {
+      font-size: 42px;
+      margin-right: 20px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat {
+    display: inline-block;
+    margin-top: -200px;
+    width: 100%;
+    min-height: 100%;
+    height: 850px;
+    overflow-y:  scroll;
+    padding-top: 10px;
+    margin-top: 20px;
+    padding-bottom: 50px;
+    margin-bottom: 50px;
+    overflow-x:  hidden;
+    text-align: center;
+    position: relative;
+    z-index: 9;
+  }
+
+  /* @media (min-width: 360px) {
+    .bookyour-seat .chooseyourseat {
+      min-height: 750px;
+    }
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .chooseyourseat {
+      min-height: 1050px;
+      text-align: initial;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat {
+      min-height: 1000px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat {
+      margin-top: -300px;
+      min-height: 1050px;
+    }
+  } */
+
+  /* @media (min-width: 1440px) {
+    .bookyour-seat .chooseyourseat {
+      margin-top: -500px;
+    }
+  } */
+
+  .bookyour-seat .chooseyourseat .flight-body {
+    /* display: inline-block; */
+    /* position: absolute; */
+    z-index: -1;
+    top: -30px;
+    left: 0;
+    bottom: 0px;
+    right: 0px;
+    margin: auto;
+    width: 100%;
+    text-align: center;
+
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .chooseyourseat .flight-body {
+      top: 0;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .flight-body {
+      /* display: inline-block; */
+      /* position: absolute; */
+      left: -90px;
+      margin: auto;
+      width: 1000px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .bookyour-seat .chooseyourseat .flight-body {
+      /* display: inline-block; */
+      /* max-width: 1070px; */
+      /* position: absolute; */
+      left: 0px;
+      right: 0px;
+      bottom: 0;
+      margin: auto;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .flight-body img {
+    /* position: absolute; */
+    z-index: -1;
+    width: auto;
+    /* max-height: 1050px; */
+    max-width: 95%;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .chooseyourseat .flight-body img {
+      width: auto;
+      max-height: 1050px;
+      max-width: 100%;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .flight-body img {
+      width: 340px;
+      /* position: static; */
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .flight-body img {
+      width: 291px;
+      max-width: 100%;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .flight-body img:nth-of-type(1) {
+    display: none;
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .flight-body img:nth-of-type(1) {
+      display: inline-block;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .flight-body img:nth-of-type(2) {
+    display: inline-block;
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .flight-body img:nth-of-type(2) {
+      display: none;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area {
+    /* display: inline-block; */
+    width: 160px;
+    position: static;
+    margin: auto;
+    margin-top: 130px;
+    padding: 10px;
+  }
+
+  /* @media (min-width: 360px) {
+    .bookyour-seat .chooseyourseat .seating-area {
+      margin-top: 205px;
+
+    }
+  } */
+
+  /* @media (min-width: 480px) { */
+    .bookyour-seat .chooseyourseat .seating-area {
+        width: 280px;
+        margin: auto;
+        top: 135px;
+        /* position: absolute; */
+        z-index: 0;
+        /* height: 100%; */
+        left: 0;
+        right: 0px;
+        top: 0px;
+        bottom: 0;
+        background: #fff;
+        box-shadow: var(--shadow-2);
+
+    }
+        /* border-top-left-radius: 75px; */
+        /* border-top-right-radius: 75px;
+
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area {
+      top: 80px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area {
+      top: 0px;
+      /* right: 25px; */
+    /* }
+  } */
+
+  .bookyour-seat .chooseyourseat .seating-area ul {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area ul li {
+    margin-bottom: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  @media (min-width: 360px) {
+    .bookyour-seat .chooseyourseat .seating-area ul li {
+      margin-bottom: 10px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area ul li {
+      margin-bottom: 12px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area ul li:last-child {
+    margin-bottom: 0px;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area ul li span {
+    cursor: pointer;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area ul li span.selected:before {
+    color: #f00;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area ul .row-pointer {
+    position: relative;
+    display: inline-block;
+    margin: auto;
+    top: 0;
+    bottom: 10px;
+    font-size: 12px;
+    text-transform: capitalize;
+    margin-bottom: 10px;
+  }
+
+  @media (min-width: 360px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer {
+      margin-bottom: 15px;
+    }
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer {
+      font-size: 14px;
+    }
+  }
+/* 
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer {
+      width: 160px !important;
+      position: absolute;
+      font-size: 15px;
+      height: 24px;
+      margin-bottom: 15px;
+    }
+  } */
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer {
+      width: 200px !important;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area ul .row-pointer:before {
+    height: 12px;
+    width: 12px;
+    border-radius: 30px;
+    position: absolute;
+    background-color: #000;
+    top: 4px;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer:before {
+      content: "";
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area ul .row-pointer:after {
+    height: 1px;
+    width: 40px;
+    position: absolute;
+    background-color: #000;
+    top: 9px;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer:after {
+      content: "";
+      left: -70px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer:after {
+      width: 50px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area ul .row-pointer:after {
+      width: 80px;
+      left: -100px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-sbc li span {
+    font-size: 24px;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-sbc li span {
+      font-size: 40px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-sbc li:first-child {
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-sbc .row-pointer {
+      left: 290px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-sbc .row-pointer {
+      left: 330px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-sbc .row-pointer:before {
+    background-color: #e8453f;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-sbc .row-pointer:before {
+      left: -70px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-sbc .row-pointer:before {
+      left: -109px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-sbc .row-pointer:after {
+    background-color: #e8453f;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-bc {
+    margin-bottom: 15px;
+  }
+
+  @media (min-width: 360px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-bc {
+      margin-bottom: 20px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-bc {
+      margin-bottom: 50px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-bc li span {
+    font-size: 24px;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-bc li span {
+      font-size: 40px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-bc li span:before {
+    color: #ffa200;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-bc .row-pointer {
+      left: 295px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-bc .row-pointer {
+      left: 330px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-bc .row-pointer:before {
+    background-color: #ffa200;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-bc .row-pointer:before {
+      left: -70px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-bc .row-pointer:before {
+      left: -105px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-bc .row-pointer:after {
+    background-color: #ffa200;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec {
+    padding: 0px 10px;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec li {
+    margin-bottom: 5px;
+  }
+
+  @media (min-width: 360px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-ec li {
+      margin-bottom: 10px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec li span {
+    font-size: 24px;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-ec li span {
+      font-size: 44px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec li:nth-last-of-type(3) {
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec li:nth-last-of-type(2) {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec li:nth-last-of-type(1) {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec .row-pointer {
+    bottom: auto;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-ec .row-pointer {
+      left: 290px;
+      top: 20px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-ec .row-pointer {
+      left: 330px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec .row-pointer:before {
+    background-color: #3cb2e4;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-ec .row-pointer:before {
+      left: -70px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .chooseyourseat .seating-area .area-ec .row-pointer:before {
+      left: -105px;
+    }
+  }
+
+  .bookyour-seat .chooseyourseat .seating-area .area-ec .row-pointer:after {
+    background-color: #3cb2e4;
+  }
+
+  .bookyour-seat .exp-and-photos {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 9;
+    margin-top: 40px;
+  }
+
+  @media (min-width: 576px) {
+    .bookyour-seat .exp-and-photos {
+      margin-top: 0px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .exp-and-photos {
+      flex-direction: row;
+      margin-top: -320px;
+      margin-bottom: 160px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .bookyour-seat .exp-and-photos {
+      margin-top: -300px;
+      margin-bottom: 200px;
+    }
+  }
+
+  .bookyour-seat .exp-and-photos .exp-title {
+    font-size: 18px;
+    line-height: 24px;
+    color: #9c9c9c;
+    font-weight: 500;
+    max-width: 255px;
+    text-align: center;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .exp-and-photos .exp-title {
+      font-size: 22px;
+      line-height: 26px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .exp-and-photos .exp-title {
+      font-size: 24px;
+      line-height: 30px;
+    }
+  }
+
+  .bookyour-seat .exp-and-photos .exp-title span {
+    color: #111d59;
+    display: inline-block;
+    font-weight: 400;
+  }
+
+  .bookyour-seat .exp-and-photos .flights-photos {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .bookyour-seat .exp-and-photos .flights-photos li {
+    text-align: center;
+    margin: 10px;
+  }
+
+  .bookyour-seat .exp-and-photos .flights-photos li img {
+    width: 80px;
+    border-radius: 50%;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .exp-and-photos .flights-photos li img {
+      height: 80px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat .exp-and-photos .flights-photos li img {
+      width: 80px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .bookyour-seat .exp-and-photos .flights-photos li img {
+      height: 110px;
+      width: 110px;
+    }
+  }
+
+  .bookyour-seat .exp-and-photos .flights-photos li span {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #676767;
+    text-transform: capitalize;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat .exp-and-photos .flights-photos li span {
+      margin-top: 10px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat .exp-and-photos .flights-photos li span {
+      margin-top: 15px;
+    }
+  }
+
+  .bookyour-seat footer {
+    margin: 0px;
+    padding: 0px;
+    background: transparent;
+    text-align: center;
+  }
+
+  .bookyour-seat footer h4 {
+    color: #111d59;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    margin-top: 0px;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat footer h4 {
+      font-size: 24px;
+      line-height: 24px;
+      margin-bottom: 15px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat footer h4 {
+      font-size: 28px;
+      line-height: 28px;
+      margin-bottom: 20px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat footer h4 {
+      font-size: 30px;
+      line-height: 30px;
+    }
+  }
+
+  .bookyour-seat footer span {
+    color: #34363f;
+    display: inline-block;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 13px;
+    margin-bottom: 30px;
+  }
+
+  @media (min-width: 480px) {
+    .bookyour-seat footer span {
+      margin-bottom: 40px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat footer span {
+      margin-bottom: 50px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat footer span {
+      margin-bottom: 60px;
+    }
+  }
+
+  .bookyour-seat footer p {
+    color: #afafaf;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  .bookyour-seat footer .seat-dtls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 40px;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat footer .seat-dtls {
+      margin-bottom: 50px;
+      flex-direction: row;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat footer .seat-dtls {
+      margin-bottom: 60px;
+    }
+  }
+
+  .bookyour-seat footer .seat-dtls li {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 0px;
+    margin-bottom: 10px;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat footer .seat-dtls li {
+      margin-right: 25px;
+      margin-bottom: 0px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat footer .seat-dtls li {
+      margin-right: 35px;
+    }
+  }
+
+  .bookyour-seat footer .seat-dtls li i {
+    margin-right: 20px;
+    font-size: 30px;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat footer .seat-dtls li i {
+      font-size: 36px;
+      margin-right: 15px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat footer .seat-dtls li i {
+      font-size: 42px;
+      margin-right: 20px;
+    }
+  }
+
+  .bookyour-seat footer .seat-dtls li .gt-seat-eco {
+    font-size: 36px;
+  }
+
+  @media (min-width: 768px) {
+    .bookyour-seat footer .seat-dtls li .gt-seat-eco {
+      font-size: 42px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .bookyour-seat footer .seat-dtls li .gt-seat-eco {
+      font-size: 62px;
+    }
+  }
+
+  .bookyour-seat footer .seat-dtls li:last-child {
+    margin-right: 0px;
+  }
+
+
 
 /* =============================
         Contact Page
@@ -7680,6 +8898,259 @@ only screen and (min-width: 576px) and (max-width: 767px),
 
 
 
+.flight-card{
+    /* border: 1px solid #ddd; */
+    
+    background-color: #fff;
+    /* margin-bottom: 10px; */
+    width: 95%;
+    
+}
+
+
+
+
+
+.flight-card .flight-card-list-dt{
+
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+
+
+.img-baggage{
+    background-color: #dbf9ef;
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+
+
+}
+
+
+.passenger-det .border{
+    border: 2px solid #dee2e6!important; 
+}
+
+
+.active>.border{
+    border: 2px solid #1fba71 !important;
+    /* border-color: #1fba71 !important; */
+}
+
+
+.passenger-det .faqs_main_item .accordion-button{
+    padding: 0 !important;
+    border: none !important;
+}
+
+
+.passenger-det .faqs_main_item .accordion-collapse.show{
+    /* border: 1px solid #1fba71 !important; */
+    background-color: #eee;
+}
+
+
+.passenger-det .faqs_main_item  .accordion-button::after{
+    margin: 15px;
+
+}
+
+
+
+.passenger-det .card-header {
+    border: 0px solid #ddd ;
+    background: #ffffff;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0px;
+ 
+}
+
+.bg-light-primary {
+    background-color: #d4eee3 !important;
+}
+
+.passenger-det .nav {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 10px;
+}
+.text-xs {
+    font-size: 10px;
+  }
+  
+  .text-sm {
+    font-size: 12px;
+  }
+  
+  .text-md {
+    font-size: 14px;
+  }
+  
+
+.square--30 {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.flight-card flights-list__item hr{
+    margin: 0.5rem 0;
+}
+
+
+.baggage-allw{
+    background-color: #f0f0f0;
+    padding: 15px;
+}
+
+.baggage-allw .info-b{
+    font-size: 12px;
+    line-height: 15px;
+}
+
+
+.add-baggage{
+    display: inline-block;
+    padding: 20px 29px;
+    line-height: 20px;
+    font-size: 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 10px;
+    color: var(--white-color);
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+}
+
+
+.add-baggage:hover{
+    color: var(--bs-dark);
+    background-color: var(--bs-white);
+    
+}
+
+
+.included_baggage{
+
+}
+
+.flight-card-ft-typ{
+display: flex;
+justify-content: space-between;
+}
+.flight-card-ft-typ p{
+    color: #1fba71;
+}
+
+
+.flight-card__airline {
+    border-radius: 100%;
+    overflow: hidden;
+    flex: 0 1 5rem;
+    border: 0.2rem solid #fff;
+}
+
+.flight-card__airline + .flight-card__airline {
+    position: relative;
+    top: -1.5rem;
+}
+.flight-card__airline {
+    border-radius: 100%;
+    overflow: hidden;
+    flex: 0 1 5rem;
+    border: 0.2rem solid #fff;
+}
+/* .flight-card__departure {
+    margin-left: 2rem;
+} */
+
+.flight-card__time {
+    display: inline-block;
+    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: normal;
+}
+.flight-card__city {
+    margin-bottom: 0px;
+    font-size: 20px;
+    line-height: 20px;
+}
+
+.flight-card__day {
+    font-size:15px;
+}
+
+.flight-card__route {
+    /* display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+    justify-content: center;
+    align-items: center; */
+    padding: 0 3rem;
+}
+.flight-card__duration, .flight-card__type {
+    font-size: 15px;
+}
+.route-line {
+    /* position: relative;
+    margin: 1rem 0 0;
+    width: 100%;
+    height: 1px;
+    border: 0.1rem dashed #333; */
+}
+
+
+
+.route-line__end {
+    right: 0;
+    border: 0.6rem solid #333;
+    transform: translate3d(50%, -50%, 0);
+}
+.route-line__stop {
+    border-radius: 100%;
+    box-sizing: content-box;
+    width: 0.5rem;
+    height: 0.5rem;
+    position: absolute;
+    top: 50%;
+    right: -10%;
+    background-color: #333;
+    transform: translate3d(-50%, -50%, 0);
+}
+
+.route-line__start {
+    left: 0;
+    border: 0.6rem solid #333;
+    background-color: #fff;
+}
+.flight-card__type {
+    margin-top: 1rem;
+}
+
+
+
+
+.route-line__stop-name {
+    margin-top: 10px;
+    font-size: 15px;
+    transform: translateX(-0.4rem);
+}
 
 
 
