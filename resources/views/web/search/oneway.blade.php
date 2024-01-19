@@ -1,7 +1,18 @@
 <div class="flight_search_result_wrapper" id="one_way_trip">
     @if ($data['flightDetails'])
         @foreach ($data['flightDetails'] as $fdata)
-            <div class="flight_search_item_wrappper">
+            @php
+                $cls = '';
+                if (request()->direct == '1') {
+                    if($fdata['stops'] == 0 ){
+                        $cls = '';
+                    }else{
+                        $cls = 'hide';
+                    }
+                }
+            @endphp
+            <div class="flight_search_item_wrappper {{$cls}}" data-stops="{{ $fdata['stops'] }}"
+                data-airline="{{ $fdata['airline'] }}">
                 <div class="flight_search_items">
                     <div class="multi_city_flight_lists">
                         <div class="flight_multis_area_wrapper">
@@ -83,4 +94,8 @@
             <span>No Flights Found. </span>
         </div>
     @endif
+
+    <div class="text-center fontSize24" style="display: none" id="noFlightDiv">
+        <span>No Flights Found. </span>
+    </div>
 </div>

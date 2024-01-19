@@ -15,12 +15,13 @@
     <!-- animate css -->
     <link href="{{ asset('assets/css/animate.min.css') }}" rel="stylesheet" />
     <!-- Fontawesome css -->
-    <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/bootstrap-icons.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    {{-- <link href="{{ asset('assets/css/all.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/bootstrap-icons.css') }}" rel="stylesheet" /> --}}
     <!-- owl.carousel css -->
-    <link href="{{ asset('assets/css/owl.carousel.min.css') }}" rel="stylesheet" />
+    {{-- <link href="{{ asset('assets/css/owl.carousel.min.css') }}" rel="stylesheet" /> --}}
     <!-- owl.theme.default css -->
-    <link href="{{ asset('assets/css/owl.theme.default.min.css') }}" rel="stylesheet" />
+    {{-- <link href="{{ asset('assets/css/owl.theme.default.min.css') }}" rel="stylesheet" /> --}}
     <!-- navber css -->
     <link href="{{ asset('assets/css/navber.css') }}" rel="stylesheet" />
     <!-- meanmenu css -->
@@ -378,7 +379,7 @@
     <!-- Meanu js -->
     <script src="{{ asset('assets/js/jquery.meanmenu.js') }}"></script>
     <!-- owl carousel js -->
-    <script src="{{ asset('assets/js/owl.carousel.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/owl.carousel.min.js') }}"></script> --}}
     <!-- wow.js -->
     <script src="{{ asset('assets/js/wow.min.js') }}"></script>
     <!-- Custom js -->
@@ -543,6 +544,14 @@
                 return false;
             }
         });
+    </script>
+
+    <script>
+        var config = {
+            routes: {
+                flydubai_ancillary: "{{ route('flydubai.ancillary') }}"
+            }
+        };
     </script>
 
     @stack('footer')

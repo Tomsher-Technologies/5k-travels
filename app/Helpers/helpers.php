@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 
+use function PHPUnit\Framework\returnSelf;
+
 /**
  * Write code on Method
  *
@@ -531,7 +533,11 @@ function getFDCombinedData(&$FareTypes, $serviceDetails)
 
             if (count($FareType['ApplicableServices']['ServiceIDs'])) {
                 foreach ($FareType['ApplicableServices']['ServiceIDs'] as $service) {
-                    $service_details[] = $serviceDetails[$service['ID']];
+                    foreach ($serviceDetails as $serviceDetail) {
+                        if ($serviceDetail['ID'] == $service['ID']) {
+                            $service_details[] = $serviceDetail;
+                        }
+                    }
                 }
             }
 
@@ -578,7 +584,7 @@ function getFDFlightNum($airline, $flightNum)
 {
     $flightNums = explode('/', $flightNum);
     foreach ($flightNums as $key => $fn) {
-        $flightNums[$key] = $airline . ' ' . str_pad($fn, 4, 0, STR_PAD_LEFT);
+        $flightNums[$key] = $airline . ' ' . $fn;
     }
 
     return implode(' / ', $flightNums);
@@ -587,9 +593,15 @@ function getFDFlightNum($airline, $flightNum)
 function getFDStops($fdata, $legDetails)
 {
     $stops = array();
-
     foreach ($fdata['flightLegs'] as $legs) {
-        $leg = $legDetails[$legs['PFID']];
+        foreach ($legDetails as $legDetail) {
+            if (
+                $legDetail['PFID'] == $legs['PFID'] &&
+                $legDetail['DepartureDate'] == $legs['DepartureDate']
+            ) {
+                $leg = $legDetail;
+            }
+        }
         $stops[] = $leg['Origin'];
         $stops[] = $leg['Destination'];
     }
@@ -647,7 +659,51 @@ function priceFormat($amount, $decimals = 2, $sepperator = '.')
     return number_format($amount, $decimals, $sepperator);
 }
 
+function getDisplyPrice($amount, $fromCurrency = "AED")
+{
+    return getActiveCurrency() . ' ' . convertCurrency($amount, $fromCurrency);
+}
 
+function getOrginDestinationSession($search_type)
+{
+    try {
+        switch ($search_type) {
+            case 'OneWay':
+                $result = Session::get('flight_search_oneway');
+                return [
+                    'origin' => $result['oFrom'],
+                    'destination' => $result['oTo'],
+                    'date' => $result['oDate'],
+                    'adult' => $result['oAdult'],
+                    'child' => $result['oChild'],
+                    'infant' => $result['oInfant'],
+                    'class' => $result['oClass'],
+                ];
+                break;
+            case 'Return':
+                $result = Session::get('flight_search_return');
+                return [
+                    'origin' => $result['rFrom'],
+                    'destination' => $result['rTo'],
+                    'date' => $result['rDate'],
+                    'rtn_date' => $result['rReturnDate'],
+                    'adult' => $result['rAdult'],
+                    'child' => $result['rChild'],
+                    'infant' => $result['rInfant'],
+                    'class' => $result['rClass'],
+                ];
+                break;
+            case 'Circle':
+                return [
+                    // $search['cFrom'],
+                    // $search['cTo'],
+                ];
+                break;
+        }
+    } catch (Exception $e) {
+        return [];
+    }
+}
 
 function getOrginDestination($search)
 {
@@ -699,4 +755,40 @@ function getCombinability($combinability): array
     }
 
     return $newArray;
+}
+
+function getSegmentDetails($id, $depDate, $segments)
+{
+    if ($segments) {
+        foreach ($segments as $segment) {
+            if ($segment['LFID'] ==  $id) {
+                return $segment;
+            }
+        }
+    }
+    return null;
+}
+
+function getLegDetails($id, $legs)
+{
+    if ($legs) {
+        foreach ($legs as $leg) {
+            if ($leg['PFID'] ==  $id) {
+                return $leg;
+            }
+        }
+    }
+    return null;
+}
+
+function getFlightDetails($id, $flights)
+{
+    if ($flights) {
+        foreach ($flights as $flight) {
+            if ($flight['LFID'] ==  $id) {
+                return $flight;
+            }
+        }
+    }
+    return null;
 }

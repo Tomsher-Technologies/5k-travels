@@ -241,14 +241,27 @@
         <div class="d-flex stickyFlightDetails">
             <div class="d-flex align-center margin-left-auto">
                 <div class="margin-right10">
-                    <p class="white font22 bold stickyTotalCont" style="display: none">{{ getActiveCurrency() }}&nbsp;<span
-                            class="white font22 bold" id="stickyTotal"></span></p>
+                    <p class="white font22 bold stickyTotalCont" style="display: none">
+                        {{ getActiveCurrency() }}&nbsp;<span class="white font22 bold" id="stickyTotal"></span></p>
                 </div>
                 <div class="d-flex align-center">
                     <div>
-                        <a href="#" target="_blank" id="stickyButton" style="display: none"
-                            class="button bookingBtn btn-40 ">Book
-                            Now</a>
+                        <form method="POST" id="addToCart" action="{{ route('flight.booking') }}">
+                            @csrf
+                            <input type="hidden" name="search_id" value="">
+
+                            <input type="hidden" name="dep_LFID" value="">
+                            <input type="hidden" name="rtn_LFID" value="">
+
+                            <input type="hidden" name="dep_FareTypeID" value="">
+                            <input type="hidden" name="rtn_FareTypeID" value="">
+
+                            <input type="hidden" name="dep_solnid" value="">
+                            <input type="hidden" name="rtn_solnid" value="">
+
+                            <button id="stickyButton" style="display: none"
+                                class="button bookingBtn btn-40 ret_book_btn" type="submit">Book Now</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -416,7 +429,6 @@
 
             hideIncompatible()
 
-
             rtn_search_id = 0;
             rtn_lfid = 0;
             rtn_solnid = 0;
@@ -424,6 +436,16 @@
             rtn_flight_type = 0;
             rtn_loop_id = 0;
             rtn_fare = 0;
+
+            $('#addToCart input[name=search_id]').val(dep_search_id);
+
+            $('#addToCart input[name=rtn_LFID]').val('');
+            $('#addToCart input[name=rtn_FareTypeID]').val('');
+            $('#addToCart input[name=rtn_solnid]').val('');
+
+            $('#addToCart input[name=dep_LFID]').val(dep_lfid);
+            $('#addToCart input[name=dep_FareTypeID]').val(dep_faretypeid);
+            $('#addToCart input[name=dep_solnid]').val(dep_solnid);
 
             $('#stickyReturnFlight').html('')
             $('#stickyReturnFromTime').html('')
@@ -443,6 +465,11 @@
             arr_time = $('#cont_' + rtn_loop_id + ' .arr_time').html()
             flight_num = $('#cont_' + rtn_loop_id + ' .flight_num').html()
             d_fare = $(this).parent().siblings('.d_fare').html()
+
+
+            $('#addToCart input[name=rtn_LFID]').val(rtn_lfid);
+            $('#addToCart input[name=rtn_FareTypeID]').val(rtn_faretypeid);
+            $('#addToCart input[name=rtn_solnid]').val(rtn_solnid);
 
             $('#stickyReturnFlight').html(flight_num)
             $('#stickyReturnFromTime').html(dep_time)

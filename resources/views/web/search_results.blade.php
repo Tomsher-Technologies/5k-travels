@@ -143,7 +143,7 @@
                                 @endisset
                             </div>
                         </div>
-                        <div class="left_side_search_boxed">
+                        {{-- <div class="left_side_search_boxed">
                             <div class="left_side_search_heading">
                                 <h5>Refundable</h5>
                             </div>
@@ -172,7 +172,7 @@
                                 </div>
 
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <div class="col-lg-9">
@@ -196,14 +196,24 @@
     <!-- newsletter content -->
     @include('web.includes.newsletter')
     <!-- /newsletter content -->
+
+    @if (request()->direct == '1')
+        <script>
+            $(document).ready(function(){
+                console.log("ASd");
+                $('#flexCheckDefaultf4').trigger('click');
+            });
+        </script>
+    @endif
 @endsection
 
 @push('header')
     <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
-
     <style>
-
+        .flight_search_item_wrappper.hide {
+            display: none;
+        }
     </style>
 @endpush
 @push('footer')
@@ -211,4 +221,19 @@
     <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('assets/js/search_flights.js') }}"></script>
     <script src="{{ asset('assets/js/booking.js') }}"></script>
+
+
+
+
+    @if (session()->has('ancillary_status'))
+        <script>
+            console.log('{{ session()->get('ancillary_status') }}');
+            swal({
+                title: "Not Available",
+                text: "Something went wrong, please try again",
+                icon: "warning"
+            });
+        </script>
+    @endif
+
 @endpush

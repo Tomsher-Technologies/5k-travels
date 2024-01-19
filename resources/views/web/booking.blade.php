@@ -849,7 +849,6 @@
                                             @endfor
                                         @endif
                                         @if(isset($passengers['CHD']))
-                                            
                                             @for($ch=1; $ch <= $passengers['CHD']; $ch++)
                                                 <div class="tour_booking_form_box mt-3">
                                                     <h3>Passenger {{$passCount}} (Child)</h3>

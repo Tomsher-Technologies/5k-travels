@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FlightsApiController;
+use App\Http\Controllers\Providers\FlyDubaiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,29 @@ use App\Http\Controllers\FlightsApiController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+
+Route::get('/cur', function () {
+
+
+    // return view('web.provides.flydubai.ancillary');
+
+    // $url = 'https://api.currencybeacon.com/v1/convert';
+
+    // $data = [
+    //     'from' => 'AED',
+    //     'to' => 'USD',
+    //     'amount' => 1,
+    //     'api_key' => env('CURRENCY_API_KEY')
+    // ];
+
+    // $response = Http::timeout(300)->withOptions(['verify' => false])
+    //     ->get($url, $data);
+    // $apiResult = $response->json();
+    // // $resultData = json_decode($apiResult, true);
+
+    // dd($apiResult);
+});
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -29,7 +53,7 @@ Route::get('/flights/search', [FlightsController::class, 'search'])->name('fligh
 
 Route::get('/flights/search-return', [FlightsController::class, 'searchReturn'])->name('flight.search-return');
 
-Route::get('/flights/booking', [FlightsController::class, 'booking'])->name('flight.booking');
+Route::post('/flights/booking', [FlightsController::class, 'booking'])->name('flight.booking');
 
 Route::post('/flights/create-booking', [FlightsController::class, 'createBooking'])->name('flight.create-booking');
 
@@ -48,6 +72,12 @@ Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logou
 
 Route::get('/search-flights', [FlightsApiController::class, 'searchFlights'])->name('search-flights');
 Route::get('/authorize', [FlightsApiController::class, 'getToken'])->name('authorize');
+
+
+// Flydubai routes
+Route::get('/flydubai/optional', [FlyDubaiController::class, 'getAncillaryOffers'])->name('flydubai.ancillary');
+Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
+// Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
 
 
 Route::group(['middleware' => ['auth', 'web']], function () {

@@ -215,8 +215,8 @@
                                                             </div>
                                                             <div class="top_form_search_button">
                                                                 <div class="form-check write_spical_check">
-                                                                    <input class="form-check-input" type="checkbox" value="1" {{ $direct != '' ? 'checked' : '' }} name="direct" id="flexCheckDefaultf1">
-                                                                    <label class="form-check-label" for="flexCheckDefaultf1"> Direct Flight Only </label>
+                                                                    <input class="form-check-input" type="checkbox" value="1" {{ $direct != '' ? 'checked' : '' }} name="direct" id="flexCheckDefaultf1DIR">
+                                                                    <label class="form-check-label" for="flexCheckDefaultf1DIR"> Direct Flight Only </label>
                                                                 </div>
                                                                
                                                                 <button class="btn btn_theme btn_md show_flights" type="submit" onclick="return oneWayCheckFilter()">Show flights</button>

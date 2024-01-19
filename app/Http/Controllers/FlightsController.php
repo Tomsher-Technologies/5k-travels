@@ -93,7 +93,7 @@ class FlightsController extends Controller
         $data['cabin_type'] = $cabin_type;
         $data['combinability'] = getCombinability($fly_dubai_res['combinability']);
 
-        // dd($data);
+        // dd($data['serviceDetails']);
 
         // dd($data['combinability']);
 
