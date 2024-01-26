@@ -184,17 +184,27 @@
                                                     @foreach ($leg['serviceQuotes'] as $meals)
                                                         <div class="col-6">
                                                             <div class="meal-box-w">
-                                                                <input type="radio"
-                                                                    id="mealADT{{ $ad }}{{ $meals['code'] }}"
-                                                                    name="meal[ADT][{{ $ad }}]" value="1">
+                                                                <input class="input_meal" type="radio"
+                                                                    data-user="Adult {{ $ad }}"
+                                                                    data-des="({{ $meals['description'] }})"
+                                                                    data-rate="{{ convertCurrency($meals['amount'], $meals['currency']) }}"
+                                                                    id="meal[{{ $leg['pfID'] }}]ADT{{ $ad }}{{ $meals['code'] }}"
+                                                                    name="meal[{{ $leg['pfID'] }}][ADT][{{ $ad }}]"
+                                                                    value="{{ $meals['code'] }}">
                                                                 <label
-                                                                    for="mealADT{{ $ad }}{{ $meals['code'] }}">
+                                                                    for="meal[{{ $leg['pfID'] }}]ADT{{ $ad }}{{ $meals['code'] }}">
                                                                     <h5>{{ $meals['description'] }}</h5>
                                                                     <span> {{ getDisplyPrice($meals['amount']) }} </span>
                                                                 </label>
                                                             </div>
                                                         </div>
                                                     @endforeach
+                                                    <div class="col-12">
+                                                        <button type="button"
+                                                            class="btn btn_theme btn_md removeMealSelection"
+                                                            data-mealseleted="meal[{{ $leg['pfID'] }}][ADT][{{ $ad }}]">Remove
+                                                            Selection</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -216,17 +226,27 @@
                                                     @foreach ($leg['serviceQuotes'] as $meals)
                                                         <div class="col-6">
                                                             <div class="meal-box-w">
-                                                                <input type="radio"
-                                                                    id="mealCHD{{ $ad }}{{ $meals['code'] }}"
-                                                                    name="meal[CHD][{{ $ad }}]" value="1">
+                                                                <input class="input_meal" type="radio"
+                                                                    data-user="Child {{ $ad }}"
+                                                                    data-des="({{ $meals['description'] }})"
+                                                                    data-rate="{{ convertCurrency($meals['amount'], $meals['currency']) }}"
+                                                                    id="meal{{ $leg['pfID'] }}CHD{{ $ad }}{{ $meals['code'] }}"
+                                                                    name="meal[{{ $leg['pfID'] }}][CHD][{{ $ad }}]"
+                                                                    value="{{ $meals['code'] }}">
                                                                 <label
-                                                                    for="mealCHD{{ $ad }}{{ $meals['code'] }}">
+                                                                    for="meal{{ $leg['pfID'] }}CHD{{ $ad }}{{ $meals['code'] }}">
                                                                     <h5>{{ $meals['description'] }}</h5>
                                                                     <span> {{ getDisplyPrice($meals['amount']) }} </span>
                                                                 </label>
                                                             </div>
                                                         </div>
                                                     @endforeach
+                                                    <div class="col-12">
+                                                        <button type="button"
+                                                            class="btn btn_theme btn_md removeMealSelection"
+                                                            data-mealseleted="meal[{{ $leg['pfID'] }}][CHD][{{ $ad }}]">Remove
+                                                            Selection</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

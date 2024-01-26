@@ -79,6 +79,7 @@ Route::get('/flydubai/optional', [FlyDubaiController::class, 'getAncillaryOffers
 Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
 // Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
 
+Route::get('/flights/booking/fail', [FlightsController::class, 'bookingFail'])->name('flight.booking.fail');
 
 Route::group(['middleware' => ['auth', 'web']], function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');

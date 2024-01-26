@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Providers\FlightLogicController;
 use App\Http\Controllers\Providers\FlyDubaiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Airports;
 use App\Models\Airlines;
-use App\Models\Countries;
 use App\Models\FlightBookings;
 use App\Models\FlightPassengers;
 use App\Models\FlightItineraryDetails;
@@ -49,7 +47,6 @@ class FlightsController extends Controller
 
     public function search(Request $request)
     {
-
         $data = $flightCodes = [];
 
         $cabin_type = 'Economy';
@@ -68,7 +65,6 @@ class FlightsController extends Controller
 
         $data['flightData'] = Airlines::get()->keyBy('AirLineCode')->toArray();
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
-
         $fly_dubai_con = new FlyDubaiController();
         $fly_dubai_res = $fly_dubai_con->search($request);
 
@@ -98,7 +94,6 @@ class FlightsController extends Controller
         // dd($data['combinability']);
 
         // dd(Cache::get('fd_search_result_' . $data['search_id']));
-
         return  view('web.search_results', compact('data'));
     }
 
@@ -318,224 +313,229 @@ class FlightsController extends Controller
     //     echo json_encode($msg);
     // }
 
-    public function createBooking(Request $request)
-    {
-
-        $adultArray = $childArray = $infantArray = $adultServiceOut = $childServiceOut = $infantServiceOut = $adultServiceIn = $childServiceIn = $infantServiceIn = [];
-        $details = $request->all();
-        // echo '<pre>';
-        // print_r($details);die;
-        // print_r($request->baggageIn);
-        $adultCount = $request->adultCount;
-        $childCount = $request->childCount;
-        $infantCount = $request->infantCount;
-        $totalAddons = $request->total_addons;
-        if ($totalAddons != 0 && $totalAddons != '') {
-            $adultExtra = $childExtra = $infantExtra = 0;
-            if (isset($request->baggageOut)) {
-                foreach ($request->baggageOut as $okey => $obag) {
-                    if (isset($obag[0]) && $obag[0] != 0) {
-                        for ($i = 1; $i <= $obag[0]; $i++) {
-                            if ($adultExtra != $adultCount) {
-                                $adultServiceOut[] = array($okey);
-                                $adultExtra++;
-                            } elseif ($childExtra != $childCount) {
-                                $childServiceOut[] = array($okey);
-                                $childExtra++;
-                            } elseif ($infantExtra != $infantCount) {
-                                $infantServiceOut[] = array($okey);
-                                $infantExtra++;
-                            }
-                        }
-                    }
-                }
-            }
-            $adultExtraIn = $childExtraIn = $infantExtraIn = 0;
-            if (isset($request->baggageIn)) {
-                foreach ($request->baggageIn as $ikey => $ibag) {
-                    if (isset($ibag[0]) && $ibag[0] != 0) {
-                        for ($i = 1; $i <= $ibag[0]; $i++) {
-                            if ($adultExtraIn != $adultCount) {
-                                $adultServiceIn[] = array($ikey);
-                                $adultExtraIn++;
-                            } elseif ($childExtraIn != $childCount) {
-                                $childServiceIn[] = array($ikey);
-                                $childExtraIn++;
-                            } elseif ($infantExtraIn != $infantCount) {
-                                $infantServiceIn[] = array($ikey);
-                                $infantExtraIn++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // print_r($adultServiceOut);
-        // print_r($childServiceOut);
-        // print_r($infantServiceOut);
-        // print_r($adultServiceIn);
-        // print_r($childServiceIn);
-        // print_r($infantServiceIn);
-        // $agentMargins = [] ;
-        // echo '<br>'. $details['total_amount_org'];
-
-        // echo '<br>';
-        // print_r($margins);
-        // print_r($agentMargins);
-        // die;
-        $data['flightBookingInfo']['flight_session_id'] = $request->session_id;
-        $data['flightBookingInfo']['fare_source_code'] = $request->fare_source_code;
-        if (isset($request->fare_source_code_inbound)) {
-            $data['flightBookingInfo']['fare_source_code_inbound'] = $request->fare_source_code_inbound;
-        }
-        $data['flightBookingInfo']['IsPassportMandatory'] = $request->IsPassportMandatory;
-        $data['flightBookingInfo']['fareType'] = $request->FareType;
-        $data['flightBookingInfo']['countryCode'] = $request->mobile_code;
-        $data['flightBookingInfo']['areaCode'] = $request->mobile_code;
-
-        $clientRef = str_replace(':', '', str_replace("-", "", date('d-m-yH:i:s')));
-        $details['clientRef'] = $clientRef;
-        $data["paxInfo"]["clientRef"] = $clientRef;
-        $data["paxInfo"]["customerEmail"] = $request->email;
-        $data["paxInfo"]["customerPhone"] = $request->mobile_no;
-
-        if ($adultCount != 0) {
-            $adultArray["title"] =  $request->adult_title;
-            $adultArray["firstName"] =  $request->adult_first_name;
-            $adultArray["lastName"] =   $request->adult_last_name;
-            $adultArray["dob"] =   $request->adult_dob;
-            $adultArray["nationality"] =   $request->adult_nationality;
-            $adultArray["passportNo"] =   $request->adult_passport;
-            $adultArray["passportIssueCountry"] =   $request->adult_passport_country;
-            $adultArray["passportExpiryDate"] =   $request->adult_passport_expiry;
-            // if($request->FareType == 'WebFare'){
-            //     if(!empty($adultServiceOut)){
-            //         $adultArray["ExtraServiceOutbound"] = $adultServiceOut;
-            //     }
-            //     if(!empty($adultServiceIn)){
-            //         $adultArray["ExtraServiceInbound"] = $adultServiceIn;
-            //     }
-            // }
-            $adultArray["ExtraServiceOutbound"] = $adultServiceOut;
-            $adultArray["ExtraServiceInbound"] = $adultServiceIn;
-            $paxDetails["adult"] = $adultArray;
-        }
-        if ($childCount != 0) {
-            $childArray["title"] =  $request->child_title;
-            $childArray["firstName"] =  $request->child_first_name;
-            $childArray["lastName"] =   $request->child_last_name;
-            $childArray["dob"] =   $request->child_dob;
-            $childArray["nationality"] =   $request->child_nationality;
-            $childArray["passportNo"] =   $request->child_passport;
-            $childArray["passportIssueCountry"] =   $request->child_passport_country;
-            $childArray["passportExpiryDate"] =   $request->child_passport_expiry;
-            // if($request->FareType == 'WebFare'){
-            //     if(!empty($childServiceOut)){
-            //         $childArray["ExtraServiceOutbound"] = $childServiceOut;
-            //     }
-            //     if(!empty($childServiceIn)){
-            //         $childArray["ExtraServiceInbound"] = $childServiceIn;
-            //     }
-            // }
-            $childArray["ExtraServiceOutbound"] = $childServiceOut;
-            $childArray["ExtraServiceInbound"] = $childServiceIn;
-
-            $paxDetails["child"] = $childArray;
-        }
-        if ($infantCount != 0) {
-            $infantArray["title"] =  $request->infant_title;
-            $infantArray["firstName"] =  $request->infant_first_name;
-            $infantArray["lastName"] =   $request->infant_last_name;
-            $infantArray["dob"] =   $request->infant_dob;
-            $infantArray["nationality"] =   $request->infant_nationality;
-            $infantArray["passportNo"] =   $request->infant_passport;
-            $infantArray["passportIssueCountry"] =   $request->infant_passport_country;
-            $infantArray["passportExpiryDate"] =   $request->infant_passport_expiry;
-            $infantArray["ExtraServiceOutbound"] = $infantServiceOut;
-            $infantArray["ExtraServiceInbound"] = $infantServiceIn;
-            $paxDetails["infant"] = $infantArray;
-        }
-        $data["paxInfo"]["paxDetails"][] = $paxDetails;
-        // echo json_encode($data["paxInfo"]["paxDetails"]);
-        // echo '<pre>';
-        // print_r($data);
-        // die;
-        $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL') . 'booking', $data);
-
-        $result = $response->getBody()->getContents();
-        $result = json_decode($result, true);
-
-        // die;
-        if (!isset($result['status']['errors'])) {
-            $bookResult = $result['BookFlightResponse']['BookFlightResult'];
-            if ($bookResult['Success'] == 'true' || $bookResult['Success'] == '1') {
-                $bookingId = $bookResult['UniqueID'];
-                if (strtolower($request->FareType) != "webfare") {
-                    $ticketOrderRes = $this->ticketOrder($bookingId);
-                    $ticketOrderRes = json_decode($ticketOrderRes, true);
-                    // echo '<pre>';
-                    // print_r($ticketOrderRes);
-
-                    $ticketOrderResSuccess = $ticketOrderRes['AirOrderTicketRS']['TicketOrderResult']['Success'];
-                    if ($ticketOrderResSuccess == 'true' || $ticketOrderResSuccess == "1") {
-                        $tripDetails = $this->getTripDetails($bookingId);
-                        $tripDetails = json_decode($tripDetails, true);
-                        // echo '<pre>';
-                        // print_r($tripDetails);
-                        // die;
-                        if (isset($tripDetails['TripDetailsResponse'])) {
-                            $TripDetailsResponse = $tripDetails['TripDetailsResponse'];
-                            if (isset($TripDetailsResponse['TripDetailsResultInbound'])) {
-                                $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
-                                $tripDetailsResultInbound = $TripDetailsResponse['TripDetailsResultInbound'];
-                                if ($tripDetailsResult['Success'] == 'true') {
-                                    $bookingId = $this->saveDomesticFlightBookingData($tripDetailsResult, $tripDetailsResultInbound, $details);
-                                }
-                            } else {
-                                $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
-                                if ($tripDetailsResult['Success'] == 'true') {
-                                    $bookingId = $this->saveFlightBookingData($tripDetailsResult, $details);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    $tripDetails = $this->getTripDetails($bookingId);
-                    $tripDetails = json_decode($tripDetails, true);
-                    // echo '<pre>';
-                    // print_r($tripDetails);
-                    // die;
-                    if (isset($tripDetails['TripDetailsResponse'])) {
-                        $TripDetailsResponse = $tripDetails['TripDetailsResponse'];
-                        if (isset($TripDetailsResponse['TripDetailsResultInbound'])) {
-                            $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
-                            $tripDetailsResultInbound = $TripDetailsResponse['TripDetailsResultInbound'];
-                            if ($tripDetailsResult['Success'] == 'true') {
-                                $bookingId = $this->saveDomesticFlightBookingData($tripDetailsResult, $tripDetailsResultInbound, $details);
-                            }
-                        } else {
-                            $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
-                            if ($tripDetailsResult['Success'] == 'true') {
-                                $bookingId = $this->saveFlightBookingData($tripDetailsResult, $details);
-                            }
-                        }
-                    }
-                }
-                $msg = 'success';
-                $bookings = $this->getBookingDetails($bookingId);
-                $this->sendBookingMail($bookings);
-            } else {
-                // print_r($bookResult);
-                $bookings = [];
-                $msg =  (isset($bookResult['Errors']['Error'])) ? $bookResult['Errors']['Error']['ErrorMessage'] : ((isset($bookResult['Errors']['Errors'])) ? $bookResult['Errors']['Errors']['ErrorMessage'] : 'Something went wrong');
-            }
-        } else {
-            $bookings = [];
-            $msg =  (isset($result['status']['errors'][0])) ? $result['status']['errors'][0]['errorMessage'] : 'Something went wrong';
-        }
-        return  view('web.booking_success', compact('msg', 'bookings'));
+    public function createBooking(Request $request){
+        $fly_dubai_con = new FlyDubaiController();
+        $fly_dubai_res = $fly_dubai_con->submitPnr($request);
     }
+
+    // public function createBooking(Request $request)
+    // {
+
+    //     $adultArray = $childArray = $infantArray = $adultServiceOut = $childServiceOut = $infantServiceOut = $adultServiceIn = $childServiceIn = $infantServiceIn = [];
+    //     $details = $request->all();
+    //     // echo '<pre>';
+    //     // print_r($details);die;
+    //     // print_r($request->baggageIn);
+    //     $adultCount = $request->adultCount;
+    //     $childCount = $request->childCount;
+    //     $infantCount = $request->infantCount;
+    //     $totalAddons = $request->total_addons;
+    //     if ($totalAddons != 0 && $totalAddons != '') {
+    //         $adultExtra = $childExtra = $infantExtra = 0;
+    //         if (isset($request->baggageOut)) {
+    //             foreach ($request->baggageOut as $okey => $obag) {
+    //                 if (isset($obag[0]) && $obag[0] != 0) {
+    //                     for ($i = 1; $i <= $obag[0]; $i++) {
+    //                         if ($adultExtra != $adultCount) {
+    //                             $adultServiceOut[] = array($okey);
+    //                             $adultExtra++;
+    //                         } elseif ($childExtra != $childCount) {
+    //                             $childServiceOut[] = array($okey);
+    //                             $childExtra++;
+    //                         } elseif ($infantExtra != $infantCount) {
+    //                             $infantServiceOut[] = array($okey);
+    //                             $infantExtra++;
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         $adultExtraIn = $childExtraIn = $infantExtraIn = 0;
+    //         if (isset($request->baggageIn)) {
+    //             foreach ($request->baggageIn as $ikey => $ibag) {
+    //                 if (isset($ibag[0]) && $ibag[0] != 0) {
+    //                     for ($i = 1; $i <= $ibag[0]; $i++) {
+    //                         if ($adultExtraIn != $adultCount) {
+    //                             $adultServiceIn[] = array($ikey);
+    //                             $adultExtraIn++;
+    //                         } elseif ($childExtraIn != $childCount) {
+    //                             $childServiceIn[] = array($ikey);
+    //                             $childExtraIn++;
+    //                         } elseif ($infantExtraIn != $infantCount) {
+    //                             $infantServiceIn[] = array($ikey);
+    //                             $infantExtraIn++;
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // print_r($adultServiceOut);
+    //     // print_r($childServiceOut);
+    //     // print_r($infantServiceOut);
+    //     // print_r($adultServiceIn);
+    //     // print_r($childServiceIn);
+    //     // print_r($infantServiceIn);
+    //     // $agentMargins = [] ;
+    //     // echo '<br>'. $details['total_amount_org'];
+
+    //     // echo '<br>';
+    //     // print_r($margins);
+    //     // print_r($agentMargins);
+    //     // die;
+    //     $data['flightBookingInfo']['flight_session_id'] = $request->session_id;
+    //     $data['flightBookingInfo']['fare_source_code'] = $request->fare_source_code;
+    //     if (isset($request->fare_source_code_inbound)) {
+    //         $data['flightBookingInfo']['fare_source_code_inbound'] = $request->fare_source_code_inbound;
+    //     }
+    //     $data['flightBookingInfo']['IsPassportMandatory'] = $request->IsPassportMandatory;
+    //     $data['flightBookingInfo']['fareType'] = $request->FareType;
+    //     $data['flightBookingInfo']['countryCode'] = $request->mobile_code;
+    //     $data['flightBookingInfo']['areaCode'] = $request->mobile_code;
+
+    //     $clientRef = str_replace(':', '', str_replace("-", "", date('d-m-yH:i:s')));
+    //     $details['clientRef'] = $clientRef;
+    //     $data["paxInfo"]["clientRef"] = $clientRef;
+    //     $data["paxInfo"]["customerEmail"] = $request->email;
+    //     $data["paxInfo"]["customerPhone"] = $request->mobile_no;
+
+    //     if ($adultCount != 0) {
+    //         $adultArray["title"] =  $request->adult_title;
+    //         $adultArray["firstName"] =  $request->adult_first_name;
+    //         $adultArray["lastName"] =   $request->adult_last_name;
+    //         $adultArray["dob"] =   $request->adult_dob;
+    //         $adultArray["nationality"] =   $request->adult_nationality;
+    //         $adultArray["passportNo"] =   $request->adult_passport;
+    //         $adultArray["passportIssueCountry"] =   $request->adult_passport_country;
+    //         $adultArray["passportExpiryDate"] =   $request->adult_passport_expiry;
+    //         // if($request->FareType == 'WebFare'){
+    //         //     if(!empty($adultServiceOut)){
+    //         //         $adultArray["ExtraServiceOutbound"] = $adultServiceOut;
+    //         //     }
+    //         //     if(!empty($adultServiceIn)){
+    //         //         $adultArray["ExtraServiceInbound"] = $adultServiceIn;
+    //         //     }
+    //         // }
+    //         $adultArray["ExtraServiceOutbound"] = $adultServiceOut;
+    //         $adultArray["ExtraServiceInbound"] = $adultServiceIn;
+    //         $paxDetails["adult"] = $adultArray;
+    //     }
+    //     if ($childCount != 0) {
+    //         $childArray["title"] =  $request->child_title;
+    //         $childArray["firstName"] =  $request->child_first_name;
+    //         $childArray["lastName"] =   $request->child_last_name;
+    //         $childArray["dob"] =   $request->child_dob;
+    //         $childArray["nationality"] =   $request->child_nationality;
+    //         $childArray["passportNo"] =   $request->child_passport;
+    //         $childArray["passportIssueCountry"] =   $request->child_passport_country;
+    //         $childArray["passportExpiryDate"] =   $request->child_passport_expiry;
+    //         // if($request->FareType == 'WebFare'){
+    //         //     if(!empty($childServiceOut)){
+    //         //         $childArray["ExtraServiceOutbound"] = $childServiceOut;
+    //         //     }
+    //         //     if(!empty($childServiceIn)){
+    //         //         $childArray["ExtraServiceInbound"] = $childServiceIn;
+    //         //     }
+    //         // }
+    //         $childArray["ExtraServiceOutbound"] = $childServiceOut;
+    //         $childArray["ExtraServiceInbound"] = $childServiceIn;
+
+    //         $paxDetails["child"] = $childArray;
+    //     }
+    //     if ($infantCount != 0) {
+    //         $infantArray["title"] =  $request->infant_title;
+    //         $infantArray["firstName"] =  $request->infant_first_name;
+    //         $infantArray["lastName"] =   $request->infant_last_name;
+    //         $infantArray["dob"] =   $request->infant_dob;
+    //         $infantArray["nationality"] =   $request->infant_nationality;
+    //         $infantArray["passportNo"] =   $request->infant_passport;
+    //         $infantArray["passportIssueCountry"] =   $request->infant_passport_country;
+    //         $infantArray["passportExpiryDate"] =   $request->infant_passport_expiry;
+    //         $infantArray["ExtraServiceOutbound"] = $infantServiceOut;
+    //         $infantArray["ExtraServiceInbound"] = $infantServiceIn;
+    //         $paxDetails["infant"] = $infantArray;
+    //     }
+    //     $data["paxInfo"]["paxDetails"][] = $paxDetails;
+    //     // echo json_encode($data["paxInfo"]["paxDetails"]);
+    //     // echo '<pre>';
+    //     // print_r($data);
+    //     // die;
+    //     $response = Http::timeout(300)->withOptions($this->options)->post(env('API_BASE_URL') . 'booking', $data);
+
+    //     $result = $response->getBody()->getContents();
+    //     $result = json_decode($result, true);
+
+    //     // die;
+    //     if (!isset($result['status']['errors'])) {
+    //         $bookResult = $result['BookFlightResponse']['BookFlightResult'];
+    //         if ($bookResult['Success'] == 'true' || $bookResult['Success'] == '1') {
+    //             $bookingId = $bookResult['UniqueID'];
+    //             if (strtolower($request->FareType) != "webfare") {
+    //                 $ticketOrderRes = $this->ticketOrder($bookingId);
+    //                 $ticketOrderRes = json_decode($ticketOrderRes, true);
+    //                 // echo '<pre>';
+    //                 // print_r($ticketOrderRes);
+
+    //                 $ticketOrderResSuccess = $ticketOrderRes['AirOrderTicketRS']['TicketOrderResult']['Success'];
+    //                 if ($ticketOrderResSuccess == 'true' || $ticketOrderResSuccess == "1") {
+    //                     $tripDetails = $this->getTripDetails($bookingId);
+    //                     $tripDetails = json_decode($tripDetails, true);
+    //                     // echo '<pre>';
+    //                     // print_r($tripDetails);
+    //                     // die;
+    //                     if (isset($tripDetails['TripDetailsResponse'])) {
+    //                         $TripDetailsResponse = $tripDetails['TripDetailsResponse'];
+    //                         if (isset($TripDetailsResponse['TripDetailsResultInbound'])) {
+    //                             $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
+    //                             $tripDetailsResultInbound = $TripDetailsResponse['TripDetailsResultInbound'];
+    //                             if ($tripDetailsResult['Success'] == 'true') {
+    //                                 $bookingId = $this->saveDomesticFlightBookingData($tripDetailsResult, $tripDetailsResultInbound, $details);
+    //                             }
+    //                         } else {
+    //                             $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
+    //                             if ($tripDetailsResult['Success'] == 'true') {
+    //                                 $bookingId = $this->saveFlightBookingData($tripDetailsResult, $details);
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             } else {
+    //                 $tripDetails = $this->getTripDetails($bookingId);
+    //                 $tripDetails = json_decode($tripDetails, true);
+    //                 // echo '<pre>';
+    //                 // print_r($tripDetails);
+    //                 // die;
+    //                 if (isset($tripDetails['TripDetailsResponse'])) {
+    //                     $TripDetailsResponse = $tripDetails['TripDetailsResponse'];
+    //                     if (isset($TripDetailsResponse['TripDetailsResultInbound'])) {
+    //                         $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
+    //                         $tripDetailsResultInbound = $TripDetailsResponse['TripDetailsResultInbound'];
+    //                         if ($tripDetailsResult['Success'] == 'true') {
+    //                             $bookingId = $this->saveDomesticFlightBookingData($tripDetailsResult, $tripDetailsResultInbound, $details);
+    //                         }
+    //                     } else {
+    //                         $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
+    //                         if ($tripDetailsResult['Success'] == 'true') {
+    //                             $bookingId = $this->saveFlightBookingData($tripDetailsResult, $details);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //             $msg = 'success';
+    //             $bookings = $this->getBookingDetails($bookingId);
+    //             $this->sendBookingMail($bookings);
+    //         } else {
+    //             // print_r($bookResult);
+    //             $bookings = [];
+    //             $msg =  (isset($bookResult['Errors']['Error'])) ? $bookResult['Errors']['Error']['ErrorMessage'] : ((isset($bookResult['Errors']['Errors'])) ? $bookResult['Errors']['Errors']['ErrorMessage'] : 'Something went wrong');
+    //         }
+    //     } else {
+    //         $bookings = [];
+    //         $msg =  (isset($result['status']['errors'][0])) ? $result['status']['errors'][0]['errorMessage'] : 'Something went wrong';
+    //     }
+    //     return  view('web.booking_success', compact('msg', 'bookings'));
+    // }
 
     public function sendBookingMail($bookings)
     {
@@ -2266,5 +2266,10 @@ class FlightsController extends Controller
         }
         return $flightBookId;
         // die;
+    }
+
+    public function bookingFail()
+    {
+        return view('web.booking_fail');
     }
 }

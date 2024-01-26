@@ -2,10 +2,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="tou_booking_form_Wrapper">
-                <form action="{{ route('flydubai.pnrsummery') }}" method="post" id="bookingForm">
-                    @csrf
 
-                    <input type="hidden" name="seatch_">
 
                     <div class="">
                         @php
@@ -99,7 +96,7 @@
                                                     <div class="error-div"></div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="date">Passport Number<span
                                                             class="required">*</span></label>
@@ -110,7 +107,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="date">Passport Issuing Country<span
                                                             class="required">*</span></label>
@@ -124,7 +121,15 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
+                                                <label for="date">Passport Issue<span
+                                                        class="required">*</span></label>
+                                                <input type="text" class="form-control bg_input passportIssue"
+                                                    readonly placeholder="YYYY-MM-DD" name="adult_passport_issue[]"
+                                                    id="passportIssue{{ $passCount }}" />
+                                                <div class="error-div"></div>
+                                            </div>
+                                            <div class="col-lg-6">
                                                 <label for="date">Passport Expiry<span
                                                         class="required">*</span></label>
                                                 <input type="text" class="form-control bg_input passportExpiry"
@@ -206,7 +211,7 @@
                                                     <div class="error-div"></div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="date">Passport Number<span
                                                             class="required">*</span></label>
@@ -218,7 +223,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="date">Passport Issuing Country<span
                                                             class="required">*</span></label>
@@ -231,8 +236,15 @@
                                                     <div class="error-div"></div>
                                                 </div>
                                             </div>
-
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
+                                                <label for="date">Passport Issue<span
+                                                        class="required">*</span></label>
+                                                <input type="text" class="form-control bg_input passportIssue"
+                                                    readonly placeholder="YYYY-MM-DD" name="child_passport_issue[]"
+                                                    id="passportIssue{{ $passCount }}" />
+                                                <div class="error-div"></div>
+                                            </div>
+                                            <div class="col-lg-6">
                                                 <label for="date">Passport Expiry<span
                                                         class="required">*</span></label>
                                                 <input type="text" class="form-control bg_input passportExpiry"
@@ -315,7 +327,7 @@
                                                     <div class="error-div"></div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="date">Passport Number<span
                                                             class="required">*</span></label>
@@ -327,7 +339,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label for="date">Passport Issuing Country<span
                                                             class="required">*</span></label>
@@ -340,8 +352,15 @@
                                                     <div class="error-div"></div>
                                                 </div>
                                             </div>
-
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-6">
+                                                <label for="date">Passport Issue<span
+                                                        class="required">*</span></label>
+                                                <input type="text" class="form-control bg_input passportIssue"
+                                                    readonly placeholder="YYYY-MM-DD" name="infant_passport_issue[]"
+                                                    id="passportIssue{{ $passCount }}" />
+                                                <div class="error-div"></div>
+                                            </div>
+                                            <div class="col-lg-6">
                                                 <label for="date">Passport Expiry<span
                                                         class="required">*</span></label>
                                                 <input type="text" class="form-control bg_input passportExpiry"
@@ -388,12 +407,7 @@
 
                         </div>
                     </div>
-
-                    <button type="submit">Submit</button>
-
-                </form>
-
-
+                    <button type="submit" class="btn btn_theme btn_md">Submit</button>
             </div>
         </div>
     </div>

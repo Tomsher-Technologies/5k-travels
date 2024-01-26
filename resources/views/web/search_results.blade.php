@@ -199,8 +199,7 @@
 
     @if (request()->direct == '1')
         <script>
-            $(document).ready(function(){
-                console.log("ASd");
+            $(document).ready(function() {
                 $('#flexCheckDefaultf4').trigger('click');
             });
         </script>
@@ -213,6 +212,29 @@
     <style>
         .flight_search_item_wrappper.hide {
             display: none;
+        }
+    </style>
+
+    <style>
+        .pricing__feature-info-available2:hover .pricing__feature-info-tooltip2 {
+            z-index: 2000;
+        }
+
+        .pricing__table {
+            overflow: visible;
+        }
+
+        .pricing__feature-info-available .btn_md {
+            padding: 5px 39px;
+        }
+
+        .pricing__feature-info-available {
+            padding: 5px 25px;
+        }
+
+        .flight_policy_refund {
+
+            padding: 0px;
         }
     </style>
 @endpush

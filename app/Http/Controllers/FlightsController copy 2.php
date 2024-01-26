@@ -151,7 +151,7 @@ class FlightsController extends Controller
 
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
-        
+
         // echo '<pre>';
         // // print_r($request->all());
         // print_r($result);

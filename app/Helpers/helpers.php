@@ -9,6 +9,7 @@ use App\Models\Airports;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
@@ -153,6 +154,14 @@ if (!function_exists('getUserMarginData')) {
         $data['totalmargin'] = $margin->value;
         return $data;
     }
+}
+
+function getMargin()
+{
+    if (Auth::check()) {
+        return getAgentMarginData(Auth::user()->id);
+    }
+    return getUserMarginData();
 }
 
 if (!function_exists('getAgentWalletBalance')) {
@@ -791,4 +800,75 @@ function getFlightDetails($id, $flights)
         }
     }
     return null;
+}
+
+function getFareDetails($id, $flight)
+{
+    if ($flight) {
+        foreach ($flight['fares'] as $fare) {
+            if ($fare['FareTypeID'] ==  $id) {
+                return $fare;
+            }
+        }
+    }
+    return null;
+}
+
+function getFarePrices($FareInfos)
+{
+    $rates = [
+        'base_fare' => 0,
+        'tax_fare' => 0,
+        'total_fare' => 0,
+    ];
+
+    if ($FareInfos) {
+        foreach ($FareInfos as $FareInfo) {
+            foreach ($FareInfo as $fareInfo) {
+                foreach ($fareInfo['Pax'] as $pax) {
+                    $rates['base_fare'] += $pax['FareAmtNoTaxes'];
+                    $rates['tax_fare'] += $pax['DisplayTaxSum'];
+                    $rates['total_fare'] += $pax['BaseFareAmtInclTax'];
+                }
+            }
+        }
+    }
+
+    $margin = getMargin();
+
+    // dd($margin );
+    
+    foreach ($rates as $key => $rate) {
+        $rates[$key] += ($margin['totalmargin'] / 100) * $rate;
+    }
+
+    return $rates;
+}
+
+function generateSeatSVG()
+{
+    return <<<SVG
+    <svg width="30" height="30" viewBox="0 0 464 564" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <g clip-path="url(#clip0_1138_4421)">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M346.388 376.247H123.517L95.6584 63.7295C95.6584 63.7295 79.4231 0.482422 234.905 0.482422C390.482 0.482422 374.2 63.7295 374.2 63.7295L346.388 376.247Z"
+                                                    fill="#434343" />
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M421.635 528.624C421.635 548.154 409.776 563.919 395.141 563.919H74.0584C59.4231 563.919 47.6113 548.154 47.6113 528.624C47.6113 528.624 67.7996 425.754 100.976 425.754H368.364C405.964 425.754 421.635 528.624 421.635 528.624Z"
+                                                    fill="#434343" />
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M463.799 393.707C463.799 410.13 454.858 423.401 443.987 423.401C433.07 423.401 424.223 410.13 424.223 393.707V267.448C424.223 251.024 433.07 237.754 443.987 237.754C454.811 237.754 463.799 251.024 463.799 267.448V393.707Z"
+                                                    fill="#434343" />
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M43.8 393.707C43.8 410.13 33.9648 423.401 21.9177 423.401C9.77652 423.401 -0.0117188 410.13 -0.0117188 393.707V267.448C-0.0117188 251.024 9.77652 237.754 21.9177 237.754C33.9648 237.754 43.8 251.024 43.8 267.448V393.707Z"
+                                                    fill="#434343" />
+                                            </g>
+                                            <defs>
+                                                <clipPath id="clip0_1138_4421">
+                                                    <rect width="464" height="564" fill="white" />
+                                                </clipPath>
+                                            </defs>
+                                        </svg>
+    SVG;
 }

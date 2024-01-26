@@ -3,12 +3,14 @@
         <div class="col-lg-6 col-md-6 col-sm-12 col-12">
             <div class="faqs_main_item">
                 @isset($acc_response['ancillaryQuotes']['flights'])
+                    @php
+                        $flightLoop = 1;
+                    @endphp
                     @foreach ($acc_response['ancillaryQuotes']['flights'] as $flights)
                         @php
                             $segments = $flights['segments'];
                             $segment_details = getSegmentDetails($segments['lfID'], $segments['depDate'], $res_data['search_result']['segmentDetails']);
                         @endphp
-
                         <div class="accordion" id="accordionExample{{ $segments['lfID'] }}">
                             <div class="accordion-item">
                                 <h2 class="accordion-header" id="headingOne{{ $segments['lfID'] }}">
@@ -51,8 +53,10 @@
                                                     @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
                                                         <li class="">
                                                             <a href="#tab{{ $segments['lfID'] }}ADT{{ $ad }}"
-                                                                data-bs-toggle="tab" aria-selected="false" role="tab"
-                                                                tabindex="-1">
+                                                                class="{{ $flightLoop == 1 && $ad == 1 ? 'active' : '' }}"
+                                                                data-bs-toggle="tab"
+                                                                aria-selected="{{ $flightLoop == 1 && $ad == 1 ? 'true' : 'false' }}"
+                                                                role="tab" tabindex="-1">
                                                                 <div class="card border">
                                                                     <div class="card-header">
                                                                         <div
@@ -85,7 +89,6 @@
                                                 @if (isset($passengers['CHD']))
                                                     @for ($ad = 1; $ad <= $passengers['CHD']; $ad++)
                                                         <li class="">
-
                                                             <a href="#tab{{ $segments['lfID'] }}CHD{{ $ad }}"
                                                                 class="" data-bs-toggle="tab" aria-selected="false"
                                                                 role="tab" tabindex="-1">
@@ -159,6 +162,9 @@
                                 </div>
                             </div>
                         </div>
+                        @php
+                            $flightLoop++;
+                        @endphp
                     @endforeach
                 @endisset
             </div>
@@ -168,17 +174,19 @@
             <div class="tab-content">
 
                 @isset($acc_response['ancillaryQuotes']['flights'])
+                    @php
+                        $flightLoop = 1;
+                    @endphp
                     @foreach ($acc_response['ancillaryQuotes']['flights'] as $flights)
                         @php
                             $segments = $flights['segments'];
                             $segment_details = getSegmentDetails($segments['lfID'], $segments['depDate'], $res_data['search_result']['segmentDetails']);
-
                             $baggage = array_combine(array_column($segments['serviceQuotes'], 'code'), $segments['serviceQuotes']);
                         @endphp
 
                         @if (isset($passengers['ADT']))
                             @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
-                                <div class="tab-pane table-responsive userprof-tab"
+                                <div class="tab-pane table-responsive userprof-tab {{ $flightLoop == 1 && $ad == 1  ? 'active' : '' }}"
                                     id="tab{{ $segments['lfID'] }}ADT{{ $ad }}" role="tabpanel">
                                     <div class="baggage-allw">
                                         <p class="info-b pt-2">If your fare includes checked baggage, you can take
@@ -198,10 +206,15 @@
                                                 @foreach ($baggage as $bag)
                                                     @if ($bag['code'] !== 'BAGI')
                                                         <div class="col-12">
-                                                            <input type="radio" name="bag[ADT][{{ $ad }}]"
-                                                                id="ADT{{ $ad }}{{ $bag['code'] }}">
+                                                            <input class="input_baggage"
+                                                                data-user="Adult {{ $ad }}"
+                                                                data-des="({{ $bag['description'] }})"
+                                                                data-rate="{{ convertCurrency($bag['amount'], $bag['currency']) }}"
+                                                                type="radio" value="{{ $bag['code'] }}"
+                                                                name="bag[{{ $segments['lfID'] }}][ADT][{{ $ad }}]"
+                                                                id="{{ $segments['lfID'] }}ADT{{ $ad }}{{ $bag['code'] }}">
                                                             <label class="w-100"
-                                                                for="ADT{{ $ad }}{{ $bag['code'] }}">
+                                                                for="{{ $segments['lfID'] }}ADT{{ $ad }}{{ $bag['code'] }}">
                                                                 <div class="bg-white rounded-2 p-2">
                                                                     <div
                                                                         class="d-flex align-items-center justify-content-between g-2">
@@ -229,6 +242,12 @@
                                                         </div>
                                                     @endif
                                                 @endforeach
+                                                <div class="col-12">
+                                                    <button type="button"
+                                                        class="btn btn_theme btn_md removeSeatSelection"
+                                                        data-seatseleted="bag[{{ $segments['lfID'] }}][ADT][{{ $ad }}]">Remove
+                                                        Selection</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -255,10 +274,15 @@
                                                 @foreach ($baggage as $bag)
                                                     @if ($bag['code'] !== 'BAGI')
                                                         <div class="col-12">
-                                                            <input type="radio" name="bag[CHD][{{ $ad }}]"
-                                                                id="CHD{{ $ad }}{{ $bag['code'] }}">
+                                                            <input class="input_baggage"
+                                                                data-user="Child {{ $ad }}"
+                                                                data-des="({{ $bag['description'] }})"
+                                                                data-rate="{{ convertCurrency($bag['amount'], $bag['currency']) }}"
+                                                                value="{{ $bag['code'] }}" type="radio"
+                                                                name="bag[{{ $segments['lfID'] }}][CHD][{{ $ad }}]"
+                                                                id="{{ $segments['lfID'] }}CHD{{ $ad }}{{ $bag['code'] }}">
                                                             <label class="w-100"
-                                                                for="CHD{{ $ad }}{{ $bag['code'] }}">
+                                                                for="{{ $segments['lfID'] }}CHD{{ $ad }}{{ $bag['code'] }}">
                                                                 <div class="bg-white rounded-2 p-2">
                                                                     <div
                                                                         class="d-flex align-items-center justify-content-between g-2">
@@ -285,12 +309,23 @@
                                                         </div>
                                                     @endif
                                                 @endforeach
+
+                                                <div class="col-12">
+                                                    <button type="button"
+                                                        class="btn btn_theme btn_md removeSeatSelection"
+                                                        data-seatseleted="bag[{{ $segments['lfID'] }}][CHD][{{ $ad }}]">Remove
+                                                        Selection</button>
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             @endfor
                         @endif
+                        @php
+                            $flightLoop++;
+                        @endphp
                     @endforeach
                 @endisset
             </div>

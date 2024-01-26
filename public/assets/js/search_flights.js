@@ -591,45 +591,51 @@ $(document).on('click', '.viewFlightDetails', function () {
     } else {
         $('.ajaxloader').css('display', 'block');
 
-        var viewdata = {
-            id: $(this).attr('data-id'),
-            session_id: $(this).attr('data-session_id'),
-            search_type: $(this).attr('data-search_type'),
-            fareCode: $(this).attr('data-fareCode'),
-            api_provider: $(this).attr('data-api_provider'),
-            cabin_type: $(this).attr('data-cabin_type')
-        }
-
-        if ($(this).attr('data-api_provider') == 'flydubai') {
-            viewdata.LFID = $(this).attr('data-LFID')
-        }
-
-        $.ajax({
-            url: ROUTES.flight_view_details,
-            data: viewdata,
-            success: function (response) {
-                $('.ajaxloader').css('display', 'none');
-                var resp = JSON.parse(response);
-                if (resp.status == true) {
-                    $('#detialsView_' + id).html(resp.data);
-                    $('#detialsView_' + id).addClass('show');
-                    that.attr('data-data_loaded', true)
-                    $('html, body').animate({
-                        scrollTop: $('#detialsView_' + id).offset().top
-                    }, 1000);
-                    $(document).trigger("rtn_details_loaded");
-                } else {
-                    swal({
-                        title: "Not Available",
-                        text: "Flights fare may have changed. Please refresh the page.",
-                        icon: "warning"
-                    }).then(function () {
-                        // window.location.reload();
-                    });
-                }
-
+        if (that.attr('data-data_loaded') == 'false') {
+            var viewdata = {
+                id: $(this).attr('data-id'),
+                session_id: $(this).attr('data-session_id'),
+                search_type: $(this).attr('data-search_type'),
+                fareCode: $(this).attr('data-fareCode'),
+                api_provider: $(this).attr('data-api_provider'),
+                cabin_type: $(this).attr('data-cabin_type')
             }
-        });
+
+            if ($(this).attr('data-api_provider') == 'flydubai') {
+                viewdata.LFID = $(this).attr('data-LFID')
+            }
+
+            $.ajax({
+                url: ROUTES.flight_view_details,
+                data: viewdata,
+                success: function (response) {
+                    $('.ajaxloader').css('display', 'none');
+                    var resp = JSON.parse(response);
+                    if (resp.status == true) {
+                        $('#detialsView_' + id).html(resp.data);
+                        $('#detialsView_' + id).addClass('show');
+                        that.attr('data-data_loaded', true)
+                        $('html, body').animate({
+                            scrollTop: $('#detialsView_' + id).offset().top
+                        }, 1000);
+                        $(document).trigger("rtn_details_loaded");
+                    } else {
+                        swal({
+                            title: "Not Available",
+                            text: "Flights fare may have changed. Please refresh the page.",
+                            icon: "warning"
+                        }).then(function () {
+                            // window.location.reload();
+                        });
+                    }
+
+                }
+            });
+        } else {
+            $('.ajaxloader').css('display', 'none');
+            $('#detialsView_' + id).addClass('show');
+            $(document).trigger("rtn_details_loaded");
+        }
     }
 });
 
