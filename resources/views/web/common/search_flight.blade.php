@@ -92,7 +92,7 @@
                                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>From</p>
-                                                                   <input type="text" name="oFrom" placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="oFrom">
+                                                                   <input type="text" oninput="this.value = this.value.toUpperCase()" name="oFrom" placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="oFrom">
                                                                    <input type="hidden" class="airport" name="oFrom_label"  id="oFrom_label">
                                                                     <span class="place-label from_airport" id="oFrom_labels"></span>
                                                                     <div class="plan_icon_posation">
@@ -104,7 +104,7 @@
                                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>To </p>
-                                                                    <input type="text" name="oTo" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="oTo">
+                                                                    <input type="text" oninput="this.value = this.value.toUpperCase()" name="oTo" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="oTo">
                                                                     <input type="hidden"  class="airport"  name="oTo_label"  id="oTo_label">
                                                                     <span  class="place-label to_airport" id="oTo_labels"></span>
                                                                     <div class="plan_icon_posation">
@@ -215,8 +215,8 @@
                                                             </div>
                                                             <div class="top_form_search_button">
                                                                 <div class="form-check write_spical_check">
-                                                                    <input class="form-check-input" type="checkbox" value="1" {{ $direct != '' ? 'checked' : '' }} name="direct" id="flexCheckDefaultf1">
-                                                                    <label class="form-check-label" for="flexCheckDefaultf1"> Direct Flight Only </label>
+                                                                    <input class="form-check-input" type="checkbox" value="1" {{ $direct != '' ? 'checked' : '' }} name="direct" id="flexCheckDefaultf1DIR">
+                                                                    <label class="form-check-label" for="flexCheckDefaultf1DIR"> Direct Flight Only </label>
                                                                 </div>
                                                                
                                                                 <button class="btn btn_theme btn_md show_flights" type="submit" onclick="return oneWayCheckFilter()">Show flights</button>

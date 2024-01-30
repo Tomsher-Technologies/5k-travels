@@ -45,15 +45,15 @@ class FlightsApiController extends Controller
 
     public function getToken(){
         $data = [
-            "client_id"=> env('FLY_DUBAI_CLIENT_ID_TEST'),
-            "client_secret"=> env('FLY_DUBAI_CLIENT_SECRET_TEST'),
+            "client_id"=> env('FLY_DUBAI_CLIENT_ID'),
+            "client_secret"=> env('FLY_DUBAI_CLIENT_SECRET'),
             "grant_type"=> 'password',
-            "password"=> env('FLY_DUBAI_PASSWORD_TEST'),
+            "password"=> env('FLY_DUBAI_PASSWORD'),
             "scope"=> 'res',
-            "username" =>  env('FLY_DUBAI_USERNAME_TEST'),
+            "username" =>  env('FLY_DUBAI_USERNAME'),
         ];
        
-        $response = Http::timeout(300)->withOptions($this->options)->asForm()->post(env('FLY_DUBAI_API_URL_TEST').'authenticate', $data);
+        $response = Http::timeout(300)->withOptions($this->options)->asForm()->post(env('FLY_DUBAI_API_URL').'authenticate', $data);
         $result = $response->getBody()->getContents();
         return json_decode($result);
     }
@@ -67,9 +67,9 @@ class FlightsApiController extends Controller
         $retrieveFareQuote['ChannelID'] = "OTA";
         $retrieveFareQuote['CountryCode'] = "AE";
         $retrieveFareQuote['ClientIPAddress'] = "01.102.103.104";
-        $retrieveFareQuote['HistoricUserName'] = env('FLY_DUBAI_USERNAME_TEST');
+        $retrieveFareQuote['HistoricUserName'] = env('FLY_DUBAI_USERNAME');
         $retrieveFareQuote['CurrencyOfFareQuote'] = "AED";
-        $retrieveFareQuote['IataNumberOfRequestor'] = env('FLY_DUBAI_IATA_TEST');
+        $retrieveFareQuote['IataNumberOfRequestor'] = env('FLY_DUBAI_IATA');
         $retrieveFareQuote['FullInBoundDate'] = "25/12/2023";
         $retrieveFareQuote['FullOutBoundDate'] = "25/12/2023";
         $retrieveFareQuote['CorporationID'] = -2147483648;
@@ -105,8 +105,8 @@ class FlightsApiController extends Controller
 
         $response = Http::timeout(300)->withOptions($this->options)->withHeaders([
             'Accept-Encoding' => 'gzip, deflate',
-            'Authorization' => 'bearer '.$apiToken
-        ])->post(env('FLY_DUBAI_API_URL_TEST').'pricing/flightswithfares', $data);
+            'Authorization' => 'Bearer '.$apiToken
+        ])->post(env('FLY_DUBAI_API_URL').'pricing/flightswithfares', $data);
         $result = $response->getBody()->getContents();
 
         $resultData = json_decode($result);
