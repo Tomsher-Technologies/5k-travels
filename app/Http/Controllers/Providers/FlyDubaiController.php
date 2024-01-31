@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Providers;
 use App\Http\Controllers\Controller;
 use App\Models\Airports;
 use App\Models\Countries;
+use App\Models\FlightBookings;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -45,6 +46,7 @@ class FlyDubaiController extends Controller
 
     public function search(Request $request)
     {
+        generateApiToken();
         $retrieveFareQuote = [];
         $retrieveFareQuote['CarrierCodes']['CarrierCode'][]['AccessibleCarrierCode'] = "FZ";
         $retrieveFareQuote['SecutiryGUID'] = "";
@@ -897,6 +899,29 @@ class FlyDubaiController extends Controller
                 $acc_response = $this->flightBookingService->callAPI('pricing/ancillary', $data);
                 $seat_response = $this->flightBookingService->callAPI('pricing/seats', $data);
 
+                if (Cache::has('fd_search_ancillary_' . $request->search_id)) {
+                    Cache::forget('fd_search_ancillary_' . $request->search_id);
+                }
+                if (Cache::has('fd_search_seat_' . $request->search_id)) {
+                    Cache::forget('fd_search_seat_' . $request->search_id);
+                }
+
+                $logger =  Log::build([
+                    'driver' => 'single',
+                    'path' => storage_path('logs/se/' . $request->search_id . '/anc_req.json'),
+                ]);
+                $logger->info(json_encode($acc_response));
+
+                $logger =  Log::build([
+                    'driver' => 'single',
+                    'path' => storage_path('logs/se/' . $request->search_id . '/sear_req.json'),
+                ]);
+                $logger->info(json_encode($seat_response));
+
+
+                Cache::set('fd_search_ancillary_' . $request->search_id, $acc_response);
+                Cache::set('fd_search_seat_' . $request->search_id, $seat_response);
+
                 $res_data = array_merge($res_data, array(
                     'search_type' => $search_result['search_type'],
                     'search_result' => $search_result,
@@ -1009,20 +1034,84 @@ class FlyDubaiController extends Controller
         return $pass;
     }
 
+    public function generateSpecialServices(Request $request, $paxCount, $p_type)
+    {
+        // return [];
+        $acc_result = Cache::get('fd_search_ancillary_' . $request->search_id, null);
+        $services = [];
+        if (!$acc_result) {
+            return [];
+        }
+        // Bag
+        if (isset($request['bag'][$p_type][$paxCount])) {
+            $arr_key = key($request['bag'][$p_type][$paxCount]);
+            $arr_value = $request['bag'][$p_type][$paxCount][$arr_key];
+            $bagDetails = getBaggaeDetails($arr_key, $arr_value, $acc_result);
+            $bag = [];
+            $bag["ServiceID"] = 0;
+            $bag["CodeType"] = $arr_value;
+            $bag["SSRCategory"] = 0;
+            $bag["LogicalFlightID"] = $arr_key;
+            $bag["DepartureDate"] = $bagDetails['depDate'];
+            $bag["Amount"] = $bagDetails['bag']['amount'];
+            $bag["OverrideAmount"] = false;
+            $bag["CurrencyCode"] = $bagDetails['bag']['currency'];
+            $bag["Commissionable"] = false;
+            $bag["Refundable"] = false;
+            $bag["ChargeComment"] = $bagDetails['bag']['ruleID'];
+            $bag["PersonOrgID"] = -$paxCount;
+            $bag["AlreadyAdded"] = false;
+            $bag["PhysicalFlightID"] = 0;
+            $bag["secureHash"] = "";
+            $services[] = $bag;
+        }
+
+        // Meal
+        if (isset($request['meal'][$p_type][$paxCount])) {
+            foreach ($request['meal'][$p_type][$paxCount] as $key => $meal) {
+                $mealDetails = getMealDetails($key, $meal, $acc_result);
+
+                $meal_arr = [];
+                $meal_arr["ServiceID"] = 0;
+                $meal_arr["CodeType"] = $meal;
+                $meal_arr["SSRCategory"] = 0;
+                $meal_arr["LogicalFlightID"] = $mealDetails['lfID'];
+                $meal_arr["DepartureDate"] = $mealDetails['depDate'];
+                $meal_arr["Amount"] = $mealDetails['meal']['amount'];
+                $meal_arr["OverrideAmount"] = false;
+                $meal_arr["CurrencyCode"] = $mealDetails['meal']['currency'];
+                $meal_arr["Commissionable"] = false;
+                $meal_arr["Refundable"] = false;
+                $meal_arr["ChargeComment"] = $mealDetails['meal']['ruleID'];
+                $meal_arr["PersonOrgID"] = -$paxCount;
+                $meal_arr["AlreadyAdded"] = false;
+                $meal_arr["PhysicalFlightID"] = $key;
+                $meal_arr["secureHash"] = "";
+
+                $services[] = $meal_arr;
+            }
+        }
+
+        return $services;
+    }
 
     public function submitPnr(Request $request)
     {
         $passCount = -1;
         $passengers = [];
         $segments = [];
+        // dd($request);
 
-        dd($request);
+        $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
+
+        // dd($search_result );
 
         foreach ($request->adult_title as $key => $adult) {
             $segments[] = [
                 'PersonOrgID' => $passCount,
-                'FareInformationID' => (int)abs($passCount),
-                'SpecialServices' => [],
+                'FareInformationID' => 1,
+                // 'FareInformationID' => (int)abs($passCount),
+                'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'ADT'),
                 'Seats' => [],
             ];
             $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'adult');
@@ -1033,7 +1122,7 @@ class FlyDubaiController extends Controller
                 $segments[] = [
                     'PersonOrgID' => $passCount,
                     'FareInformationID' =>  (int)abs($passCount),
-                    'SpecialServices' => [],
+                    'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'CHD'),
                     'Seats' => [],
                 ];
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'child');
@@ -1050,6 +1139,7 @@ class FlyDubaiController extends Controller
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'infant');
             }
         }
+        // dd($segments);
 
         $data = [];
         $data['ActionType'] =  'GetSummary';
@@ -1087,7 +1177,7 @@ class FlyDubaiController extends Controller
         $data['Segments'] =  $segments;
         $data['Payments'] = [];
 
-        // dd(json_encode($data));
+        dd(json_encode($data));
 
         $submit_response = $this->flightBookingService->callAPI('cp/summaryPNR?accural=true', $data);
 
@@ -1109,11 +1199,44 @@ class FlyDubaiController extends Controller
             $commit_response = $this->flightBookingService->callAPI('cp/commitPNR?accrual=true', $commit_data);
 
             if ($commit_response && isset($commit_response['Exceptions']) && $commit_response['Exceptions'][0]['ExceptionCode'] == 0) {
-                dd("ok");
+                // dd([
+                //     'ok',
+                //     $commit_response
+                // ]);
+
+                $search_details =  getOrginDestinationSession($search_result->search_type);
+
+                FlightBookings::create([
+                    'unique_booking_id' => $commit_response['ConfirmationNumber'],
+                    'direction' =>  $search_result->search_type,
+                    'origin' => $search_details['origin'],
+                    'destination' =>  $search_details['destination'],
+                    'adult_count' =>  $search_details['adult'],
+                    'child_count' =>  $search_details['child'],
+                    'infant_count' =>  $search_details['infant'],
+                    'booking_status' =>  "Booked",
+                    'ticket_status' =>  "Ticketed",
+                    'cancel_request' =>  0,
+                    'currency' =>  getActiveCurrency(),
+                    'customer_name' =>  $request->adult_first_name[0] . ' '  . $request->adult_last_name[0],
+                    'customer_email' =>  $request->email,
+                    'phone_code' =>  $request->mobile_code,
+                    'customer_phone' =>  $request->mobile_no,
+                ]);
+
+                generateApiToken();
             } else {
+                dd([
+                    'commit error',
+                    $commit_response
+                ]);
                 return $this->redirectFail();
             }
         } else {
+            dd([
+                'aa',
+                $submit_response
+            ]);
             return $this->redirectFail();
         }
     }

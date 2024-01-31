@@ -54,9 +54,9 @@
                                                 @if (isset($passengers['ADT']))
                                                     @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
                                                         <li class="">
-                                                            <a href="#seatADT{{ $ad }}" class=""
-                                                                data-bs-toggle="tab" aria-selected="false"
-                                                                role="tab" tabindex="-1">
+                                                            <a data-user_id="{{ $flights['pfID'] }}_{{$ad}}" href="#seats_{{ $flights['pfID'] }}"
+                                                                class="seatselector" data-bs-toggle="tab"
+                                                                aria-selected="false" role="tab" tabindex="-1">
                                                                 <div class="card border">
                                                                     <div class="card-header">
                                                                         <div
@@ -83,7 +83,7 @@
                                                 @if (isset($passengers['CHD']))
                                                     @for ($ad = 1; $ad <= $passengers['CHD']; $ad++)
                                                         <li class="">
-                                                            <a href="#seatCHD{{ $ad }}" class=""
+                                                            <a href="#seats_{{ $flights['pfID'] }}" class="seatselector "
                                                                 data-bs-toggle="tab" aria-selected="false"
                                                                 role="tab" tabindex="-1">
                                                                 <div class="card border">
@@ -168,8 +168,7 @@
                         $seat_order = ['BUSINESS', 'ECONOMY'];
                         $cabins = array_combine(array_column($flights['cabins'], 'cabin'), $flights['cabins']);
                     @endphp
-
-                    <div class="tab-pane table-responsive userprof-tab" id="seatADT{{ $ad }}"
+                    <div class="tab-pane table-responsive seattab userprof-tab" id="seats_{{ $flights['pfID'] }}"
                         role="tabpanel">
                         <div class="bookyour-seat">
                             <div class="seat-info">
@@ -240,7 +239,7 @@
                                                                         $seat_class = 'gt-seat-business';
                                                                     }
                                                                 @endphp
-                                                                <span data-selected="false"
+                                                                <span data-user="" data-selected="false"
                                                                     tooltip="{{ getDisplyPrice($c_seat['amount'], $c_seat['currency']) }}"
                                                                     class="{{ $seat_class }} {{ $order == $current_class ? 'input_seat' : '' }} {{ $seat_avail ? 'seatnot-available' : '' }}"
                                                                     data-seat-id="{{ $seat_map['rowNumber'] . $c_seat['seat'] }}">

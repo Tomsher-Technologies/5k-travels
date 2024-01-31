@@ -5,16 +5,19 @@
 
                 @isset($acc_response['ancillaryQuotes']['flights'])
                     @foreach ($acc_response['ancillaryQuotes']['flights'] as $flights)
+                        @php
+                            $flightLoop = 1;
+                        @endphp
                         @foreach ($flights['legs'] as $leg)
                             @php
                                 $leg_details = getLegDetails($leg['pfID'], $res_data['search_result']['legDetails']);
                             @endphp
-                            <div class="accordion" id="accordionExample{{ $leg['lfID'] }}">
+                            <div class="accordion" id="accordionExample{{ $leg['pfID'] }}">
                                 <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingOne{{ $leg['lfID'] }}">
+                                    <h2 class="accordion-header" id="headingOne{{ $leg['pfID'] }}">
                                         <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapseOne{{ $leg['lfID'] }}" aria-expanded="true"
-                                            aria-controls="collapseOne{{ $leg['lfID'] }}">
+                                            data-bs-target="#collapseOne{{ $leg['pfID'] }}" aria-expanded="true"
+                                            aria-controls="collapseOne{{ $leg['pfID'] }}">
                                             <div class="flight-card flights-list__item">
                                                 <div class="flight-card-list-dt">
                                                     <div class="flight-card__departure">
@@ -45,8 +48,8 @@
                                     </h2>
 
 
-                                    <div id="collapseOne{{ $leg['lfID'] }}" class="accordion-collapse collapse show"
-                                        aria-labelledby="headingOne{{ $leg['lfID'] }}"
+                                    <div id="collapseOne{{ $leg['pfID'] }}" class="accordion-collapse collapse show"
+                                        aria-labelledby="headingOne{{ $leg['pfID'] }}"
                                         data-bs-parent="#accordionExample{{ $leg['lfID'] }}" style="">
                                         <div class="accordion-body">
                                             <div class="tabs-menus"> <!-- Tabs -->
@@ -55,9 +58,11 @@
                                                     @if (isset($passengers['ADT']))
                                                         @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
                                                             <li class="">
-                                                                <a href="#meal{{ $leg['lfID'] }}ADT{{ $ad }}"
-                                                                    class="" data-bs-toggle="tab"
-                                                                    aria-selected="false" role="tab" tabindex="-1">
+                                                                <a href="#meal{{ $leg['pfID'] }}ADT{{ $ad }}"
+                                                                    class="mealselector {{ $flightLoop == 1 && $ad == 1 ? 'active' : '' }}"
+                                                                    data-bs-toggle="tab"
+                                                                    aria-selected="{{ $flightLoop == 1 && $ad == 1 ? 'true' : 'false' }}"
+                                                                    role="tab" tabindex="-1">
                                                                     <div class="card border">
                                                                         <div class="card-header">
                                                                             <div
@@ -86,8 +91,8 @@
                                                     @if (isset($passengers['CHD']))
                                                         @for ($ad = 1; $ad <= $passengers['CHD']; $ad++)
                                                             <li class="">
-                                                                <a href="#meal{{ $leg['lfID'] }}CHD{{ $ad }}"
-                                                                    class="" data-bs-toggle="tab"
+                                                                <a href="#meal{{ $leg['pfID'] }}CHD{{ $ad }}"
+                                                                    class="mealselector" data-bs-toggle="tab"
                                                                     aria-selected="false" role="tab" tabindex="-1">
                                                                     <div class="card border">
                                                                         <div class="card-header">
@@ -165,15 +170,17 @@
 
                 @isset($acc_response['ancillaryQuotes']['flights'])
                     @foreach ($acc_response['ancillaryQuotes']['flights'] as $flights)
+                        @php
+                            $flightLoop = 1;
+                        @endphp
                         @foreach ($flights['legs'] as $leg)
                             @php
                                 $leg_details = getLegDetails($leg['pfID'], $res_data['search_result']['legDetails']);
                             @endphp
-
                             @if (isset($passengers['ADT']))
                                 @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
-                                    <div class="tab-pane table-responsive userprof-tab "
-                                        id="meal{{ $leg['lfID'] }}ADT{{ $ad }}" role="tabpanel">
+                                    <div class="tab-pane table-responsive userprof-tab meal-tab {{ $flightLoop == 1 && $ad == 1  ? 'active' : '' }}"
+                                        id="meal{{ $leg['pfID'] }}ADT{{ $ad }}" role="tabpanel">
                                         <div class="baggage-allw">
                                             <p class="info-b pt-2">
                                                 Please select your dietary preference. All food served on board is
@@ -189,7 +196,7 @@
                                                                     data-des="({{ $meals['description'] }})"
                                                                     data-rate="{{ convertCurrency($meals['amount'], $meals['currency']) }}"
                                                                     id="meal[{{ $leg['pfID'] }}]ADT{{ $ad }}{{ $meals['code'] }}"
-                                                                    name="meal[{{ $leg['pfID'] }}][ADT][{{ $ad }}]"
+                                                                    name="meal[ADT][{{ $ad }}][{{ $leg['pfID'] }}]"
                                                                     value="{{ $meals['code'] }}">
                                                                 <label
                                                                     for="meal[{{ $leg['pfID'] }}]ADT{{ $ad }}{{ $meals['code'] }}">
@@ -215,7 +222,7 @@
                             @if (isset($passengers['CHD']))
                                 @for ($ad = 1; $ad <= $passengers['CHD']; $ad++)
                                     <div class="tab-pane table-responsive userprof-tab"
-                                        id="meal{{ $leg['lfID'] }}CHD{{ $ad }}" role="tabpanel">
+                                        id="meal{{ $leg['pfID'] }}CHD{{ $ad }}" role="tabpanel">
                                         <div class="baggage-allw">
                                             <p class="info-b pt-2">
                                                 Please select your dietary preference. All food served on board is
@@ -231,7 +238,7 @@
                                                                     data-des="({{ $meals['description'] }})"
                                                                     data-rate="{{ convertCurrency($meals['amount'], $meals['currency']) }}"
                                                                     id="meal{{ $leg['pfID'] }}CHD{{ $ad }}{{ $meals['code'] }}"
-                                                                    name="meal[{{ $leg['pfID'] }}][CHD][{{ $ad }}]"
+                                                                    name="meal[CHD][{{ $ad }}][{{ $leg['pfID'] }}]"
                                                                     value="{{ $meals['code'] }}">
                                                                 <label
                                                                     for="meal{{ $leg['pfID'] }}CHD{{ $ad }}{{ $meals['code'] }}">

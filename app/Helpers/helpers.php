@@ -837,7 +837,7 @@ function getFarePrices($FareInfos)
     $margin = getMargin();
 
     // dd($margin );
-    
+
     foreach ($rates as $key => $rate) {
         $rates[$key] += ($margin['totalmargin'] / 100) * $rate;
     }
@@ -871,4 +871,52 @@ function generateSeatSVG()
                                             </defs>
                                         </svg>
     SVG;
+}
+
+
+function getBaggaeDetails($lfid, $code, $ancillary)
+{
+    $arr = [];
+
+    foreach ($ancillary['ancillaryQuotes']['flights'] as $flights) {
+        $segments = $flights['segments'];
+        $arr['lfID'] = $segments['lfID'];
+        $arr['depDate'] = $segments['depDate'];
+        $arr['origin'] = $segments['origin'];
+        $arr['dest'] = $segments['dest'];
+
+        foreach ($segments['serviceQuotes'] as $bags) {
+            if ($bags['code'] == $code) {
+                $arr['bag'] = $bags;
+            }
+        }
+    }
+
+    return $arr;
+}
+
+function getMealDetails($pfid, $code, $ancillary)
+{
+    $arr = [];
+
+    foreach ($ancillary['ancillaryQuotes']['flights'] as $flights) {
+        foreach ($flights['legs'] as $legs) {
+            if ($legs['pfID'] == $pfid) {
+                $arr["lfID"] = $legs['lfID'];
+                $arr["pfID"] = $legs['pfID'];
+                $arr["depDate"] = $legs['depDate'];
+                $arr["origin"] = $legs['origin'];
+                $arr["dest"] = $legs['dest'];
+                $arr["flightNum"] = $legs['flightNum'];
+
+                foreach ($legs['serviceQuotes'] as $serviceQuotes) {
+                    if ($serviceQuotes['code']  ==  $code) {
+                        $arr["meal"] = $serviceQuotes;
+                    }
+                }
+            }
+        }
+    }
+
+    return $arr;
 }

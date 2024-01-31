@@ -53,7 +53,7 @@
                                                     @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
                                                         <li class="">
                                                             <a href="#tab{{ $segments['lfID'] }}ADT{{ $ad }}"
-                                                                class="{{ $flightLoop == 1 && $ad == 1 ? 'active' : '' }}"
+                                                                class="tabselector {{ $flightLoop == 1 && $ad == 1 ? 'active' : '' }}"
                                                                 data-bs-toggle="tab"
                                                                 aria-selected="{{ $flightLoop == 1 && $ad == 1 ? 'true' : 'false' }}"
                                                                 role="tab" tabindex="-1">
@@ -90,7 +90,7 @@
                                                     @for ($ad = 1; $ad <= $passengers['CHD']; $ad++)
                                                         <li class="">
                                                             <a href="#tab{{ $segments['lfID'] }}CHD{{ $ad }}"
-                                                                class="" data-bs-toggle="tab" aria-selected="false"
+                                                                class="tabselector" data-bs-toggle="tab" aria-selected="false"
                                                                 role="tab" tabindex="-1">
 
                                                                 <div class="card border">
@@ -211,7 +211,7 @@
                                                                 data-des="({{ $bag['description'] }})"
                                                                 data-rate="{{ convertCurrency($bag['amount'], $bag['currency']) }}"
                                                                 type="radio" value="{{ $bag['code'] }}"
-                                                                name="bag[{{ $segments['lfID'] }}][ADT][{{ $ad }}]"
+                                                                name="bag[ADT][{{ $ad }}][{{ $segments['lfID'] }}]"
                                                                 id="{{ $segments['lfID'] }}ADT{{ $ad }}{{ $bag['code'] }}">
                                                             <label class="w-100"
                                                                 for="{{ $segments['lfID'] }}ADT{{ $ad }}{{ $bag['code'] }}">
@@ -279,7 +279,7 @@
                                                                 data-des="({{ $bag['description'] }})"
                                                                 data-rate="{{ convertCurrency($bag['amount'], $bag['currency']) }}"
                                                                 value="{{ $bag['code'] }}" type="radio"
-                                                                name="bag[{{ $segments['lfID'] }}][CHD][{{ $ad }}]"
+                                                                name="bag[CHD][{{ $ad }}][{{ $segments['lfID'] }}]"
                                                                 id="{{ $segments['lfID'] }}CHD{{ $ad }}{{ $bag['code'] }}">
                                                             <label class="w-100"
                                                                 for="{{ $segments['lfID'] }}CHD{{ $ad }}{{ $bag['code'] }}">

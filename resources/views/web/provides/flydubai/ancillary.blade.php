@@ -7,6 +7,11 @@
             'INF' => (int) $res_data['search_params']['infant'],
         ];
 
+        $pax_count = 0;
+        foreach ($passengers as $value) {
+            $pax_count += $value;
+        }
+
         if ($res_data['search_type'] == 'OneWay') {
             $flight = getFlightDetails(request()->LFID, $res_data['search_result']['flights']);
             $fare = getFareDetails(request()->FareTypeID, $flight);
@@ -1011,6 +1016,24 @@
             $('#amountSpan').html(total + grandTotal);
         }
 
+        // $('.tabselector').on('click', function() {
+        //     $('.tabselector.active').removeClass('active');
+        //     $(this).addClass('active')
+        // });
+
+
+        // $('.mealselector').on('click', function() {
+        //     $('.tabselector.active').removeClass('active');
+        //     $(this).addClass('active');
+
+        //     $('.meal-tab').removeClass('active');
+
+        //     var id = $(this).attr('href');
+        //     $(id).addClass('active')
+        // });
+
+
+
         // baggage script
         $('.input_baggage').on('change', function() {
             var name = $(this).attr('name')
@@ -1079,9 +1102,22 @@
 
 
         // Seat script
+        var pax_count = {{ $pax_count }}
+        var selected_seat_count = 0;
         $('.input_seat').on('click', function() {
+            var user_id = $('.seatselector.active').attr('data-user_id');
+            console.log(user_id);
+            if ($('.input_seat.active').length > 0) {
+                $('.input_seat.active').each(ele => {
+                    if ($(ele).attr('data-user') == user_id) {
+                        console.log(ele);
+                        $(ele).attr('data-user', '');
+                        $(ele).remoeClass('active');
+                    }
+                })
+            }
             $(this).toggleClass('active');
-            $(this).data('selected', !$(this).data('selected'));
+            $(this).attr('data-user', user_id);
         });
     </script>
 @endpush
