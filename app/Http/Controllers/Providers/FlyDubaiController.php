@@ -148,10 +148,17 @@ class FlyDubaiController extends Controller
         ]);
         $logger->debug(json_encode($data));
 
+        // dd(json_encode($data));
 
         $resultData = $this->flightBookingService->callAPI('pricing/flightswithfares', $data);
 
-        // dd( $resultData);
+
+        // dd($resultData['RetrieveFareQuoteDateRangeResponse']['RetrieveFareQuoteDateRangeResult']['FlightSegments']);
+
+        // echo "<pre>";
+        // print_r( $resultData);
+        // echo "</pre>";
+        // die();
 
         $flights = [];
         $one_stop = $two_stop = $three_stop = $non_stop = $three_plus_stop = $refund = $no_refund = 0;
@@ -396,7 +403,12 @@ class FlyDubaiController extends Controller
             ]);
             $logger->info(json_encode($resultData));
 
+            if (Cache::has('fd_add_cart_res_' . $request->search_id)) {
+                Cache::forget('fd_add_cart_res_' . $request->search_id);
+            }
+
             if ($resultData['Exceptions'][0]['ExceptionCode'] == 0) {
+                Cache::set('fd_add_cart_res_' . $request->search_id, $resultData);
                 $msg = array(
                     'status' => true,
                     'data' => $request->all(),
@@ -1103,71 +1115,112 @@ class FlyDubaiController extends Controller
         $passengers = [];
         $segments = [];
 
-        $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
+        // dd($request);
 
-        
+        $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
+        $cart_res = Cache::get('fd_add_cart_res_' . $request->search_id, null);
+
+        // dd($cart_res);
+
+        if (!$search_result || !$cart_res) {
+            return $this->redirectFail();
+        }
+
+        $fareID = [];
+
+        foreach ($cart_res['flightGroups'] as $flightGroup) {
+            foreach ($flightGroup['fareBrands'] as $fareBrand) {
+                foreach ($fareBrand['fareInfos'] as $fareInfo) {
+                    foreach ($fareInfo['paxFareInfos'] as $paxFareInfo) {
+                        $fareID[$paxFareInfo['PTC']] = $paxFareInfo['fareID'];
+                    }
+                }
+            }
+        }
+
+
         $segmentsArray = [];
 
-        // if ($search_result['search_type'] == 'OneWay') {
-        //     $search_lfdi = $request->dep_LFID;
-        //     $search_FareTypeID = $request->FareTypeID;
+        if ($search_result['search_type'] == 'OneWay') {
+            $search_lfdi = $request->LFID;
+            $search_FareTypeID = $request->FareTypeID;
 
-        //     foreach ($search_result['flights'] as $flight) {
-        //         if ($flight['LFID'] == $search_lfdi) {
-        //             $segmentsArray[] = $flight;
-        //         }
-        //     }
-        // } else if ($search_result['search_type'] == 'Return') {
-        //     $dep_LFID = $request->dep_LFID;
-        //     $rtn_LFID = $request->rtn_LFID;
-        //     $dep_FareTypeID = $request->dep_FareTypeID;
-        //     $rtn_FareTypeID = $request->rtn_FareTypeID;
+            foreach ($search_result['flights'] as $flight) {
+                if ($flight['LFID'] == $search_lfdi) {
+                    $segmentsArray[] = $flight;
+                }
+            }
+        } else if ($search_result['search_type'] == 'Return') {
+            $dep_LFID = $request->dep_LFID;
+            $rtn_LFID = $request->rtn_LFID;
+            $dep_FareTypeID = $request->dep_FareTypeID;
+            $rtn_FareTypeID = $request->rtn_FareTypeID;
 
-        //     foreach ($search_result['flights'] as $flight) {
-        //         if ($flight['LFID'] == $dep_LFID || $flight['LFID'] == $rtn_LFID) {
-        //             $segmentsArray[] = $flight;
-        //         }
-        //     }
-        // }
+            foreach ($search_result['flights'] as $flight) {
+                if ($flight['LFID'] == $dep_LFID || $flight['LFID'] == $rtn_LFID) {
+                    $segmentsArray[] = $flight;
+                }
+            }
+        }
 
         // dd($segmentsArray);
 
         foreach ($request->adult_title as $key => $adult) {
-            $segments[] = [
-                'PersonOrgID' => $passCount,
-                // 'FareInformationID' => 1,
-                'FareInformationID' => (int)abs($passCount),
-                'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'ADT'),
-                'Seats' => [],
-            ];
+            // $segments[] = [
+            //     'PersonOrgID' => $passCount,
+            //     // 'FareInformationID' => 1,
+            //     'FareInformationID' => (int)abs($passCount),
+            //     'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'ADT'),
+            //     'Seats' => [],
+            // ];
             $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'adult');
         }
 
         if (isset($request->child_title)) {
             foreach ($request->child_title as $key => $child) {
-                $segments[] = [
-                    'PersonOrgID' => $passCount,
-                    // 'FareInformationID' => 1,
-                    'FareInformationID' =>  (int)abs($passCount),
-                    'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'CHD'),
-                    'Seats' => [],
-                ];
+                // $segments[] = [
+                //     'PersonOrgID' => $passCount,
+                //     // 'FareInformationID' => 1,
+                //     'FareInformationID' =>  (int)abs($passCount),
+                //     'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'CHD'),
+                //     'Seats' => [],
+                // ];
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'child');
             }
         }
         if (isset($request->infant_title)) {
             foreach ($request->infant_title as $key => $infant) {
-                $segments[] = [
-                    'PersonOrgID' => $passCount,
-                    // 'FareInformationID' => 1,
-                    'FareInformationID' =>  (int)abs($passCount),
-                    'SpecialServices' => [],
-                    'Seats' => [],
-                ];
+                // $segments[] = [
+                //     'PersonOrgID' => $passCount,
+                //     // 'FareInformationID' => 1,
+                //     'FareInformationID' =>  (int)abs($passCount),
+                //     'SpecialServices' => [],
+                //     'Seats' => [],
+                // ];
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'infant');
             }
         }
-        // dd($segments);
+        // dd([$passengers, $fareID]);
+
+        foreach ($segmentsArray as $segment) {
+            foreach ($passengers as $passenger) {
+                $seg = [];
+                $seg['PersonOrgID'] = $passenger['PersonOrgID'];
+                $seg['FareInformationID'] = $fareID[$passenger['PTCID']];
+                $seg['SpecialServices'] = [];
+                $seg['Seats'] = [];
+
+                $segments[] = $seg;
+            }
+        }
+
+        dd([
+            $cart_res,
+            $segmentsArray,
+            $segments,
+        ]);
+
+        // dd(json_encode($segments));
 
         $data = [];
         $data['ActionType'] =  'GetSummary';
