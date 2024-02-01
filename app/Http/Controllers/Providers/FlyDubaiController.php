@@ -768,7 +768,7 @@ class FlyDubaiController extends Controller
                 "fareClass" => $pax['FCCode'],
                 "cabin" => $pax['Cabin'],
                 "paxID" => [
-                    (string)$pax['ID']
+                    (int)$pax['ID']
                 ]
 
             );
@@ -1120,7 +1120,7 @@ class FlyDubaiController extends Controller
         $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
         $cart_res = Cache::get('fd_add_cart_res_' . $request->search_id, null);
 
-        // dd($cart_res);
+        dd($cart_res);
 
         if (!$search_result || !$cart_res) {
             return $this->redirectFail();
@@ -1132,11 +1132,13 @@ class FlyDubaiController extends Controller
             foreach ($flightGroup['fareBrands'] as $fareBrand) {
                 foreach ($fareBrand['fareInfos'] as $fareInfo) {
                     foreach ($fareInfo['paxFareInfos'] as $paxFareInfo) {
-                        $fareID[$paxFareInfo['PTC']] = $paxFareInfo['fareID'];
+                        $fareID[$flightGroup['ID']][$paxFareInfo['PTC']] = $paxFareInfo['fareID'];
                     }
                 }
             }
         }
+
+        // dd($fareID);
 
 
         $segmentsArray = [];
@@ -1200,13 +1202,13 @@ class FlyDubaiController extends Controller
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'infant');
             }
         }
-        // dd([$passengers, $fareID]);
+        dd([$passengers, $fareID, $segmentsArray]);
 
         foreach ($segmentsArray as $segment) {
             foreach ($passengers as $passenger) {
                 $seg = [];
                 $seg['PersonOrgID'] = $passenger['PersonOrgID'];
-                $seg['FareInformationID'] = $fareID[$passenger['PTCID']];
+                $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
                 $seg['SpecialServices'] = [];
                 $seg['Seats'] = [];
 
@@ -1214,11 +1216,11 @@ class FlyDubaiController extends Controller
             }
         }
 
-        dd([
-            $cart_res,
-            $segmentsArray,
-            $segments,
-        ]);
+        // dd([
+        //     $cart_res,
+        //     $segmentsArray,
+        //     $segments,
+        // ]);
 
         // dd(json_encode($segments));
 
