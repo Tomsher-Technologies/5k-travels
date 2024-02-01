@@ -950,10 +950,10 @@ class FlyDubaiController extends Controller
 
         switch ($passengerType) {
             case 'child':
-                $PTCID = 5;
+                $PTCID = 6;
                 break;
             case 'infant':
-                $PTCID = 6;
+                $PTCID = 5;
                 break;
             default:
                 $PTCID = 1;
@@ -1105,35 +1105,32 @@ class FlyDubaiController extends Controller
 
         $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
 
+        
         $segmentsArray = [];
 
-        if ($search_result['search_type'] == 'OneWay') {
-            $search_lfdi = $request->LFID;
-            $search_FareTypeID = $request->FareTypeID;
+        // if ($search_result['search_type'] == 'OneWay') {
+        //     $search_lfdi = $request->dep_LFID;
+        //     $search_FareTypeID = $request->FareTypeID;
 
+        //     foreach ($search_result['flights'] as $flight) {
+        //         if ($flight['LFID'] == $search_lfdi) {
+        //             $segmentsArray[] = $flight;
+        //         }
+        //     }
+        // } else if ($search_result['search_type'] == 'Return') {
+        //     $dep_LFID = $request->dep_LFID;
+        //     $rtn_LFID = $request->rtn_LFID;
+        //     $dep_FareTypeID = $request->dep_FareTypeID;
+        //     $rtn_FareTypeID = $request->rtn_FareTypeID;
 
-            foreach ($search_result['flights'] as $flight) {
-                if ($flight['LFID'] == $search_lfdi) {
-                    $segmentsArray[] = $flight;
-                }
-            }
-        } else if ($search_result['search_type'] == 'Return') {
-            $dep_LFID = $request->dep_LFID;
-            $rtn_LFID = $request->rtn_LFID;
-            $dep_FareTypeID = $request->dep_FareTypeID;
-            $rtn_FareTypeID = $request->rtn_FareTypeID;
+        //     foreach ($search_result['flights'] as $flight) {
+        //         if ($flight['LFID'] == $dep_LFID || $flight['LFID'] == $rtn_LFID) {
+        //             $segmentsArray[] = $flight;
+        //         }
+        //     }
+        // }
 
-            foreach ($search_result['flights'] as $flight) {
-                if ($flight['LFID'] == $dep_LFID || $flight['LFID'] == $rtn_LFID) {
-                    $segmentsArray[] = $flight;
-                }
-            }
-        }
-
-        dd([
-            $segmentsArray,
-            $request->all()
-        ]);
+        // dd($segmentsArray);
 
         foreach ($request->adult_title as $key => $adult) {
             $segments[] = [

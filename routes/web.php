@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FlightsApiController;
 use App\Http\Controllers\Providers\FlyDubaiController;
 use App\Models\FlightBookings;
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,50 +23,48 @@ use App\Models\FlightBookings;
 
 Route::get('/cur', function () {
 
+    // $flight_booking = FlightBookings::create([
+    //     'unique_booking_id' => "PNR",
+    //     'direction' =>  "OneWay",
+    //     'origin' => "DXB",
+    //     'destination' =>  "IST",
+    //     'adult_count' =>  1,
+    //     'child_count' => 1,
+    //     'infant_count' =>  1,
+    //     'booking_status' =>  "Booked",
+    //     'ticket_status' =>  "Ticketed",
+    //     'cancel_request' =>  0,
+    //     'currency' =>  getActiveCurrency(),
+    //     'customer_name' =>  "Test User",
+    //     'customer_email' =>  "email@email.com",
+    //     'phone_code' =>  '971',
+    //     'customer_phone' => '123456789',
+    //     'user_id' => 0,
+    //     'client_ref' => '',
+    //     'fare_type' => ''
+    // ]);
 
+    // dd($flight_booking);
 
-    $flight_booking = FlightBookings::create([
-        'unique_booking_id' => "PNR",
-        'direction' =>  "OneWay",
-        'origin' => "DXB",
-        'destination' =>  "IST",
-        'adult_count' =>  1,
-        'child_count' => 1,
-        'infant_count' =>  1,
-        'booking_status' =>  "Booked",
-        'ticket_status' =>  "Ticketed",
-        'cancel_request' =>  0,
-        'currency' =>  getActiveCurrency(),
-        'customer_name' =>  "Test User",
-        'customer_email' =>  "email@email.com",
-        'phone_code' =>  '971',
-        'customer_phone' => '123456789',
-        'user_id' => 0,
-        'client_ref' => '',
-        'fare_type' => ''
-    ]);
-
-    dd($flight_booking);
-
-    dd(ini_get('max_execution_time'));
+    // dd(ini_get('max_execution_time'));
 
     // return view('web.provides.flydubai.ancillary');
 
-    // $url = 'https://api.currencybeacon.com/v1/convert';
+    $url = 'https://api.currencybeacon.com/v1/convert';
 
-    // $data = [
-    //     'from' => 'AED',
-    //     'to' => 'USD',
-    //     'amount' => 1,
-    //     'api_key' => env('CURRENCY_API_KEY')
-    // ];
+    $data = [
+        'from' => 'AED',
+        'to' => 'USD',
+        'amount' => 10,
+        'api_key' => env('CURRENCY_API_KEY')
+    ];
 
-    // $response = Http::timeout(300)->withOptions(['verify' => false])
-    //     ->get($url, $data);
-    // $apiResult = $response->json();
-    // // $resultData = json_decode($apiResult, true);
+    $response = Http::timeout(300)->withOptions(['verify' => false])
+        ->get($url, $data);
+    $apiResult = $response->json();
+    // $resultData = json_decode($apiResult, true);
 
-    // dd($apiResult);
+    dd($apiResult);
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
