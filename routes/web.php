@@ -6,6 +6,7 @@ use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FlightsApiController;
 use App\Http\Controllers\Providers\FlyDubaiController;
+use App\Models\FlightBookings;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,32 @@ use App\Http\Controllers\Providers\FlyDubaiController;
 
 Route::get('/cur', function () {
 
+
+
+    $flight_booking = FlightBookings::create([
+        'unique_booking_id' => "PNR",
+        'direction' =>  "OneWay",
+        'origin' => "DXB",
+        'destination' =>  "IST",
+        'adult_count' =>  1,
+        'child_count' => 1,
+        'infant_count' =>  1,
+        'booking_status' =>  "Booked",
+        'ticket_status' =>  "Ticketed",
+        'cancel_request' =>  0,
+        'currency' =>  getActiveCurrency(),
+        'customer_name' =>  "Test User",
+        'customer_email' =>  "email@email.com",
+        'phone_code' =>  '971',
+        'customer_phone' => '123456789',
+        'user_id' => 0,
+        'client_ref' => '',
+        'fare_type' => ''
+    ]);
+
+    dd($flight_booking);
+
+    dd(ini_get('max_execution_time'));
 
     // return view('web.provides.flydubai.ancillary');
 
@@ -75,6 +102,7 @@ Route::get('/authorize', [FlightsApiController::class, 'getToken'])->name('autho
 
 
 // Flydubai routes
+Route::get('/flydubai/seats', [FlyDubaiController::class, 'loadSeatHTML'])->name('flydubai.seathtml');
 Route::get('/flydubai/optional', [FlyDubaiController::class, 'getAncillaryOffers'])->name('flydubai.ancillary');
 Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
 // Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');

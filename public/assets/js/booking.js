@@ -21,7 +21,6 @@ $(document).on('click', '.addToCart', function () {
             $('.ajaxloader').css('display', 'none');
             var resp = JSON.parse(data);
             if (resp.status == true) {
-                console.log(data);
 
                 $('<form/>', { action: config.routes.flydubai_ancillary, method: 'GET' }).append(
                     $('<input>', { type: 'hidden', name: 'search_id', value: form.data('search_id') }),

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Airports;
 use App\Models\Countries;
 use App\Models\FlightBookings;
+use App\Models\FlightPassengers;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -46,6 +47,8 @@ class FlyDubaiController extends Controller
 
     public function search(Request $request)
     {
+
+        // Cache::clear();
         generateApiToken();
         $retrieveFareQuote = [];
         $retrieveFareQuote['CarrierCodes']['CarrierCode'][]['AccessibleCarrierCode'] = "FZ";
@@ -139,11 +142,11 @@ class FlyDubaiController extends Controller
 
         $search_id = Str::random(10);
 
-        // $logger =  Log::build([
-        //     'driver' => 'single',
-        //     'path' => storage_path('logs/se/' . $search_id . '/fare_req.json'),
-        // ]);
-        // $logger->debug(json_encode($data));
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/' . $search_id . '/fare_req.json'),
+        ]);
+        $logger->debug(json_encode($data));
 
 
         $resultData = $this->flightBookingService->callAPI('pricing/flightswithfares', $data);
@@ -164,11 +167,11 @@ class FlyDubaiController extends Controller
 
         if ($resultData) {
 
-            // $logger =  Log::build([
-            //     'driver' => 'single',
-            //     'path' => storage_path('logs/se/' . $search_id . '/fare_res.json'),
-            // ]);
-            // $logger->debug(json_encode($resultData));
+            $logger =  Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/se/' . $search_id . '/fare_res.json'),
+            ]);
+            $logger->debug(json_encode($resultData));
 
             $flightSegments = isset($resultData['RetrieveFareQuoteDateRangeResponse']['RetrieveFareQuoteDateRangeResult']['FlightSegments']['FlightSegment']) ? $resultData['RetrieveFareQuoteDateRangeResponse']['RetrieveFareQuoteDateRangeResult']['FlightSegments']['FlightSegment'] : array();
             $segmentDetails = $legDetails = $serviceDetails = $taxDetails = [];
@@ -379,19 +382,19 @@ class FlyDubaiController extends Controller
                 $data = $this->constructReturnBookingData($search_result, $request);
             }
 
-            // $logger =  Log::build([
-            //     'driver' => 'single',
-            //     'path' => storage_path('logs/se/' . $request->search_id . '/cart_req.json'),
-            // ]);
-            // $logger->info(json_encode($data));
+            $logger =  Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/se/' . $request->search_id . '/cart_req.json'),
+            ]);
+            $logger->info(json_encode($data));
 
             $resultData = $this->flightBookingService->callAPI('order/cart', $data);
 
-            // $logger =  Log::build([
-            //     'driver' => 'single',
-            //     'path' => storage_path('logs/se/' . $request->search_id . '/cart_res.json'),
-            // ]);
-            // $logger->info(json_encode($resultData));
+            $logger =  Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/se/' . $request->search_id . '/cart_res.json'),
+            ]);
+            $logger->info(json_encode($resultData));
 
             if ($resultData['Exceptions'][0]['ExceptionCode'] == 0) {
                 $msg = array(
@@ -486,7 +489,7 @@ class FlyDubaiController extends Controller
                     $bookingCodes['paxID'][] = (string)$pax['ID'];
                 }
             } else {
-                $bookingCodes['paxID'][] = (string)$pax['ID'];
+                $bookingCodes['paxID'][] = (int)$pax['ID'];
             }
         }
 
@@ -658,7 +661,7 @@ class FlyDubaiController extends Controller
                 "fareClass" => $pax['FCCode'],
                 "cabin" => $pax['Cabin'],
                 "paxID" => [
-                    (string)$pax['ID']
+                    (int)$pax['ID']
                 ]
 
             );
@@ -899,12 +902,15 @@ class FlyDubaiController extends Controller
                 $acc_response = $this->flightBookingService->callAPI('pricing/ancillary', $data);
                 $seat_response = $this->flightBookingService->callAPI('pricing/seats', $data);
 
-                if (Cache::has('fd_search_ancillary_' . $request->search_id)) {
-                    Cache::forget('fd_search_ancillary_' . $request->search_id);
-                }
-                if (Cache::has('fd_search_seat_' . $request->search_id)) {
-                    Cache::forget('fd_search_seat_' . $request->search_id);
-                }
+                // if (Cache::has('fd_search_ancillary_' . $request->search_id)) {
+                //     Cache::forget('fd_search_ancillary_' . $request->search_id);
+                // }
+                // if (Cache::has('fd_seat_req_' . $request->search_id)) {
+                //     Cache::forget('fd_seat_req_s' . $request->search_id);
+                // }
+                // if (Cache::has('fd_seat_res_data_' . $request->search_id)) {
+                //     Cache::forget('fd_seat_res_data_' . $request->search_id);
+                // }
 
                 $logger =  Log::build([
                     'driver' => 'single',
@@ -912,15 +918,8 @@ class FlyDubaiController extends Controller
                 ]);
                 $logger->info(json_encode($acc_response));
 
-                $logger =  Log::build([
-                    'driver' => 'single',
-                    'path' => storage_path('logs/se/' . $request->search_id . '/sear_req.json'),
-                ]);
-                $logger->info(json_encode($seat_response));
-
-
-                Cache::set('fd_search_ancillary_' . $request->search_id, $acc_response);
-                Cache::set('fd_search_seat_' . $request->search_id, $seat_response);
+                // Cache::set('fd_search_ancillary_' . $request->search_id, $acc_response);
+                // Cache::set('fd_seat_req_' . $request->search_id, $data);
 
                 $res_data = array_merge($res_data, array(
                     'search_type' => $search_result['search_type'],
@@ -929,7 +928,7 @@ class FlyDubaiController extends Controller
                     'countries' => Countries::all()
                 ));
 
-                // dd($seat_response);
+                // Cache::set('fd_seat_res_data_' . $request->search_id, $res_data);
 
                 return view('web.provides.flydubai.ancillary', compact('acc_response', 'seat_response', 'res_data'));
             }
@@ -938,7 +937,6 @@ class FlyDubaiController extends Controller
                 'ancillary_status' => "data empty"
             ]);
         } catch (Exception $e) {
-            dd($e);
             return redirect()->back()->with([
                 'ancillary_status' => "try catch"
             ]);
@@ -997,7 +995,7 @@ class FlyDubaiController extends Controller
             [
                 "Key" => null,
                 "ContactID" => 0,
-                "PersonOrgID" => -1,
+                "PersonOrgID" => $passCount,
                 "ContactField" => $request->mobile_no,
                 "ContactType" => 1,
                 "Extension" => "",
@@ -1010,7 +1008,7 @@ class FlyDubaiController extends Controller
             [
                 "Key" => null,
                 "ContactID" => 0,
-                "PersonOrgID" => -1,
+                "PersonOrgID" => $passCount,
                 "ContactField" => $request->email,
                 "ContactType" => 4,
                 "Extension" => "",
@@ -1095,22 +1093,53 @@ class FlyDubaiController extends Controller
         return $services;
     }
 
+    public function generateSeatArray(Request $request, $paxCount, $p_type)
+    {
+    }
+
     public function submitPnr(Request $request)
     {
         $passCount = -1;
         $passengers = [];
         $segments = [];
-        // dd($request);
 
         $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
 
-        // dd($search_result );
+        $segmentsArray = [];
+
+        if ($search_result['search_type'] == 'OneWay') {
+            $search_lfdi = $request->LFID;
+            $search_FareTypeID = $request->FareTypeID;
+
+
+            foreach ($search_result['flights'] as $flight) {
+                if ($flight['LFID'] == $search_lfdi) {
+                    $segmentsArray[] = $flight;
+                }
+            }
+        } else if ($search_result['search_type'] == 'Return') {
+            $dep_LFID = $request->dep_LFID;
+            $rtn_LFID = $request->rtn_LFID;
+            $dep_FareTypeID = $request->dep_FareTypeID;
+            $rtn_FareTypeID = $request->rtn_FareTypeID;
+
+            foreach ($search_result['flights'] as $flight) {
+                if ($flight['LFID'] == $dep_LFID || $flight['LFID'] == $rtn_LFID) {
+                    $segmentsArray[] = $flight;
+                }
+            }
+        }
+
+        dd([
+            $segmentsArray,
+            $request->all()
+        ]);
 
         foreach ($request->adult_title as $key => $adult) {
             $segments[] = [
                 'PersonOrgID' => $passCount,
-                'FareInformationID' => 1,
-                // 'FareInformationID' => (int)abs($passCount),
+                // 'FareInformationID' => 1,
+                'FareInformationID' => (int)abs($passCount),
                 'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'ADT'),
                 'Seats' => [],
             ];
@@ -1121,6 +1150,7 @@ class FlyDubaiController extends Controller
             foreach ($request->child_title as $key => $child) {
                 $segments[] = [
                     'PersonOrgID' => $passCount,
+                    // 'FareInformationID' => 1,
                     'FareInformationID' =>  (int)abs($passCount),
                     'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'CHD'),
                     'Seats' => [],
@@ -1132,6 +1162,7 @@ class FlyDubaiController extends Controller
             foreach ($request->infant_title as $key => $infant) {
                 $segments[] = [
                     'PersonOrgID' => $passCount,
+                    // 'FareInformationID' => 1,
                     'FareInformationID' =>  (int)abs($passCount),
                     'SpecialServices' => [],
                     'Seats' => [],
@@ -1177,9 +1208,22 @@ class FlyDubaiController extends Controller
         $data['Segments'] =  $segments;
         $data['Payments'] = [];
 
-        dd(json_encode($data));
+        // dd(json_encode($data));
+
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/' . $request->search_id . '/submit_req.json'),
+        ]);
+        $logger->info(json_encode($data));
+
 
         $submit_response = $this->flightBookingService->callAPI('cp/summaryPNR?accural=true', $data);
+
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/' . $request->search_id . '/submit_res.json'),
+        ]);
+        $logger->info(json_encode($submit_response));
 
         if ($submit_response && isset($submit_response['Exceptions']) && $submit_response['Exceptions'][0]['ExceptionCode'] == 0) {
             $commit_data = [
@@ -1196,32 +1240,47 @@ class FlyDubaiController extends Controller
                 "HistoricUserName" => env('FLY_DUBAI_USERNAME')
             ];
 
+            $logger =  Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/se/' . $request->search_id . '/commit_req.json'),
+            ]);
+            $logger->info(json_encode($commit_data));
+
             $commit_response = $this->flightBookingService->callAPI('cp/commitPNR?accrual=true', $commit_data);
 
+            $logger =  Log::build([
+                'driver' => 'single',
+                'path' => storage_path('logs/se/' . $request->search_id . '/commit_res.json'),
+            ]);
+            $logger->info(json_encode($commit_response));
+
             if ($commit_response && isset($commit_response['Exceptions']) && $commit_response['Exceptions'][0]['ExceptionCode'] == 0) {
-                // dd([
-                //     'ok',
-                //     $commit_response
+
+                // $search_details =  getOrginDestinationSession($search_result['search_type']);
+
+                // $flight_booking = FlightBookings::create([
+                //     'unique_booking_id' => $commit_response['ConfirmationNumber'],
+                //     'direction' =>  $search_result['search_type'],
+                //     'origin' => $search_details['origin'],
+                //     'destination' =>  $search_details['destination'],
+                //     'adult_count' =>  $search_details['adult'],
+                //     'child_count' =>  $search_details['child'],
+                //     'infant_count' =>  $search_details['infant'],
+                //     'booking_status' =>  "Booked",
+                //     'ticket_status' =>  "Ticketed",
+                //     'cancel_request' =>  0,
+                //     'currency' =>  getActiveCurrency(),
+                //     'customer_name' =>  $request->adult_first_name[0] . ' '  . $request->adult_last_name[0],
+                //     'customer_email' =>  $request->email,
+                //     'phone_code' =>  $request->mobile_code,
+                //     'customer_phone' =>  $request->mobile_no,
                 // ]);
 
-                $search_details =  getOrginDestinationSession($search_result->search_type);
+                // $flight_passengers = $this->savePassengerDetails($request, $flight_booking->id);
 
-                FlightBookings::create([
-                    'unique_booking_id' => $commit_response['ConfirmationNumber'],
-                    'direction' =>  $search_result->search_type,
-                    'origin' => $search_details['origin'],
-                    'destination' =>  $search_details['destination'],
-                    'adult_count' =>  $search_details['adult'],
-                    'child_count' =>  $search_details['child'],
-                    'infant_count' =>  $search_details['infant'],
-                    'booking_status' =>  "Booked",
-                    'ticket_status' =>  "Ticketed",
-                    'cancel_request' =>  0,
-                    'currency' =>  getActiveCurrency(),
-                    'customer_name' =>  $request->adult_first_name[0] . ' '  . $request->adult_last_name[0],
-                    'customer_email' =>  $request->email,
-                    'phone_code' =>  $request->mobile_code,
-                    'customer_phone' =>  $request->mobile_no,
+                dd([
+                    'ok',
+                    $commit_response
                 ]);
 
                 generateApiToken();
@@ -1234,7 +1293,7 @@ class FlyDubaiController extends Controller
             }
         } else {
             dd([
-                'aa',
+                'Submit error',
                 $submit_response
             ]);
             return $this->redirectFail();
@@ -1245,402 +1304,89 @@ class FlyDubaiController extends Controller
     {
         return redirect()->route('flight.booking.fail');
     }
-    // public function submitPnr(Request $request)
-    // {
-    //     $passCount = -1;
-    //     $passengers = [];
-    //     foreach ($request->adult_title as $key => $adult) {
-    //         $pass = [];
 
-    //         $age = Carbon::parse($request->adult_dob[$key])->age;
+    public function savePassengerDetails(Request $request, $flight_booking_id)
+    {
+        foreach ($request->adult_title as $key => $adult) {
+            FlightPassengers::create([
+                'booking_id' => $flight_booking_id,
+                'passenger_type' => "ADT",
+                'passenger_first_name' => $request->adult_first_name[$key],
+                'passenger_last_name' => $request->adult_last_name[$key],
+                'passenger_title' => $request->adult_title[$key],
+                'gender' => $request->adult_gender[$key],
+                'date_of_birth' => $request->adult_dob[$key],
+                'passenger_nationality' => $request->adult_nationality[$key],
+                'passport_number' => $request->adult_passport[$key],
+                'passport_issue_country' => $request->adult_passport_country[$key],
+                'passport_issue_date' => $request->adult_passport_issue[$key],
+                'passport_expiry_date' => $request->adult_passport_expiry[$key],
+            ]);
+        }
 
-    //         $pass['PersonOrgID'] = $passCount;
-    //         $pass['FirstName'] = $request->adult_first_name[$key];
-    //         $pass['LastName'] = $request->adult_last_name[$key];
-    //         $pass['MiddleName'] = '';
-    //         $pass['Age'] = $age;
-    //         $pass['DOB'] = $request->adult_dob[$key];
-    //         $pass['Gender'] = $request->adult_gender[$key];
-    //         $pass['Title'] = $request->adult_title[$key];
-    //         $pass['NationalityLaguageID'] = 1;
-    //         $pass['RelationType'] = 'Self';
-    //         $pass['WBCID'] = 1;
-    //         $pass['PTCID'] = 1;
-    //         $pass['TravelsWithPersonOrgID'] = -1;
-    //         $pass['MarketingOptIn'] = true;
-    //         $pass['UseInventory'] = false;
-    //         $pass['UseInventory'] = false;
-    //         $pass['Address'] = [
-    //             "Address1" => "",
-    //             "Address2" => "",
-    //             "City" => "",
-    //             "State" => "",
-    //             "Postal" => "",
-    //             "Country" => "",
-    //             "CountryCode" => "",
-    //             "AreaCode" => "",
-    //             "PhoneNumber" => "",
-    //             "Display" => ""
-    //         ];
-    //         $pass['Nationality'] = $request->adult_nationality[$key];
-    //         $pass['ProfileId'] = -2147483648;
-    //         $pass['IsPrimaryPassenger'] = $key == 0;
-    //         $pass['ContactInfos'] = [
-    //             [
-    //                 "Key" => null,
-    //                 "ContactID" => 0,
-    //                 "PersonOrgID" => -1,
-    //                 "ContactField" => $request->mobile_no,
-    //                 "ContactType" => 1,
-    //                 "Extension" => "",
-    //                 "CountryCode" => $request->mobile_code,
-    //                 "PhoneNumber" => $request->mobile_no,
-    //                 "Display" => "",
-    //                 "PreferredContactMethod" => false,
-    //                 "ValidatedContact" => false
-    //             ],
-    //             [
-    //                 "Key" => null,
-    //                 "ContactID" => 0,
-    //                 "PersonOrgID" => -1,
-    //                 "ContactField" => $request->email,
-    //                 "ContactType" => 4,
-    //                 "Extension" => "",
-    //                 "CountryCode" => "",
-    //                 "PhoneNumber" => "",
-    //                 "Display" => "",
-    //                 "PreferredContactMethod" => true,
-    //                 "ValidatedContact" => false
-    //             ]
-    //         ];
-    //         $pass['DocumentInfos'] = [
-    //             [
-    //                 "DocType" => "1",
-    //                 "DocNumber" => $request->adult_passport[$key],
-    //                 "IssuingCountry" => $request->adult_passport_country[$key],
-    //                 "IssueDate" => Carbon::parse($request->adult_passport_issue[$key])->format('Y-m-d\T00:00:00'),
-    //                 "ExpiryDate" => Carbon::parse($request->adult_passport_expiry[$key])->format('Y-m-d\T00:00:00'),
-    //             ]
-    //         ];
+        if (isset($request->child_title)) {
+            foreach ($request->child_title as $key => $child) {
+                FlightPassengers::create([
+                    'booking_id' => $flight_booking_id,
+                    'passenger_type' => "ADT",
+                    'passenger_first_name' => $request->child_first_name[$key],
+                    'passenger_last_name' => $request->child_last_name[$key],
+                    'passenger_title' => $request->child_title[$key],
+                    'gender' => $request->child_gender[$key],
+                    'date_of_birth' => $request->child_dob[$key],
+                    'passenger_nationality' => $request->child_nationality[$key],
+                    'passport_number' => $request->child_passport[$key],
+                    'passport_issue_country' => $request->child_passport_country[$key],
+                    'passport_issue_date' => $request->child_passport_issue[$key],
+                    'passport_expiry_date' => $request->child_passport_expiry[$key],
+                ]);
+            }
+        }
+        if (isset($request->infant_title)) {
+            foreach ($request->infant_title as $key => $infant) {
+                FlightPassengers::create([
+                    'booking_id' => $flight_booking_id,
+                    'passenger_type' => "ADT",
+                    'passenger_first_name' => $request->infant_first_name[$key],
+                    'passenger_last_name' => $request->infant_last_name[$key],
+                    'passenger_title' => $request->infant_title[$key],
+                    'gender' => $request->infant_gender[$key],
+                    'date_of_birth' => $request->infant_dob[$key],
+                    'passenger_nationality' => $request->infant_nationality[$key],
+                    'passport_number' => $request->infant_passport[$key],
+                    'passport_issue_country' => $request->infant_passport_country[$key],
+                    'passport_issue_date' => $request->infant_passport_issue[$key],
+                    'passport_expiry_date' => $request->infant_passport_expiry[$key],
+                ]);
+            }
+        }
+    }
 
-    //         $passCount--;
-    //         $passengers[] = $pass;
-    //     }
+    public function loadSeatHTML(Request $request)
+    {
 
-    //     foreach ($request->child_title as $key => $adult) {
-    //         $pass = [];
+        $seat_request = Cache::get('fd_seat_req_' . $request->search_id);
+        $res_data = Cache::get('fd_seat_res_data_' . $request->search_id);
 
-    //         $age = Carbon::parse($request->child_dob[$key])->age;
+        if (Cache::has('fd_search_seat_' . $request->search_id)) {
+            Cache::forget('fd_search_seat_' . $request->search_id);
+        }
 
-    //         $pass['PersonOrgID'] = $passCount;
-    //         $pass['FirstName'] = $request->child_first_name[$key];
-    //         $pass['LastName'] = $request->child_last_name[$key];
-    //         $pass['MiddleName'] = '';
-    //         $pass['Age'] = $age;
-    //         $pass['DOB'] = $request->child_dob[$key];
-    //         $pass['Gender'] = $request->child_gender[$key];
-    //         $pass['Title'] = $request->child_title[$key];
-    //         $pass['NationalityLaguageID'] = 1;
-    //         $pass['RelationType'] = 'Self';
-    //         $pass['WBCID'] = 1;
-    //         $pass['PTCID'] = 6;
-    //         $pass['TravelsWithPersonOrgID'] = -1;
-    //         $pass['MarketingOptIn'] = true;
-    //         $pass['UseInventory'] = false;
-    //         $pass['UseInventory'] = false;
-    //         $pass['Address'] = [
-    //             "Address1" => "",
-    //             "Address2" => "",
-    //             "City" => "",
-    //             "State" => "",
-    //             "Postal" => "",
-    //             "Country" => "",
-    //             "CountryCode" => "",
-    //             "AreaCode" => "",
-    //             "PhoneNumber" => "",
-    //             "Display" => ""
-    //         ];
-    //         $pass['Nationality'] = $request->child_nationality[$key];
-    //         $pass['ProfileId'] = -2147483648;
-    //         $pass['IsPrimaryPassenger'] = $key == 0;
-    //         $pass['ContactInfos'] = [
-    //             [
-    //                 "Key" => null,
-    //                 "ContactID" => 0,
-    //                 "PersonOrgID" => -1,
-    //                 "ContactField" => $request->mobile_no,
-    //                 "ContactType" => 1,
-    //                 "Extension" => "",
-    //                 "CountryCode" => $request->mobile_code,
-    //                 "PhoneNumber" => $request->mobile_no,
-    //                 "Display" => "",
-    //                 "PreferredContactMethod" => false,
-    //                 "ValidatedContact" => false
-    //             ],
-    //             [
-    //                 "Key" => null,
-    //                 "ContactID" => 0,
-    //                 "PersonOrgID" => -1,
-    //                 "ContactField" => $request->email,
-    //                 "ContactType" => 4,
-    //                 "Extension" => "",
-    //                 "CountryCode" => "",
-    //                 "PhoneNumber" => "",
-    //                 "Display" => "",
-    //                 "PreferredContactMethod" => true,
-    //                 "ValidatedContact" => false
-    //             ]
-    //         ];
-    //         $pass['DocumentInfos'] = [
-    //             [
-    //                 "DocType" => "1",
-    //                 "DocNumber" => $request->child_passport[$key],
-    //                 "IssuingCountry" => $request->child_passport_country[$key],
-    //                 "IssueDate" => Carbon::parse($request->child_passport_issue[$key])->format('Y-m-d\T00:00:00'),
-    //                 "ExpiryDate" =>  Carbon::parse($request->child_passport_expiry[$key])->format('Y-m-d\T00:00:00'),
-    //             ]
-    //         ];
+        $seat_response = $this->flightBookingService->callAPI('pricing/seats', $seat_request);
 
-    //         $passCount--;
-    //         $passengers[] = $pass;
-    //     }
-    //     foreach ($request->child_title as $key => $adult) {
-    //         $pass = [];
+        Cache::set('fd_search_seat_' . $request->search_id, $seat_response);
 
-    //         $age = Carbon::parse($request->infant_dob[$key])->age;
-
-    //         $pass['PersonOrgID'] = $passCount;
-    //         $pass['FirstName'] = $request->infant_first_name[$key];
-    //         $pass['LastName'] = $request->infant_last_name[$key];
-    //         $pass['MiddleName'] = '';
-    //         $pass['Age'] = $age;
-    //         $pass['DOB'] = $request->infant_dob[$key];
-    //         $pass['Gender'] = $request->infant_gender[$key];
-    //         $pass['Title'] = $request->infant_title[$key];
-    //         $pass['NationalityLaguageID'] = 1;
-    //         $pass['RelationType'] = 'Self';
-    //         $pass['WBCID'] = 1;
-    //         $pass['PTCID'] = 5;
-    //         $pass['TravelsWithPersonOrgID'] = -1;
-    //         $pass['MarketingOptIn'] = true;
-    //         $pass['UseInventory'] = false;
-    //         $pass['UseInventory'] = false;
-    //         $pass['Address'] = [
-    //             "Address1" => "",
-    //             "Address2" => "",
-    //             "City" => "",
-    //             "State" => "",
-    //             "Postal" => "",
-    //             "Country" => "",
-    //             "CountryCode" => "",
-    //             "AreaCode" => "",
-    //             "PhoneNumber" => "",
-    //             "Display" => ""
-    //         ];
-    //         $pass['Nationality'] = $request->infant_nationality[$key];
-    //         $pass['ProfileId'] = -2147483648;
-    //         $pass['IsPrimaryPassenger'] = $key == 0;
-    //         $pass['ContactInfos'] = [
-    //             [
-    //                 "Key" => null,
-    //                 "ContactID" => 0,
-    //                 "PersonOrgID" => -1,
-    //                 "ContactField" => $request->mobile_no,
-    //                 "ContactType" => 1,
-    //                 "Extension" => "",
-    //                 "CountryCode" => $request->mobile_code,
-    //                 "PhoneNumber" => $request->mobile_no,
-    //                 "Display" => "",
-    //                 "PreferredContactMethod" => false,
-    //                 "ValidatedContact" => false
-    //             ],
-    //             [
-    //                 "Key" => null,
-    //                 "ContactID" => 0,
-    //                 "PersonOrgID" => -1,
-    //                 "ContactField" => $request->email,
-    //                 "ContactType" => 4,
-    //                 "Extension" => "",
-    //                 "CountryCode" => "",
-    //                 "PhoneNumber" => "",
-    //                 "Display" => "",
-    //                 "PreferredContactMethod" => true,
-    //                 "ValidatedContact" => false
-    //             ]
-    //         ];
-    //         $pass['DocumentInfos'] = [
-    //             [
-    //                 "DocType" => "1",
-    //                 "DocNumber" => $request->infant_passport[$key],
-    //                 "IssuingCountry" => $request->infant_passport_country[$key],
-    //                 "IssueDate" =>  Carbon::parse($request->infant_passport_issue[$key])->format('Y-m-d\T00:00:00'),
-    //                 "ExpiryDate" => Carbon::parse($request->infant_passport_expiry[$key])->format('Y-m-d\T00:00:00'),
-    //             ]
-    //         ];
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/' . $request->search_id . '/seat_req.json'),
+        ]);
+        $logger->info(json_encode($seat_response));
 
 
-    //         $passCount--;
-    //         $passengers[] = $pass;
-    //     }
+        // return response()->json(array('success' => true, 'seat_response' => $seat_response, 'res_data' => $res_data));
 
+        $returnHTML = view('web.provides.flydubai.seats_html', compact('seat_response', 'res_data'))->render();
 
-
-    //     // $passengers = [
-    //     //     [
-    //     //         "PersonOrgID" => -1,
-    //     //         "FirstName" => "TEST FIRSTNAME",
-    //     //         "LastName" => "TEST",
-    //     //         "MiddleName" => "",
-    //     //         "Age" => 25,
-    //     //         "DOB" => "1994-01-01T00:00:00",
-    //     //         "Gender" => "Male",
-    //     //         "Title" => "Mr",
-    //     //         "NationalityLaguageID" => 1,
-    //     //         "RelationType" => "Self",
-    //     //         "WBCID" => 1,
-    //     //         "PTCID" => 1,
-    //     //         "TravelsWithPersonOrgID" => -1,
-    //     //         "MarketingOptIn" => true,
-    //     //         "UseInventory" => false,
-    //     //         "Address" => [
-    //     //             "Address1" => "asdad",
-    //     //             "Address2" => "asdasd",
-    //     //             "City" => "asdasd",
-    //     //             "State" => "asdasd",
-    //     //             "Postal" => 12123233,
-    //     //             "Country" => "",
-    //     //             "CountryCode" => "",
-    //     //             "AreaCode" => "",
-    //     //             "PhoneNumber" => "",
-    //     //             "Display" => ""
-    //     //         ],
-    //     //         "Nationality" => "AE",
-    //     //         "ProfileId" => -2147483648,
-    //     //         "IsPrimaryPassenger" => true,
-    //     //         "ContactInfos" => [
-    //     //             [
-    //     //                 "Key" => null,
-    //     //                 "ContactID" => 0,
-    //     //                 "PersonOrgID" => -1,
-    //     //                 "ContactField" => "8882223741",
-    //     //                 "ContactType" => 2,
-    //     //                 "Extension" => "",
-    //     //                 "CountryCode" => "91",
-    //     //                 "PhoneNumber" => "8882223741",
-    //     //                 "Display" => "",
-    //     //                 "PreferredContactMethod" => false,
-    //     //                 "ValidatedContact" => false
-    //     //             ],
-    //     //             [
-    //     //                 "Key" => null,
-    //     //                 "ContactID" => 0,
-    //     //                 "PersonOrgID" => -1,
-    //     //                 "ContactField" => "8882223741",
-    //     //                 "ContactType" => 0,
-    //     //                 "Extension" => "",
-    //     //                 "CountryCode" => "011",
-    //     //                 "PhoneNumber" => "8882223741",
-    //     //                 "Display" => "",
-    //     //                 "PreferredContactMethod" => false,
-    //     //                 "ValidatedContact" => false
-    //     //             ],
-    //     //             [
-    //     //                 "Key" => null,
-    //     //                 "ContactID" => 0,
-    //     //                 "PersonOrgID" => -1,
-    //     //                 "ContactField" => "asasdds@asdasd.com",
-    //     //                 "ContactType" => 4,
-    //     //                 "Extension" => "",
-    //     //                 "CountryCode" => "91",
-    //     //                 "PhoneNumber" => "123456789",
-    //     //                 "Display" => "",
-    //     //                 "PreferredContactMethod" => true,
-    //     //                 "ValidatedContact" => false
-    //     //             ]
-    //     //         ],
-    //     //         "DocumentInfos" => [
-    //     //             [
-    //     //                 "DocType" => "1",
-    //     //                 "DocNumber" => "J4868UT",
-    //     //                 "IssuingCountry" => "AE",
-    //     //                 "IssueDate" => "1980-01-01T00:00:00",
-    //     //                 "ExpiryDate" => "2025-01-01T00:00:00"
-    //     //             ]
-    //     //         ]
-    //     //     ]
-    //     // ];
-
-    //     $data = [];
-    //     $data['ActionType'] =  'GetSummary';
-    //     $data['ReservationInfo'] =  [
-    //         "SeriesNumber" => "299",
-    //         "ConfirmationNumber" => ""
-    //     ];
-    //     $data['CarrierCodes'] =  [[
-    //         "AccessibleCarrierCode" => "FZ"
-    //     ]];
-
-    //     $data['ClientIPAddress'] =  "";
-    //     $data['SecurityToken'] = '';
-    //     $data['SecurityGUID'] = '';
-    //     $data['HistoricUserName'] = env('FLY_DUBAI_USERNAME');
-    //     $data['CarrierCurrency'] = 'AED';
-    //     $data['DisplayCurrency'] = 'AED';
-    //     $data['IATANum'] = env('FLY_DUBAI_IATA');
-    //     $data['User'] = env('FLY_DUBAI_USERNAME');
-    //     $data['ReceiptLanguageID'] = "-1";
-    //     $data['Address'] = [
-    //         "Address1" => "",
-    //         "Address2" => "",
-    //         "City" => "",
-    //         "State" => "",
-    //         "Postal" => "",
-    //         "Country" => "",
-    //         "CountryCode" => "",
-    //         "AreaCode" => "",
-    //         "PhoneNumber" => "",
-    //         "Display" => ""
-    //     ];
-    //     $data['ContactInfos'] = [];
-    //     $data['Passengers'] = $passengers;
-    //     $data['Segments'] = [
-    //         [
-    //             "PersonOrgID" => -1,
-    //             "FareInformationID" => 1,
-    //             "SpecialServices" => [],
-    //             "Seats" => []
-    //         ]
-    //     ];
-    //     $data['Payments'] = [];
-
-    //     dd($data);
-
-    //     $submit_response = $this->flightBookingService->callAPI('cp/summaryPNR?accural=true', $data);
-
-    //     // 
-
-    //     // try {
-    //     //     $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
-    //     //     $acc_result = Cache::get('fd_search_ancillary_' . $request->search_id, null);
-
-    //     //     $search_params = getOrginDestinationSession('OneWay');
-
-    //     //     if ($search_result == null || $acc_result == null) {
-    //     //         dd("fail");
-    //     //     }
-
-    //     //     $flights = array_combine(array_column($search_result['flights'], 'LFID'), $search_result['flights']);
-
-    //     //     if ($search_result['search_type'] == 'OneWay') {
-
-    //     //         $search_params = getOrginDestinationSession('OneWay');
-    //     //         dd($search_params);
-    //     //         if (empty($search_params)) {
-    //     //             dd("fail");
-    //     //         }
-    //     //     }
-    //     // } catch (Exception $e) {
-    //     //     dd("fail");
-    //     // }
-    // }
+        return response()->json(array('success' => true, 'html' => $returnHTML));
+    }
 }

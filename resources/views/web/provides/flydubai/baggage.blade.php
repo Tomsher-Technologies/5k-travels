@@ -90,8 +90,8 @@
                                                     @for ($ad = 1; $ad <= $passengers['CHD']; $ad++)
                                                         <li class="">
                                                             <a href="#tab{{ $segments['lfID'] }}CHD{{ $ad }}"
-                                                                class="tabselector" data-bs-toggle="tab" aria-selected="false"
-                                                                role="tab" tabindex="-1">
+                                                                class="tabselector" data-bs-toggle="tab"
+                                                                aria-selected="false" role="tab" tabindex="-1">
 
                                                                 <div class="card border">
                                                                     <div class="card-header">
@@ -166,6 +166,13 @@
                             $flightLoop++;
                         @endphp
                     @endforeach
+
+                    <button type="button" data-target="#nav-meals" data-targetbtn="#nav-meals-tab"
+                        class="tabswitch_btn btn btn_theme w-100">Continue
+                        to meals</button>
+                    <button type="button" data-targetbtn="#nav-details-tab" data-target="#nav-details"
+                        class="tabswitch_btn btn btn_theme_white w-100">Continue to passenger details(Skip all
+                        extras)</button>
                 @endisset
             </div>
         </div>
@@ -186,7 +193,7 @@
 
                         @if (isset($passengers['ADT']))
                             @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
-                                <div class="tab-pane table-responsive userprof-tab {{ $flightLoop == 1 && $ad == 1  ? 'active' : '' }}"
+                                <div class="tab-pane table-responsive userprof-tab {{ $flightLoop == 1 && $ad == 1 ? 'active' : '' }}"
                                     id="tab{{ $segments['lfID'] }}ADT{{ $ad }}" role="tabpanel">
                                     <div class="baggage-allw">
                                         <p class="info-b pt-2">If your fare includes checked baggage, you can take

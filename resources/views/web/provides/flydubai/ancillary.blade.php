@@ -60,7 +60,7 @@
             <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                     <div class="section_heading_center">
-                        <h2>Explore our hot deals</h2>
+                        <h2>Complete your booking</h2>
                     </div>
                 </div>
             </div>
@@ -201,6 +201,7 @@
         .area-sbc.disabled .left,
         .area-sbc.disabled .right {
             cursor: no-drop !important;
+            pointer-events: none;
         }
 
         .area-sbc.disabled span {
@@ -1002,7 +1003,6 @@
         });
     </script>
 
-
     <script>
         const activeCurrency = '{{ getActiveCurrency() }}';
         const grandTotal = parseFloat($('#amountSpan').html())
@@ -1012,26 +1012,50 @@
             $("#addon_items .rates").each(function() {
                 total = total + parseFloat($(this).html());
             });
-            $('#addons').html(total);
+            $('#addons').html(parseFloat(total).toFixed(2));
             $('#amountSpan').html(total + grandTotal);
         }
 
-        // $('.tabselector').on('click', function() {
-        //     $('.tabselector.active').removeClass('active');
-        //     $(this).addClass('active')
-        // });
+        $('.tabselector').on('click', function() {
+            $('.tabselector.active').removeClass('active');
+            $('.userprof-tab.active').removeClass('active');
+
+            $(this).addClass('active')
+            var id = $(this).attr('href');
+            $(id).addClass('active')
+        });
 
 
-        // $('.mealselector').on('click', function() {
-        //     $('.tabselector.active').removeClass('active');
-        //     $(this).addClass('active');
+        $('.mealselector').on('click', function() {
+            $('.meal-tab.active').removeClass('active');
+            $('.mealselector.active').removeClass('active');
+            $(this).addClass('active');
+            var id = $(this).attr('href');
+            $(id).addClass('active')
+        });
 
-        //     $('.meal-tab').removeClass('active');
+        $('.seatselector').on('click', function() {
+            $('.userprof-tab.active').removeClass('active');
+            $('.seatselector.active').removeClass('active');
+            $(this).addClass('active');
+            var id = $(this).attr('href');
+            $(id).addClass('active')
+        });
 
-        //     var id = $(this).attr('href');
-        //     $(id).addClass('active')
-        // });
+        $('.tabswitch_btn').on('click', function() {
+            $('.tab-pane.active').removeClass('active');
+            $('.nav-link.active').removeClass('active');
 
+            var target = $(this).data('target');
+            console.log(target);
+            $(target).addClass('active')
+            $(target).addClass('show')
+
+            var targetbtn = $(this).data('targetbtn');
+            console.log(targetbtn);
+            $(targetbtn).addClass('active')
+
+        });
 
 
         // baggage script
@@ -1104,20 +1128,56 @@
         // Seat script
         var pax_count = {{ $pax_count }}
         var selected_seat_count = 0;
-        $('.input_seat').on('click', function() {
-            var user_id = $('.seatselector.active').attr('data-user_id');
-            console.log(user_id);
-            if ($('.input_seat.active').length > 0) {
-                $('.input_seat.active').each(ele => {
-                    if ($(ele).attr('data-user') == user_id) {
-                        console.log(ele);
-                        $(ele).attr('data-user', '');
-                        $(ele).remoeClass('active');
-                    }
-                })
+        $(document).on('click', '.input_seat', function() {
+
+            console.log($(this).hasClass('.active'));
+
+            if (!$(this).hasClass('seatnot-available') && !$(this).hasClass('active')) {
+                var user_id = $('.seatselector.active').attr('data-user_id');
+                console.log(user_id);
+                var lfid = $('.seatselector.active').attr('data-lfid');
+                var cont_id = '#seating_area_' + lfid;
+                if ($('.input_seat.active').length > 0) {
+                    $('.input_seat.active').each(function() {
+                        console.log($(this).attr('data-user'));
+                        if ($(this).attr('data-user') === user_id) {
+                            $(this).attr('data-user', '');
+                            $(this).removeClass('active');
+                        } else {
+                            console.log("asd");
+                        }
+                    })
+                }
+                $(this).toggleClass('active');
+                $(this).attr('data-user', user_id);
+
+
+                var seat_input_id = '#seat_input_' + $('.seatselector.active').attr('data-user-type') + '_' + $(
+                    '.seatselector.active').attr('data-user-count') + '_' + lfid;
+
+                console.log(seat_input_id);
+
+                $(seat_input_id).val($(this).attr('data-code'))
+
+                $('#addon_items .' + user_id).remove();
+
+                var html = '<h6 class="' + user_id + '">' +
+                    '<p style="display:block">' +
+                    $('.seatselector.active .seta_pas_text ').html() +
+                    '<span>Seat: ' + $(this).attr('data-seat-id') + '</span>' +
+                    '</p>' +
+                    '<p>' +
+                    activeCurrency + ' ' +
+                    '<span class="rates">' +
+                    $(this).data('rate') +
+                    '</span>' +
+                    '</p>' +
+                    '</h6>';
+
+                $('#addon_items').append(html);
+                // $('#addon_items').append('<h6 class="' + name + '">' + $(this).data('rate') + '</h6>');
+                updateTotal();
             }
-            $(this).toggleClass('active');
-            $(this).attr('data-user', user_id);
         });
     </script>
 @endpush

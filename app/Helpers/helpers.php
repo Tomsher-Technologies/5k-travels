@@ -264,7 +264,7 @@ if (!function_exists('getCurrencyValue')) {
 
 function getActiveCurrency()
 {
-    return Session::get('user_currency', 'USD');
+    return Session::get('user_currency', 'AED');
 }
 
 if (!function_exists('getNewReissuedBooking')) {

@@ -4,10 +4,10 @@
             <div class="faqs_main_item">
 
                 @isset($acc_response['ancillaryQuotes']['flights'])
+                    @php
+                        $flightLoop = 1;
+                    @endphp
                     @foreach ($acc_response['ancillaryQuotes']['flights'] as $flights)
-                        @php
-                            $flightLoop = 1;
-                        @endphp
                         @foreach ($flights['legs'] as $leg)
                             @php
                                 $leg_details = getLegDetails($leg['pfID'], $res_data['search_result']['legDetails']);
@@ -159,8 +159,19 @@
                                     </div>
                                 </div>
                             </div>
+                            @php
+                                $flightLoop++;
+                            @endphp
                         @endforeach
                     @endforeach
+
+                    <button type="button" data-target="#nav-seats" data-targetbtn="#nav-seats-tab"
+                        class="tabswitch_btn btn btn_theme w-100">Continue
+                        to seats</button>
+                    <button type="button" data-targetbtn="#nav-details-tab" data-target="#nav-details"
+                        class="tabswitch_btn btn btn_theme_white w-100">Continue to passenger details(Skip all
+                        extras)</button>
+
                 @endisset
             </div>
         </div>
@@ -169,17 +180,17 @@
             <div class="tab-content meal-selector">
 
                 @isset($acc_response['ancillaryQuotes']['flights'])
+                    @php
+                        $flightLoop = 1;
+                    @endphp
                     @foreach ($acc_response['ancillaryQuotes']['flights'] as $flights)
-                        @php
-                            $flightLoop = 1;
-                        @endphp
                         @foreach ($flights['legs'] as $leg)
                             @php
                                 $leg_details = getLegDetails($leg['pfID'], $res_data['search_result']['legDetails']);
                             @endphp
                             @if (isset($passengers['ADT']))
                                 @for ($ad = 1; $ad <= $passengers['ADT']; $ad++)
-                                    <div class="tab-pane table-responsive userprof-tab meal-tab {{ $flightLoop == 1 && $ad == 1  ? 'active' : '' }}"
+                                    <div class="tab-pane table-responsive userprof-tab meal-tab {{ $flightLoop == 1 && $ad == 1 ? 'active' : '' }}"
                                         id="meal{{ $leg['pfID'] }}ADT{{ $ad }}" role="tabpanel">
                                         <div class="baggage-allw">
                                             <p class="info-b pt-2">
@@ -221,7 +232,7 @@
 
                             @if (isset($passengers['CHD']))
                                 @for ($ad = 1; $ad <= $passengers['CHD']; $ad++)
-                                    <div class="tab-pane table-responsive userprof-tab"
+                                    <div class="tab-pane table-responsive userprof-tab meal-tab"
                                         id="meal{{ $leg['pfID'] }}CHD{{ $ad }}" role="tabpanel">
                                         <div class="baggage-allw">
                                             <p class="info-b pt-2">
@@ -261,6 +272,9 @@
                                 @endfor
                             @endif
                         @endforeach
+                        @php
+                            $flightLoop++;
+                        @endphp
                     @endforeach
                 @endisset
             </div>
