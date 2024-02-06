@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FlightsApiController;
 use App\Http\Controllers\Providers\FlyDubaiController;
 use App\Models\FlightBookings;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 /*
@@ -68,6 +69,12 @@ Route::get('/cur', function () {
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/checklogin', function () {
+    return json_encode(array(
+        'status' => Auth::check()
+    ));
+})->name('checklogin');
 
 Route::get('change-currency/{currency}', [HomeController::class, 'changeCurrency'])->name('change-currency');
 

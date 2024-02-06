@@ -94,6 +94,7 @@ class FlyDubaiController extends Controller
             $retrieveFareQuote['FareQuoteDetails']['FareQuoteDetailDateRange'][] = [
                 "Origin" => $request->rFrom,
                 "Destination" => $request->rTo,
+                "PartyConfig" => "",
                 'UseAirportsNotMetroGroups' => true,
                 'UseAirportsNotMetroGroupsAsRule' => true,
                 'UseAirportsNotMetroGroupsForFrom' => true,
@@ -103,10 +104,12 @@ class FlyDubaiController extends Controller
                 'FareQuoteRequestInfos' => [
                     'FareQuoteRequestInfo' => $passengers
                 ],
+                "FareTypeCategory" => "1"
             ];
             $retrieveFareQuote['FareQuoteDetails']['FareQuoteDetailDateRange'][] = [
                 "Origin" => $request->rTo,
                 "Destination" => $request->rFrom,
+                "PartyConfig" => "",
                 'UseAirportsNotMetroGroups' => true,
                 'UseAirportsNotMetroGroupsAsRule' => true,
                 'UseAirportsNotMetroGroupsForFrom' => true,
@@ -116,6 +119,7 @@ class FlyDubaiController extends Controller
                 'FareQuoteRequestInfos' => [
                     'FareQuoteRequestInfo' => $passengers
                 ],
+                "FareTypeCategory" => "1"
             ];
         } elseif ($request->search_type == 'Circle') {
 
@@ -408,6 +412,7 @@ class FlyDubaiController extends Controller
             }
 
             if ($resultData['Exceptions'][0]['ExceptionCode'] == 0) {
+                // dd($resultData);
                 Cache::set('fd_add_cart_res_' . $request->search_id, $resultData);
                 $msg = array(
                     'status' => true,
@@ -564,6 +569,297 @@ class FlyDubaiController extends Controller
         return $data;
     }
 
+    // private function constructReturnBookingData($search_result, $request)
+    // {
+    //     $flights =  $search_result['flights'];
+    //     $flights = array_combine(array_column($flights, 'LFID'), $flights);
+    //     $search_params  = getOrginDestinationSession('Return');
+
+    //     $combinability = false;
+    //     $originDestinations = [];
+
+    //     foreach ($search_result['combinability'] as $combinability) {
+    //         if (
+    //             in_array($request->dep_solnid, $combinability['SolnRef']) &&
+    //             in_array($request->rtn_solnid, $combinability['SolnRef'])
+    //         ) {
+    //             $combinability = true;
+    //         }
+    //     }
+
+    //     if (!$combinability) {
+    //         $msg = array('status' => false, 'data' => ['Not combinability']);
+    //         echo json_encode($msg);
+    //         exit();
+    //     }
+
+    //     if (!isset($flights[$request->dep_LFID]) || !isset($flights[$request->rtn_LFID])) {
+    //         $msg = array('status' => false, 'data' => ['abc']);
+    //         echo json_encode($msg);
+    //         exit();
+    //     }
+
+    //     // Out bound
+    //     $outBoundFlight = $flights[$request->dep_LFID];
+    //     $outBoundFares = $outBoundFlight['fares'];
+
+    //     // In Bound
+    //     $inBoundFlight = $flights[$request->rtn_LFID];
+    //     $inBoundFares = $inBoundFlight['fares'];
+
+    //     $outBoundFare = $inBoundFare = [];
+
+    //     foreach ($outBoundFares  as $fares) {
+    //         if (
+    //             $fares['FareTypeID'] == $request->dep_FareTypeID &&
+    //             $fares['SolnId'] == $request->dep_solnid
+    //         ) {
+    //             $outBoundFare = $fares;
+    //         }
+    //     }
+
+    //     foreach ($inBoundFares  as $fares) {
+    //         if (
+    //             $fares['FareTypeID'] == $request->rtn_FareTypeID &&
+    //             $fares['SolnId'] == $request->rtn_solnid
+    //         ) {
+    //             $inBoundFare = $fares;
+    //         }
+    //     }
+
+
+    //     if (
+    //         empty($inBoundFare) ||
+    //         empty($outBoundFare)
+    //     ) {
+    //         $msg = array('status' => false, 'data' => ['123']);
+    //         echo json_encode($msg);
+    //         exit();
+    //     }
+
+    //     // Out bound array
+    //     $FCCode = $Cabin = '';
+    //     $paxID= [];
+    //     $bookingCodes = [];
+    //     foreach ($inBoundFare['FareInfos']['FareInfo'] as $FareInfo) {
+    //         foreach ($FareInfo['Pax'] as $pax) {
+    //             $taxDetails = [];
+    //             foreach ($pax['ApplicableTaxDetails']['ApplicableTaxDetail'] as $tax) {
+
+    //                 $c_tax = null;
+
+    //                 foreach ($search_result['taxDetails'] as $taxDetail) {
+    //                     if ($taxDetail['TaxID'] == $tax['TaxID']) {
+    //                         $c_tax = $taxDetail;
+    //                     }
+    //                 }
+
+    //                 $taxDetails[] = [
+    //                     "amt" => $tax['Amt'],
+    //                     "taxCode" => $c_tax['TaxCode'],
+    //                     "taxID" => $tax['TaxID']
+    //                 ];
+    //             }
+
+    //             $paxFareInfos[] = array(
+    //                 "fareID" => $pax['FareID'],
+    //                 "ID" => $pax['ID'],
+    //                 "FBC" => $pax['FBCode'],
+    //                 "baseFare" => $pax['BaseFareAmtNoTaxes'],
+    //                 "originalFare" => $pax['OriginalFare'],
+    //                 "ruleID" => $pax['RuleId'],
+    //                 "totalFare" => $pax['FareAmtInclTax'],
+    //                 "PTC" => $pax['PTCID'],
+    //                 "secureHash" => $pax['hashcode'],
+    //                 "secureData" => "",
+    //                 "fareCarrier" => $pax['FareCarrier'],
+    //                 "seatAvailability" => $pax['SeatsAvailable'],
+    //                 "infantAvailability" => 0,
+    //                 "applicableTaxDetails" => $taxDetails,
+    //                 "fareClass" => $pax['FCCode'],
+    //             );
+                
+    //             $FCCode = $pax['FCCode'];
+    //             $Cabin = $pax['Cabin'];
+    //             $paxID[] = (string)$pax['FareID'];
+    //         }
+    //     }
+
+    //     $bookingCodes[] = array(
+    //         "fareClass" => $FCCode,
+    //         "cabin" => $Cabin,
+    //         "paxID" => $paxID
+    //     );
+
+    //     // dd( $bookingCodes);
+
+    //     foreach ($outBoundFlight['flightLegs'] as $flightLeg) {
+    //         foreach ($search_result['legDetails'] as $c_leg) {
+    //             if (
+    //                 $flightLeg['PFID'] == $c_leg['PFID'] &&
+    //                 $flightLeg['DepartureDate'] == $c_leg['DepartureDate']
+    //             ) {
+    //                 $leg = $c_leg;
+    //             }
+    //         }
+
+    //         // $leg = $search_result['legDetails'][$flightLeg['PFID']];
+    //         $segmentDetails[] = [
+    //             "segmentID" => $leg['PFID'],
+    //             "OAFlight" => false,
+    //             "origin" => $leg['Origin'],
+    //             "destination" => $leg['Destination'],
+    //             "depDate" => $leg['DepartureDate'],
+    //             "arrDate" => $leg['ArrivalDate'],
+    //             "mrktCarrier" => $leg['MarketingCarrier'],
+    //             "mrktFlightNum" => $leg['FlightNum'],
+    //             "operCarrier" => $leg['OperatingCarrier'],
+    //             "operFlightNum" => $leg['MarketingFlightNum'],
+    //             "arrTerminal" => $leg['FromTerminal'],
+    //             "depTerminal" => $leg['ToTerminal'],
+    //             "bookingCodes" => $bookingCodes
+    //         ];
+    //     }
+    //     $originDestinations[] = [
+    //         "odID" => $outBoundFlight['LFID'],
+    //         "origin" => $search_params['origin'],
+    //         "destination" => $search_params['destination'],
+    //         "flightNum" => $leg['FlightNum'],
+    //         "depDate" => $outBoundFlight['dep_time'],
+    //         "arrDate" => $outBoundFlight['arv_time'],
+    //         "isPromoApplied" => false,
+    //         "fareBrand" => [
+    //             [
+    //                 "fareBrandID" => $outBoundFare['FareTypeID'],
+    //                 "fareBrand" => $outBoundFare['FareTypeName'],
+    //                 "fareInfos" => array([
+    //                     'paxFareInfos' => $paxFareInfos
+    //                 ])
+    //             ]
+    //         ],
+    //         "segmentDetails" => $segmentDetails
+    //     ];
+
+    //     $segmentDetails = [];
+    //     $paxFareInfos2 = [];
+    //     // In bound array
+
+    //     $FCCode = $Cabin = '';
+    //     $paxID= [];
+    //     $bookingCodes2 = [];
+    //     foreach ($inBoundFare['FareInfos']['FareInfo'] as $FareInfo) {
+    //         foreach ($FareInfo['Pax'] as $pax) {
+    //             $taxDetails = [];
+    //             foreach ($pax['ApplicableTaxDetails']['ApplicableTaxDetail'] as $tax) {
+
+    //                 $c_tax = null;
+
+    //                 foreach ($search_result['taxDetails'] as $taxDetail) {
+    //                     if ($taxDetail['TaxID'] == $tax['TaxID']) {
+    //                         $c_tax = $taxDetail;
+    //                     }
+    //                 }
+
+    //                 $taxDetails[] = [
+    //                     "amt" => $tax['Amt'],
+    //                     "taxCode" => $c_tax['TaxCode'],
+    //                     "taxID" => $tax['TaxID']
+    //                 ];
+    //             }
+
+    //             $paxFareInfos2[] = array(
+    //                 "fareID" => $pax['FareID'],
+    //                 "ID" => $pax['ID'],
+    //                 "FBC" => $pax['FBCode'],
+    //                 "baseFare" => $pax['BaseFareAmtNoTaxes'],
+    //                 "originalFare" => $pax['OriginalFare'],
+    //                 "ruleID" => $pax['RuleId'],
+    //                 "totalFare" => $pax['FareAmtInclTax'],
+    //                 "PTC" => $pax['PTCID'],
+    //                 "secureHash" => $pax['hashcode'],
+    //                 "secureData" => "",
+    //                 "fareCarrier" => $pax['FareCarrier'],
+    //                 "seatAvailability" => $pax['SeatsAvailable'],
+    //                 "infantAvailability" => 0,
+    //                 "applicableTaxDetails" => $taxDetails,
+    //                 "fareClass" => $pax['FCCode'],
+    //             );
+
+    //             $FCCode = $pax['FCCode'];
+    //             $Cabin = $pax['Cabin'];
+    //             $paxID[] =  (string)$pax['ID'];
+                
+    //         }
+    //     }
+
+    //     $bookingCodes2[] = array(
+    //         "fareClass" => $FCCode,
+    //         "cabin" => $Cabin,
+    //         "paxID" => $paxID
+    //     );
+
+    //     foreach ($inBoundFlight['flightLegs'] as $flightLeg) {
+
+    //         foreach ($search_result['legDetails'] as $c_leg) {
+    //             if (
+    //                 $flightLeg['PFID'] == $c_leg['PFID'] &&
+    //                 $flightLeg['DepartureDate'] == $c_leg['DepartureDate']
+    //             ) {
+    //                 $leg = $c_leg;
+    //             }
+    //         }
+
+    //         // $leg = $search_result['legDetails'][$flightLeg['PFID']];
+    //         $segmentDetails[] = [
+    //             "segmentID" => $leg['PFID'],
+    //             "OAFlight" => false,
+    //             "origin" => $leg['Origin'],
+    //             "destination" => $leg['Destination'],
+    //             "depDate" => $leg['DepartureDate'],
+    //             "arrDate" => $leg['ArrivalDate'],
+    //             "mrktCarrier" => $leg['MarketingCarrier'],
+    //             "mrktFlightNum" => $leg['FlightNum'],
+    //             "operCarrier" => $leg['OperatingCarrier'],
+    //             "operFlightNum" => $leg['MarketingFlightNum'],
+    //             "arrTerminal" => $leg['FromTerminal'],
+    //             "depTerminal" => $leg['ToTerminal'],
+    //             "bookingCodes" => $bookingCodes2
+    //         ];
+    //     }
+
+    //     $originDestinations[] = [
+    //         "odID" => $inBoundFlight['LFID'],
+    //         "origin" => $search_params['destination'],
+    //         "destination" => $search_params['origin'],
+    //         "flightNum" => $leg['FlightNum'],
+    //         "depDate" => $inBoundFlight['dep_time'],
+    //         "arrDate" => $inBoundFlight['arv_time'],
+    //         "isPromoApplied" => false,
+    //         "fareBrand" => [
+    //             [
+    //                 "fareBrandID" => $inBoundFare['FareTypeID'],
+    //                 "fareBrand" => $inBoundFare['FareTypeName'],
+    //                 "fareInfos" => array([
+    //                     'paxFareInfos' => $paxFareInfos2
+    //                 ])
+    //             ]
+    //         ],
+    //         "segmentDetails" => $segmentDetails
+    //     ];
+
+    //     $data = [
+    //         "currency" => "AED",
+    //         "IATA" => env('FLY_DUBAI_IATA'),
+    //         "inventoryFilterMethod" => 0,
+    //         "securityGUID" => "",
+    //         "originDestinations" => $originDestinations
+    //     ];
+
+    //     // dd(json_encode($paxFareInfos));
+
+    //     return $data;
+    // }
+
     private function constructReturnBookingData($search_result, $request)
     {
         $flights =  $search_result['flights'];
@@ -598,9 +894,7 @@ class FlyDubaiController extends Controller
         $outBoundFlight = $flights[$request->dep_LFID];
         $outBoundFares = $outBoundFlight['fares'];
 
-        // In Bound
-        $inBoundFlight = $flights[$request->rtn_LFID];
-        $inBoundFares = $inBoundFlight['fares'];
+        
 
         $outBoundFare = $inBoundFare = [];
 
@@ -613,6 +907,10 @@ class FlyDubaiController extends Controller
             }
         }
 
+
+        // In Bound
+        $inBoundFlight = $flights[$request->rtn_LFID];
+        $inBoundFares = $inBoundFlight['fares'];
         foreach ($inBoundFares  as $fares) {
             if (
                 $fares['FareTypeID'] == $request->rtn_FareTypeID &&
@@ -633,51 +931,61 @@ class FlyDubaiController extends Controller
         }
 
         // Out bound array
-        foreach ($outBoundFare['FareInfos']['FareInfo'][0]['Pax'] as $pax) {
-            $taxDetails = [];
-            foreach ($pax['ApplicableTaxDetails']['ApplicableTaxDetail'] as $tax) {
+        $FCCode = $Cabin = '';
+        $paxID= [];
+        $bookingCodes = [];
+        foreach ($outBoundFare['FareInfos']['FareInfo'] as $FareInfo) {
+            foreach ($FareInfo['Pax'] as $pax) {
+                $taxDetails = [];
+                foreach ($pax['ApplicableTaxDetails']['ApplicableTaxDetail'] as $tax) {
 
-                $c_tax = null;
+                    $c_tax = null;
 
-                foreach ($search_result['taxDetails'] as $taxDetail) {
-                    if ($taxDetail['TaxID'] == $tax['TaxID']) {
-                        $c_tax = $taxDetail;
+                    foreach ($search_result['taxDetails'] as $taxDetail) {
+                        if ($taxDetail['TaxID'] == $tax['TaxID']) {
+                            $c_tax = $taxDetail;
+                        }
                     }
+
+                    $taxDetails[] = [
+                        "amt" => $tax['Amt'],
+                        "taxCode" => $c_tax['TaxCode'],
+                        "taxID" => $tax['TaxID']
+                    ];
                 }
 
-                $taxDetails[] = [
-                    "amt" => $tax['Amt'],
-                    "taxCode" => $c_tax['TaxCode'],
-                    "taxID" => $tax['TaxID']
-                ];
+                $paxFareInfos[] = array(
+                    "fareID" => $pax['FareID'],
+                    "ID" => $pax['ID'],
+                    "FBC" => $pax['FBCode'],
+                    "baseFare" => $pax['BaseFareAmtNoTaxes'],
+                    "originalFare" => $pax['OriginalFare'],
+                    "ruleID" => $pax['RuleId'],
+                    "totalFare" => $pax['FareAmtInclTax'],
+                    "PTC" => $pax['PTCID'],
+                    "secureHash" => $pax['hashcode'],
+                    "secureData" => "",
+                    "fareCarrier" => $pax['FareCarrier'],
+                    "seatAvailability" => $pax['SeatsAvailable'],
+                    "infantAvailability" => 0,
+                    "applicableTaxDetails" => $taxDetails,
+                    "fareClass" => $pax['FCCode'],
+                );
+                
+                $FCCode = $pax['FCCode'];
+                $Cabin = $pax['Cabin'];
+                $paxID[] = (string)$pax['ID'];
             }
-
-            $paxFareInfos[] = array(
-                "fareID" => $pax['FareID'],
-                "ID" => $pax['ID'],
-                "FBC" => $pax['FBCode'],
-                "baseFare" => $pax['BaseFareAmtNoTaxes'],
-                "originalFare" => $pax['OriginalFare'],
-                "ruleID" => $pax['RuleId'],
-                "totalFare" => $pax['FareAmtInclTax'],
-                "PTC" => $pax['PTCID'],
-                "secureHash" => $pax['hashcode'],
-                "secureData" => "",
-                "fareCarrier" => $pax['FareCarrier'],
-                "seatAvailability" => $pax['SeatsAvailable'],
-                "infantAvailability" => 0,
-                "applicableTaxDetails" => $taxDetails,
-                "fareClass" => $pax['FCCode'],
-            );
-            $bookingCodes[] = array(
-                "fareClass" => $pax['FCCode'],
-                "cabin" => $pax['Cabin'],
-                "paxID" => [
-                    (int)$pax['ID']
-                ]
-
-            );
         }
+
+        $bookingCodes[] = array(
+            "fareClass" => $FCCode,
+            "cabin" => $Cabin,
+            "paxID" => $paxID
+        );
+
+        // dd( $bookingCodes);
+
         foreach ($outBoundFlight['flightLegs'] as $flightLeg) {
             foreach ($search_result['legDetails'] as $c_leg) {
                 if (
@@ -695,7 +1003,7 @@ class FlyDubaiController extends Controller
                 "origin" => $leg['Origin'],
                 "destination" => $leg['Destination'],
                 "depDate" => $leg['DepartureDate'],
-                "arrDate" => $leg['ArrivalDate'],
+                // "arrDate" => $leg['ArrivalDate'],
                 "mrktCarrier" => $leg['MarketingCarrier'],
                 "mrktFlightNum" => $leg['FlightNum'],
                 "operCarrier" => $leg['OperatingCarrier'],
@@ -725,54 +1033,64 @@ class FlyDubaiController extends Controller
             "segmentDetails" => $segmentDetails
         ];
 
-        $segmentDetails = [];
-        $paxFareInfos = [];
         // In bound array
-        foreach ($inBoundFare['FareInfos']['FareInfo'][0]['Pax'] as $pax) {
-            $taxDetails = [];
-            foreach ($pax['ApplicableTaxDetails']['ApplicableTaxDetail'] as $tax) {
+        $segmentDetails = [];
+        $paxFareInfos2 = [];
 
-                $c_tax = null;
+        $FCCode = $Cabin = '';
+        $paxID= [];
+        $bookingCodes2 = [];
+        foreach ($inBoundFare['FareInfos']['FareInfo'] as $FareInfo) {
+            foreach ($FareInfo['Pax'] as $pax) {
+                $taxDetails = [];
+                foreach ($pax['ApplicableTaxDetails']['ApplicableTaxDetail'] as $tax) {
 
-                foreach ($search_result['taxDetails'] as $taxDetail) {
-                    if ($taxDetail['TaxID'] == $tax['TaxID']) {
-                        $c_tax = $taxDetail;
+                    $c_tax = null;
+
+                    foreach ($search_result['taxDetails'] as $taxDetail) {
+                        if ($taxDetail['TaxID'] == $tax['TaxID']) {
+                            $c_tax = $taxDetail;
+                        }
                     }
+
+                    $taxDetails[] = [
+                        "amt" => $tax['Amt'],
+                        "taxCode" => $c_tax['TaxCode'],
+                        "taxID" => $tax['TaxID']
+                    ];
                 }
 
-                $taxDetails[] = [
-                    "amt" => $tax['Amt'],
-                    "taxCode" => $c_tax['TaxCode'],
-                    "taxID" => $tax['TaxID']
-                ];
+                $paxFareInfos2[] = array(
+                    "fareID" => $pax['FareID'],
+                    "ID" => $pax['ID'],
+                    "FBC" => $pax['FBCode'],
+                    "baseFare" => $pax['BaseFareAmtNoTaxes'],
+                    "originalFare" => $pax['OriginalFare'],
+                    "ruleID" => $pax['RuleId'],
+                    "totalFare" => $pax['FareAmtInclTax'],
+                    "PTC" => $pax['PTCID'],
+                    "secureHash" => $pax['hashcode'],
+                    "secureData" => "",
+                    "fareCarrier" => $pax['FareCarrier'],
+                    "seatAvailability" => $pax['SeatsAvailable'],
+                    "infantAvailability" => 0,
+                    "applicableTaxDetails" => $taxDetails,
+                    "fareClass" => $pax['FCCode'],
+                );
+
+                $FCCode = $pax['FCCode'];
+                $Cabin = $pax['Cabin'];
+                $paxID[] =  (string)$pax['ID'];
+                
             }
-
-            $paxFareInfos[] = array(
-                "fareID" => $pax['FareID'],
-                "ID" => $pax['ID'],
-                "FBC" => $pax['FBCode'],
-                "baseFare" => $pax['BaseFareAmtNoTaxes'],
-                "originalFare" => $pax['OriginalFare'],
-                "ruleID" => $pax['RuleId'],
-                "totalFare" => $pax['FareAmtInclTax'],
-                "PTC" => $pax['PTCID'],
-                "secureHash" => $pax['hashcode'],
-                "secureData" => "",
-                "fareCarrier" => $pax['FareCarrier'],
-                "seatAvailability" => $pax['SeatsAvailable'],
-                "infantAvailability" => 0,
-                "applicableTaxDetails" => $taxDetails,
-                "fareClass" => $pax['FCCode'],
-            );
-            $bookingCodes[] = array(
-                "fareClass" => $pax['FCCode'],
-                "cabin" => $pax['Cabin'],
-                "paxID" => [
-                    (int)$pax['ID']
-                ]
-
-            );
         }
+
+        $bookingCodes2[] = array(
+            "fareClass" => $FCCode,
+            "cabin" => $Cabin,
+            "paxID" => $paxID
+        );
+
         foreach ($inBoundFlight['flightLegs'] as $flightLeg) {
 
             foreach ($search_result['legDetails'] as $c_leg) {
@@ -791,14 +1109,14 @@ class FlyDubaiController extends Controller
                 "origin" => $leg['Origin'],
                 "destination" => $leg['Destination'],
                 "depDate" => $leg['DepartureDate'],
-                "arrDate" => $leg['ArrivalDate'],
+                // "arrDate" => $leg['ArrivalDate'],
                 "mrktCarrier" => $leg['MarketingCarrier'],
                 "mrktFlightNum" => $leg['FlightNum'],
                 "operCarrier" => $leg['OperatingCarrier'],
                 "operFlightNum" => $leg['MarketingFlightNum'],
                 "arrTerminal" => $leg['FromTerminal'],
                 "depTerminal" => $leg['ToTerminal'],
-                "bookingCodes" => $bookingCodes
+                "bookingCodes" => $bookingCodes2
             ];
         }
 
@@ -815,7 +1133,7 @@ class FlyDubaiController extends Controller
                     "fareBrandID" => $inBoundFare['FareTypeID'],
                     "fareBrand" => $inBoundFare['FareTypeName'],
                     "fareInfos" => array([
-                        'paxFareInfos' => $paxFareInfos
+                        'paxFareInfos' => $paxFareInfos2
                     ])
                 ]
             ],
@@ -829,6 +1147,8 @@ class FlyDubaiController extends Controller
             "securityGUID" => "",
             "originDestinations" => $originDestinations
         ];
+
+        // dd(json_encode($paxFareInfos));
 
         return $data;
     }
@@ -1115,12 +1435,9 @@ class FlyDubaiController extends Controller
         $passengers = [];
         $segments = [];
 
-        // dd($request);
-
         $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
         $cart_res = Cache::get('fd_add_cart_res_' . $request->search_id, null);
 
-        dd($cart_res);
 
         if (!$search_result || !$cart_res) {
             return $this->redirectFail();
@@ -1138,15 +1455,11 @@ class FlyDubaiController extends Controller
             }
         }
 
-        // dd($fareID);
-
-
         $segmentsArray = [];
 
         if ($search_result['search_type'] == 'OneWay') {
             $search_lfdi = $request->LFID;
             $search_FareTypeID = $request->FareTypeID;
-
             foreach ($search_result['flights'] as $flight) {
                 if ($flight['LFID'] == $search_lfdi) {
                     $segmentsArray[] = $flight;
@@ -1157,15 +1470,12 @@ class FlyDubaiController extends Controller
             $rtn_LFID = $request->rtn_LFID;
             $dep_FareTypeID = $request->dep_FareTypeID;
             $rtn_FareTypeID = $request->rtn_FareTypeID;
-
             foreach ($search_result['flights'] as $flight) {
                 if ($flight['LFID'] == $dep_LFID || $flight['LFID'] == $rtn_LFID) {
                     $segmentsArray[] = $flight;
                 }
             }
         }
-
-        // dd($segmentsArray);
 
         foreach ($request->adult_title as $key => $adult) {
             // $segments[] = [
@@ -1202,7 +1512,7 @@ class FlyDubaiController extends Controller
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'infant');
             }
         }
-        dd([$passengers, $fareID, $segmentsArray]);
+        // dd([$passengers, $fareID, $segmentsArray]);
 
         foreach ($segmentsArray as $segment) {
             foreach ($passengers as $passenger) {

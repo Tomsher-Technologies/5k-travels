@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Providers\FlyDubaiController;
+use App\Http\Controllers\Providers\Yasin\YasinBookingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\Airports;
@@ -65,10 +66,18 @@ class FlightsController extends Controller
 
         $data['flightData'] = Airlines::get()->keyBy('AirLineCode')->toArray();
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
+        $data['search_type'] = $request->search_type;
+        $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData();
+        $data['cabin_type'] = $cabin_type;
+
         $fly_dubai_con = new FlyDubaiController();
         $fly_dubai_res = $fly_dubai_con->search($request);
 
-        $data['search_type'] = $request->search_type;
+        // $yasin_con = new YasinBookingController();
+        // $yasin_res = $yasin_con->search($request);
+
+        // dd($yasin_res);
+
         $data['non_stop'] = $fly_dubai_res['non_stop'];
         $data['one_stop'] = $fly_dubai_res['one_stop'];
         $data['two_stop'] = $fly_dubai_res['two_stop'];
@@ -76,9 +85,6 @@ class FlightsController extends Controller
         $data['refund'] = $fly_dubai_res['refund'];
         $data['no_refund'] = $fly_dubai_res['no_refund'];
         $data['currency'] = $fly_dubai_res['currency'];
-
-        $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData();
-
         $data['totalCount'] = count($fly_dubai_res['flights']);
         $data['flightDetails'] = $fly_dubai_res['flights'];
         $data['taxDetails'] = $fly_dubai_res['taxDetails'];
@@ -86,7 +92,6 @@ class FlightsController extends Controller
         $data['legDetails'] = $fly_dubai_res['legDetails'];
         $data['airlines'] = $fly_dubai_res['airlines'];
         $data['search_id'] = $fly_dubai_res['search_id'];
-        $data['cabin_type'] = $cabin_type;
         $data['combinability'] = getCombinability($fly_dubai_res['combinability']);
 
         // dd($data['serviceDetails']);
@@ -313,7 +318,8 @@ class FlightsController extends Controller
     //     echo json_encode($msg);
     // }
 
-    public function createBooking(Request $request){
+    public function createBooking(Request $request)
+    {
         $fly_dubai_con = new FlyDubaiController();
         $fly_dubai_res = $fly_dubai_con->submitPnr($request);
     }

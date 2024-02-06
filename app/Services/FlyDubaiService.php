@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Exception;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Http;
 
@@ -19,18 +21,28 @@ class FlyDubaiService
 
     public function callAPI($url, $data, $needJson = true)
     {
-        $response = Http::timeout(300)->withOptions($this->getHttpOptions())->withHeaders([
-            'Accept-Encoding' => 'gzip, deflate',
-            'Authorization' => 'Bearer ' . getToken()
-        ])->post(env('FLY_DUBAI_API_URL') . $url, $data);
+        try {
+            $response = Http::timeout(300)->withOptions($this->getHttpOptions())->withHeaders([
+                'Accept-Encoding' => 'gzip, deflate',
+                'Authorization' => 'Bearer ' . getToken()
+            ])->post(env('FLY_DUBAI_API_URL') . $url, $data);
 
 
-        if ($response->status() == 200) {
-            if ($needJson) {
-                return $response->json();
+            if ($response->failed()) {
+                return null;
             }
 
-            return $response->getBody()->getContents();
+            if ($response->status() == 200) {
+                if ($needJson) {
+                    return $response->json();
+                }
+
+                return $response->getBody()->getContents();
+            }
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            return null;
+        } catch (RequestException $e) {
+            return null;
         }
 
         return null;

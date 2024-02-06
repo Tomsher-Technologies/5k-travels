@@ -7,6 +7,7 @@ use App\Models\FlightBookings;
 use App\Models\Airlines;
 use App\Models\Airports;
 use App\Models\User;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
@@ -299,17 +300,24 @@ function generateApiToken()
         "username" =>  env('FLY_DUBAI_USERNAME'),
     ];
 
-    $response = Http::timeout(300)->withOptions(['verify' => false])->asForm()->post(env('FLY_DUBAI_API_URL') . 'authenticate', $data);
-    $result = $response->getBody()->getContents();
-    $res = json_decode($result);
+    try {
+        $response = Http::timeout(300)->withOptions(['verify' => false])->asForm()->post(env('FLY_DUBAI_API_URL') . 'authenticate', $data);
 
-    $nowTime = strtotime(date("Y-m-d H:i:s"));
-    $expiryTime = date("Y-m-d H:i:s", strtotime('+2399 seconds', $nowTime));
-    session(['api_token' => $res->access_token]);
-    session(['api_token_expiry' => $expiryTime]);
-    session()->save();
+        $result = $response->getBody()->getContents();
+        $res = json_decode($result);
 
-    return $res->access_token;
+        $nowTime = strtotime(date("Y-m-d H:i:s"));
+        $expiryTime = date("Y-m-d H:i:s", strtotime('+2399 seconds', $nowTime));
+        session(['api_token' => $res->access_token]);
+        session(['api_token_expiry' => $expiryTime]);
+        session()->save();
+
+        return $res->access_token;
+    } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        return null;
+    } catch (RequestException $e) {
+        return null;
+    }
 }
 
 function getToken()
@@ -920,3 +928,25 @@ function getMealDetails($pfid, $code, $ancillary)
 
     return $arr;
 }
+
+// Start Yasin
+function getYasinAirLines($flights)
+{
+    $airlines = [];
+    foreach ($flights as $flight) {
+        if (isset($airlines[$flight['AirLine']])) {
+            $airlines[$flight['AirLine']] =   $airlines[$flight['AirLine']] + 1;
+        } else {
+            $airlines[$flight['AirLine']] = 1;
+        }
+    }
+    return $airlines;
+}
+
+function getYasinFlightTime($flight){
+    $depatureTime = Carbon::parse($flight['FlightDate'] . ' ' . $flight['DepatureTime']);
+    $arrivalTime = Carbon::parse($flight['ArrivalDate'] . ' ' . $flight['ArrivalTime']);
+
+    
+}
+// End Yasin

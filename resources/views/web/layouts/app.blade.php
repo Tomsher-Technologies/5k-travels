@@ -68,7 +68,7 @@
             background: #1fba71;
         }
     </style>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y9KMYW7Z2M"></script>
+    {{-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y9KMYW7Z2M"></script> --}}
     {{-- <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
@@ -549,7 +549,8 @@
     <script>
         var config = {
             routes: {
-                flydubai_ancillary: "{{ route('flydubai.ancillary') }}"
+                flydubai_ancillary: "{{ route('flydubai.ancillary') }}",
+                checklogin: "{{ route('checklogin') }}"
             }
         };
     </script>
