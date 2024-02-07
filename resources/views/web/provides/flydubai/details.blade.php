@@ -13,6 +13,11 @@
                             </div>
                             <div class="pricing__feature-info-content d-flex align-items-center">
                                 <div class="pricing__feature-info-text">
+                                    <p>Baggage</p>
+                                </div>
+                            </div>
+                            <div class="pricing__feature-info-content d-flex align-items-center">
+                                <div class="pricing__feature-info-text">
                                     <p>Meal</p>
                                 </div>
                             </div>
@@ -57,6 +62,8 @@
                             }
                         }
                         $penalities = getFDPenalities($fare['FareInfos']);
+                        // dd($fare['FareInfos']);
+                        $baggage = getFDFreeBaggage($fare['FareInfos'], $data['taxDetails']);
 
                         $seat_meal = [
                             'meal' => null,
@@ -86,6 +93,45 @@
                                             {{ $fare['FareTypeName'] }}
                                         </h3>
                                     </div>
+                                </div>
+                            </div>
+
+
+                            <div class="pricing__feature-info-wrapper">
+                                <div
+                                    class="pricing__feature-info-available pricing__feature-info-available2  text-center">
+
+                                    @if ($baggage)
+                                        <p>
+                                            <span class="done">
+                                                <svg width="11" height="9" viewBox="0 0 11 9" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M9.5451 1.27344L3.9201 7.04884L1.36328 4.42366"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                            </span>
+                                        </p>
+                                        <div class="pricing__feature-info-tooltip2 transition-3">
+                                            <p>
+                                                {{ $baggage }}
+                                            </p>
+                                        </div>
+                                    @else
+                                        <p>
+                                            <span class="cross">
+                                                <svg width="10" height="11" viewBox="0 0 12 16" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M11 1L1 10" stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round">
+                                                    </path>
+                                                    <path d="M1 1L11 10" stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round">
+                                                    </path>
+                                                </svg>
+                                            </span>
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
 
@@ -143,7 +189,7 @@
                                         </p>
                                         <div class="pricing__feature-info-tooltip2 transition-3">
                                             <p>
-                                                {{ $seat_meal['meal'] }}
+                                                {{ $seat_meal['seat'] }}
                                             </p>
                                         </div>
                                     @else
@@ -253,7 +299,7 @@
                                             $totalFareMargin = floor($totalFareMargin * 100) / 100;
                                             $displayAmount = convertCurrency($totalFareMargin, 'AED');
                                         @endphp
-                                        <span class="crc">{{ getActiveCurrency() }}</span> {{ $displayAmount }}
+                                        <span class="crc {{$margin['totalmargin']}}">{{ getActiveCurrency() }}</span> {{ $displayAmount }}
                                     </h3>
                                 </div>
                             </div>

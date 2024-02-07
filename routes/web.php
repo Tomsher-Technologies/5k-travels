@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FlightsApiController;
 use App\Http\Controllers\Providers\FlyDubaiController;
 use App\Models\FlightBookings;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
@@ -23,6 +24,31 @@ use Illuminate\Support\Facades\Http;
 
 
 Route::get('/cur', function () {
+
+
+    $booking = FlightBookings::find(2);
+    $action = "cancelBooking";
+    if ($booking->created_at > Carbon::parse('-24 hours') && $booking->created_at < Carbon::now()) {
+        dd($booking);
+    }
+    dd(Carbon::parse('-24 hours'));
+
+    // $data = [
+    //     "channel" => "OTA",
+    //     "subChannel" => "",
+    //     "pointOfSale" => "AE",
+    //     "currency" => "AED",
+    //     "carrier" => "FZ",
+    //     "PNR" => "ASd",
+    //     "modifyDetails" => [
+    //         "action" => "voidBooking"
+    //     ]
+    // ];
+
+    // dd(json_encode($data));
+
+    // 2021-07-21T06:14:14
+    // dd();
 
     // $flight_booking = FlightBookings::create([
     //     'unique_booking_id' => "PNR",
@@ -138,7 +164,7 @@ Route::group(['middleware' => ['auth', 'web']], function () {
     Route::get('/agent-profile', [HomeController::class, 'viewAgentProfile'])->name('agent.profile');
 
     Route::get('/flights/cancel', [FlightsController::class, 'cancelTicket'])->name('flight.cancel');
-    Route::get('/flights/voidQuote', [FlightsController::class, 'voidQuote'])->name('flight.voidQuote');
+    // Route::get('/flights/voidQuote', [FlightsController::class, 'voidQuote'])->name('flight.voidQuote');
     Route::post('/flights/void', [FlightsController::class, 'voidAPI'])->name('flight.void');
     Route::get('/flights/prtStatus', [FlightsController::class, 'ptrStatusCheck'])->name('flight.prtStatus');
     Route::get('/flights/refundQuote', [FlightsController::class, 'refundQuote'])->name('flight.refundQuote');

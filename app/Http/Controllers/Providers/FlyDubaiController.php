@@ -678,7 +678,7 @@ class FlyDubaiController extends Controller
     //                 "applicableTaxDetails" => $taxDetails,
     //                 "fareClass" => $pax['FCCode'],
     //             );
-                
+
     //             $FCCode = $pax['FCCode'];
     //             $Cabin = $pax['Cabin'];
     //             $paxID[] = (string)$pax['FareID'];
@@ -788,7 +788,7 @@ class FlyDubaiController extends Controller
     //             $FCCode = $pax['FCCode'];
     //             $Cabin = $pax['Cabin'];
     //             $paxID[] =  (string)$pax['ID'];
-                
+
     //         }
     //     }
 
@@ -894,7 +894,7 @@ class FlyDubaiController extends Controller
         $outBoundFlight = $flights[$request->dep_LFID];
         $outBoundFares = $outBoundFlight['fares'];
 
-        
+
 
         $outBoundFare = $inBoundFare = [];
 
@@ -932,7 +932,7 @@ class FlyDubaiController extends Controller
 
         // Out bound array
         $FCCode = $Cabin = '';
-        $paxID= [];
+        $paxID = [];
         $bookingCodes = [];
         foreach ($outBoundFare['FareInfos']['FareInfo'] as $FareInfo) {
             foreach ($FareInfo['Pax'] as $pax) {
@@ -971,7 +971,7 @@ class FlyDubaiController extends Controller
                     "applicableTaxDetails" => $taxDetails,
                     "fareClass" => $pax['FCCode'],
                 );
-                
+
                 $FCCode = $pax['FCCode'];
                 $Cabin = $pax['Cabin'];
                 $paxID[] = (string)$pax['ID'];
@@ -1038,7 +1038,7 @@ class FlyDubaiController extends Controller
         $paxFareInfos2 = [];
 
         $FCCode = $Cabin = '';
-        $paxID= [];
+        $paxID = [];
         $bookingCodes2 = [];
         foreach ($inBoundFare['FareInfos']['FareInfo'] as $FareInfo) {
             foreach ($FareInfo['Pax'] as $pax) {
@@ -1081,7 +1081,6 @@ class FlyDubaiController extends Controller
                 $FCCode = $pax['FCCode'];
                 $Cabin = $pax['Cabin'];
                 $paxID[] =  (string)$pax['ID'];
-                
             }
         }
 
@@ -1425,19 +1424,52 @@ class FlyDubaiController extends Controller
         return $services;
     }
 
-    public function generateSeatArray(Request $request, $paxCount, $p_type)
+    public function generateSeatArray(Request $request, $paxCount, $p_id, $poid, $LFID)
     {
+        $p_type = "ADT";
+        if ($p_id == 6) {
+            $p_type = "CHD";
+        } else if ($p_id == 5) {
+            $p_type = "INF";
+        }
+
+        $seatsArray = [];
+        // return $seats;
+
+        $LP_Array = getFDLfidPfid($request->search_id);
+
+        if (isset($request['seat'])) {
+            foreach ($request['seat'] as $key => $seats) {
+                if ($key == $p_type) {
+                    foreach ($seats[$paxCount + 1] as $key_2 => $seat) {
+                        $se = explode('_', $seat);
+                        if (isset($LP_Array[$LFID])) {
+                            $seatiner = [];
+                            $seatiner["PersonOrgID"] = (string)$poid;
+                            $seatiner["LogicalFlightID"] = (string)$LFID;
+                            $seatiner["PhysicalFlightID"] = (string)$key_2;
+                            $seatiner["DepartureDate"] = $LP_Array[$LFID][$key_2];
+                            $seatiner["SeatSelected"] = (string)$se[2];
+                            $seatiner["RowNumber"] = (string)$se[1];
+
+                            $seatsArray[] = $seatiner;
+                        }
+                    }
+                }
+            }
+        }
+        return $seatsArray;
     }
 
     public function submitPnr(Request $request)
     {
+        // dd($request);
         $passCount = -1;
         $passengers = [];
         $segments = [];
 
         $search_result = Cache::get('fd_search_result_' . $request->search_id, null);
         $cart_res = Cache::get('fd_add_cart_res_' . $request->search_id, null);
-
 
         if (!$search_result || !$cart_res) {
             return $this->redirectFail();
@@ -1478,61 +1510,30 @@ class FlyDubaiController extends Controller
         }
 
         foreach ($request->adult_title as $key => $adult) {
-            // $segments[] = [
-            //     'PersonOrgID' => $passCount,
-            //     // 'FareInformationID' => 1,
-            //     'FareInformationID' => (int)abs($passCount),
-            //     'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'ADT'),
-            //     'Seats' => [],
-            // ];
             $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'adult');
         }
 
         if (isset($request->child_title)) {
             foreach ($request->child_title as $key => $child) {
-                // $segments[] = [
-                //     'PersonOrgID' => $passCount,
-                //     // 'FareInformationID' => 1,
-                //     'FareInformationID' =>  (int)abs($passCount),
-                //     'SpecialServices' => $this->generateSpecialServices($request, (int)abs($passCount), 'CHD'),
-                //     'Seats' => [],
-                // ];
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'child');
             }
         }
         if (isset($request->infant_title)) {
             foreach ($request->infant_title as $key => $infant) {
-                // $segments[] = [
-                //     'PersonOrgID' => $passCount,
-                //     // 'FareInformationID' => 1,
-                //     'FareInformationID' =>  (int)abs($passCount),
-                //     'SpecialServices' => [],
-                //     'Seats' => [],
-                // ];
                 $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'infant');
             }
         }
-        // dd([$passengers, $fareID, $segmentsArray]);
 
         foreach ($segmentsArray as $segment) {
-            foreach ($passengers as $passenger) {
+            foreach ($passengers as $key => $passenger) {
                 $seg = [];
                 $seg['PersonOrgID'] = $passenger['PersonOrgID'];
                 $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
                 $seg['SpecialServices'] = [];
-                $seg['Seats'] = [];
-
+                $seg['Seats'] = $this->generateSeatArray($request, $key, $passenger['PTCID'], $passenger['PersonOrgID'], $segment['LFID']);
                 $segments[] = $seg;
             }
         }
-
-        // dd([
-        //     $cart_res,
-        //     $segmentsArray,
-        //     $segments,
-        // ]);
-
-        // dd(json_encode($segments));
 
         $data = [];
         $data['ActionType'] =  'GetSummary';
@@ -1618,27 +1619,35 @@ class FlyDubaiController extends Controller
 
             if ($commit_response && isset($commit_response['Exceptions']) && $commit_response['Exceptions'][0]['ExceptionCode'] == 0) {
 
-                // $search_details =  getOrginDestinationSession($search_result['search_type']);
+                // Payment
+                $this->makePayment($request->search_id, $commit_response);
 
-                // $flight_booking = FlightBookings::create([
-                //     'unique_booking_id' => $commit_response['ConfirmationNumber'],
-                //     'direction' =>  $search_result['search_type'],
-                //     'origin' => $search_details['origin'],
-                //     'destination' =>  $search_details['destination'],
-                //     'adult_count' =>  $search_details['adult'],
-                //     'child_count' =>  $search_details['child'],
-                //     'infant_count' =>  $search_details['infant'],
-                //     'booking_status' =>  "Booked",
-                //     'ticket_status' =>  "Ticketed",
-                //     'cancel_request' =>  0,
-                //     'currency' =>  getActiveCurrency(),
-                //     'customer_name' =>  $request->adult_first_name[0] . ' '  . $request->adult_last_name[0],
-                //     'customer_email' =>  $request->email,
-                //     'phone_code' =>  $request->mobile_code,
-                //     'customer_phone' =>  $request->mobile_no,
-                // ]);
+                $search_details =  getOrginDestinationSession($search_result['search_type']);
 
-                // $flight_passengers = $this->savePassengerDetails($request, $flight_booking->id);
+                $flight_booking = FlightBookings::create([
+                    'api_provider' => 'flydubai',
+                    'user_id' => Auth::user()->id,
+                    'fare_type' => "0",
+                    'client_ref' => $commit_response['ConfirmationNumber'],
+                    'unique_booking_id' => $commit_response['ConfirmationNumber'],
+                    'direction' =>  $search_result['search_type'],
+                    'origin' => $search_details['origin'],
+                    'destination' =>  $search_details['destination'],
+                    'adult_count' =>  $search_details['adult'],
+                    'child_count' =>  $search_details['child'],
+                    'infant_count' =>  $search_details['infant'],
+                    'booking_status' =>  "Booked",
+                    'ticket_status' =>  "Ticketed",
+                    'cancel_request' =>  0,
+                    'is_cancelled' => 0,
+                    'currency' =>  getActiveCurrency(),
+                    'customer_name' =>  $request->adult_first_name[0] . ' '  . $request->adult_last_name[0],
+                    'customer_email' =>  $request->email,
+                    'phone_code' =>  $request->mobile_code,
+                    'customer_phone' =>  $request->mobile_no,
+                ]);
+
+                $this->savePassengerDetails($request, $flight_booking->id);
 
                 dd([
                     'ok',
@@ -1647,17 +1656,17 @@ class FlyDubaiController extends Controller
 
                 generateApiToken();
             } else {
-                dd([
-                    'commit error',
-                    $commit_response
-                ]);
+                // dd([
+                //     'commit error',
+                //     $commit_response
+                // ]);
                 return $this->redirectFail();
             }
         } else {
-            dd([
-                'Submit error',
-                $submit_response
-            ]);
+            // dd([
+            //     'Submit error',
+            //     $submit_response
+            // ]);
             return $this->redirectFail();
         }
     }
@@ -1750,5 +1759,124 @@ class FlyDubaiController extends Controller
         $returnHTML = view('web.provides.flydubai.seats_html', compact('seat_response', 'res_data'))->render();
 
         return response()->json(array('success' => true, 'html' => $returnHTML));
+    }
+
+    public function makePayment($search_id, $commit_response)
+    {
+        $date = Carbon::now()->format('Y-d-m\TH:i:s');
+
+        $data = [
+            "CheckPNRStatus" => false,
+            "ApplyDiscounts" => true,
+            "TransactionInfo" => [
+                "SecurityGUID" => "",
+                "CarrierCodes" => [
+                    [
+                        "AccessibleCarrierCode" => "FZ"
+                    ]
+                ],
+                "ClientIPAddress" => request()->ip(),
+                "HistoricUserName" => env('FLY_DUBAI_USERNAME')
+            ],
+            "ReservationInfo" => [
+                "SeriesNumber" => "299",
+                "ConfirmationNumber" => $commit_response['ConfirmationNumber']
+            ],
+            "PNRPayments" => [
+                [
+                    "AccountNumber" => "",
+                    "AccountPin" => "",
+                    "CardHolder" => "",
+                    "CurrencyPaid" => "AED",
+                    "CVCode" => "",
+                    "DatePaid" => $date,
+                    "ExpirationDate" => $date,
+                    "ExchangeRate" => 0,
+                    "ExchangeRateDate" => $date,
+                    "OriginalAmount" => $commit_response['ReservationBalance'],
+                    "PaymentAmount" => $commit_response['ReservationBalance'],
+                    "BalanceAmount" => 0,
+                    "PaymentMethod" => "INVC",
+                    "UserID" => env('FLY_DUBAI_USERNAME'),
+                    "IataNumber" => env('FLY_DUBAI_IATA'),
+                    "ReservationCurrency" => "AED",
+                    "ReservationAmount" => $commit_response['ReservationBalance'],
+                    "TransactionStatus" => "NOTYETPROCESSED",
+                    "BaseAmount" => $commit_response['ReservationBalance'],
+                    "PaymentComment" => "",
+                    "AuthorizationCode" => "",
+                    "PaymentReference" => "",
+                    "CardCurrency" => "",
+                    "MerchantID" => "",
+                    "ProcessorID" => "",
+                    "ProcessorName" => "",
+                    "FingerPrintingSessionID" => "",
+                    "GcxID" => "1",
+                    "GcxOptOption" => "1",
+                    "TerminalID" => 0,
+                    "ResponseMessage" => "",
+                    "Payor" => new stdClass()
+                ]
+            ]
+        ];
+
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/' . $search_id . '/payment_req.json'),
+        ]);
+        $logger->info(json_encode($data));
+
+        $payment_response = $this->flightBookingService->callAPI('order/payment/processFOP', $data);
+
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/' . $search_id . '/payment_res.json'),
+        ]);
+        $logger->info(json_encode($payment_response));
+
+        if ($payment_response && isset($payment_response['Exceptions']) && $payment_response['Exceptions'][0]['ExceptionCode'] == 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function cancelPNR(Request $request)
+    {
+        generateApiToken();
+        $booking = FlightBookings::find($request->bookid);
+        $action = "cancelBooking";
+        if ($booking->created_at > Carbon::parse('-24 hours') && $booking->created_at < Carbon::now()) {
+            $action = "voidBooking";
+        }
+
+        $data = [
+            "channel" => "OTA",
+            "subChannel" => "",
+            "securityGUID" => "",
+            "pointOfSale" => "AE",
+            "currency" => "AED",
+            "carrier" => "FZ",
+            "PNR" => $request->id,
+            "modifyDetails" => [
+                "action" =>  $action
+            ]
+        ];
+
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/cancell_res.json'),
+        ]);
+        $logger->info(json_encode($data));
+
+        $response = $this->flightBookingService->callAPI('order/cancelPNR', $data);
+
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/cancell_res.json'),
+        ]);
+        $logger->info($response);
+
+        return true;
     }
 }

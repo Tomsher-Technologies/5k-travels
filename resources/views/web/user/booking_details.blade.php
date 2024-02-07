@@ -54,9 +54,9 @@
                                                     <a href="javascript:void(0)" class="refundQuoteTicket btn btn-cancel" title="Cancel Ticket" id=""  data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
                                                 @else
                                                     @if($bookings[0]->ticket_status == "Ticketed" || $bookings[0]->ticket_status == "OK")
-                                                        <a href="javascript:void(0)" class="voidQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                        <a href="javascript:void(0)" class="voidQuoteTicket btn btn-cancel" title="Cancel Ticket" id="" data-provider="{{ $bookings[0]->api_provider }}" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
                                                     @else
-                                                        <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" title="Cancel Ticket" data-type="void" id="" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
+                                                        <a href="javascript:void(0)" class="cancelTicket btn btn-cancel" title="Cancel Ticket" data-type="void" id="" data-provider="{{ $bookings[0]->api_provider }}" data-bookid="{{ $bookings[0]->id }}" data-id="{{ $bookings[0]->unique_booking_id }}">Cancel Booking</a>
                                                     @endif
                                                 @endif
                                             @elseif($timeDiff > 86400)
@@ -548,12 +548,18 @@ $('.reissuePTRStatusCheck').on('click', function () {
         $('#totalRefund').html('');
         $('#bookId').val('');
         $('#uniqueBookId').val('');
-        var bookId = $(this).attr('data-id');
-        var id = $(this).attr('data-bookid');
+        var id = $(this).attr('data-id');
+        var bookId = $(this).attr('data-bookid');
+        var provider = $(this).attr('data-provider');
         $.ajax({
-            url: "{{ route('flight.voidQuote')}}",
+            url: "{{ route('flight.cancel')}}",
             type: "GET",
-            data: { "_token": "{{ csrf_token() }}", "bookId" : bookId, "id" : id},
+            data: { 
+                "_token": "{{ csrf_token() }}",
+                 "bookid" : bookId,
+                  "id" : id,
+                  'provider': provider
+                },
             success: function( response ) {
                 $('.ajaxloader').css('display','none');
                 console.log(response);

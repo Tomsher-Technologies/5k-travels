@@ -583,6 +583,21 @@ function getFDCombinedData(&$FareTypes, $serviceDetails)
     );
 }
 
+function getFDFreeBaggage($fareInfos, $taxDetails)
+{
+    $taxDetails = array_combine(array_column($taxDetails, 'TaxID'), $taxDetails);
+    foreach ($fareInfos['FareInfo'] as $fareInfo) {
+        foreach ($fareInfo['Pax'] as $pax) {
+            foreach ($pax['ApplicableTaxDetails']['ApplicableTaxDetail'] as $tax) {
+                if ($tax['Amt'] == 0) {
+                    $taxDetail = $taxDetails[$tax['TaxID']];
+                    return $taxDetail['TaxDesc'];
+                }
+            }
+        }
+    }
+}
+
 
 function getFDAirLines($flights)
 {
@@ -605,6 +620,21 @@ function getFDFlightNum($airline, $flightNum)
     }
 
     return implode(' / ', $flightNums);
+}
+
+function getFDLfidPfid($search_id)
+{
+    $search_result = Cache::get('fd_search_result_' . $search_id, null);
+
+    $arr = [];
+
+    foreach ($search_result['flights'] as $flights) {
+        foreach ($flights['flightLegs'] as $flightLegs) {
+            $arr[$flights['LFID']][$flightLegs['PFID']] = $flightLegs['DepartureDate'];
+        }
+    }
+
+    return $arr;
 }
 
 function getFDStops($fdata, $legDetails)
@@ -943,10 +973,9 @@ function getYasinAirLines($flights)
     return $airlines;
 }
 
-function getYasinFlightTime($flight){
+function getYasinFlightTime($flight)
+{
     $depatureTime = Carbon::parse($flight['FlightDate'] . ' ' . $flight['DepatureTime']);
     $arrivalTime = Carbon::parse($flight['ArrivalDate'] . ' ' . $flight['ArrivalTime']);
-
-    
 }
 // End Yasin

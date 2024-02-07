@@ -29,6 +29,7 @@ class FlyDubaiService
 
 
             if ($response->failed()) {
+                dd($response);
                 return null;
             }
 
@@ -40,11 +41,13 @@ class FlyDubaiService
                 return $response->getBody()->getContents();
             }
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            dd("2");
             return null;
         } catch (RequestException $e) {
+            dd("3");
             return null;
         }
-
+        dd("4");
         return null;
     }
 

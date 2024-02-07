@@ -9,6 +9,7 @@ class FlightBookings extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'api_provider', 
         'user_id', 
         'unique_booking_id', 
         'direction',

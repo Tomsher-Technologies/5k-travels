@@ -16,7 +16,6 @@ $(document).on('click', '.addToCart', function () {
         success: function (data) {
             var resp = JSON.parse(data);
             console.log(resp.status);
-            $('.ajaxloader').css('display', 'none');
             if (resp.status == true) {
                 $.ajax({
                     type: "POST",
@@ -49,6 +48,7 @@ $(document).on('click', '.addToCart', function () {
                     }
                 });
             } else {
+                $('.ajaxloader').css('display', 'none');
                 new bootstrap.Modal(document.getElementById("common_author-forms"), {}).show();
             }
         }

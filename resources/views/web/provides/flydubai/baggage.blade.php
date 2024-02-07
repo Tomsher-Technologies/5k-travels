@@ -196,7 +196,7 @@
                                 <div class="tab-pane table-responsive userprof-tab {{ $flightLoop == 1 && $ad == 1 ? 'active' : '' }}"
                                     id="tab{{ $segments['lfID'] }}ADT{{ $ad }}" role="tabpanel">
                                     <div class="baggage-allw">
-                                        <p class="info-b pt-2">If your fare includes checked baggage, you can take
+                                        <p class="info-b py-2">If your fare includes checked baggage, you can take
                                             up to 3 bags up to the
                                             combined weight of your baggage allowance. Max. dimension 165 cm (height
                                             + width + depth).
@@ -204,14 +204,14 @@
                                         <div class="included_baggage">
                                             <div class="row align-items-center justify-content-between g-2 mb-2">
 
-                                                @isset($baggage['BAGI'])
+                                                {{-- @isset($baggage['BAGI'])
                                                     <div class="col-12">
                                                         <p class="pt-2">{{ $baggage['BAGI']['description'] }}</p>
                                                     </div>
-                                                @endisset
+                                                @endisset --}}
 
                                                 @foreach ($baggage as $bag)
-                                                    @if ($bag['code'] !== 'BAGI')
+                                                    @if (Str::contains($bag['description'], 'Upgrade'))
                                                         <div class="col-12">
                                                             <input class="input_baggage"
                                                                 data-user="Adult {{ $ad }}"
