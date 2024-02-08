@@ -21,6 +21,9 @@ class FlightPassengers extends Model
         'eticket_number', 
         'itemRPH', 
         'created_at',
+        'passport_issue_country',
+        'passport_issue_date',
+        'passport_expiry_date',
         'is_return'
     ];
 }

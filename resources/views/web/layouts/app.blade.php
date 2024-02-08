@@ -190,18 +190,6 @@
                                                                     <input type="password" class="form-control"
                                                                         name="password"
                                                                         placeholder="Enter password" />
-
-
-
-
-
-
-
-
-                                                                    <!--<a href="#"  >Forgot password?</a>-->
-
-
-
                                                                 </div>
                                                                 <div id="errors-list"></div>
                                                                 <div class="common_form_submit">
@@ -210,9 +198,8 @@
                                                                 </div>
                                                                 <div class="have_acount_area">
                                                                     <p>Dont have an account? <a href="#"
-                                                                            data-bs-toggle="tab"
-                                                                            data-bs-target="#register"
-                                                                            aria-controls="register">Register now</a>
+                                                                            onclick="$('#register-tab').trigger('click');">Register
+                                                                            now</a>
                                                                     </p>
                                                                 </div>
                                                             </form>
@@ -553,6 +540,15 @@
                 checklogin: "{{ route('checklogin') }}"
             }
         };
+        window.addEventListener('pageshow', function(event) {
+            $('.ajaxloader').hide();
+        });
+
+        $('#theme_search_form .nav-link').click(function(e) {
+            if ($(this).hasClass('active')) {
+                e.preventDefault();
+            }
+        });
     </script>
 
     @stack('footer')

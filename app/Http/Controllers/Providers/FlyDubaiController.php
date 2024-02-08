@@ -1434,30 +1434,44 @@ class FlyDubaiController extends Controller
         }
 
         $seatsArray = [];
-        // return $seats;
+        // return $seatsArray;
 
         $LP_Array = getFDLfidPfid($request->search_id);
 
-        if (isset($request['seat'])) {
-            foreach ($request['seat'] as $key => $seats) {
-                if ($key == $p_type) {
-                    foreach ($seats[$paxCount + 1] as $key_2 => $seat) {
-                        $se = explode('_', $seat);
-                        if (isset($LP_Array[$LFID])) {
-                            $seatiner = [];
-                            $seatiner["PersonOrgID"] = (string)$poid;
-                            $seatiner["LogicalFlightID"] = (string)$LFID;
-                            $seatiner["PhysicalFlightID"] = (string)$key_2;
-                            $seatiner["DepartureDate"] = $LP_Array[$LFID][$key_2];
-                            $seatiner["SeatSelected"] = (string)$se[2];
-                            $seatiner["RowNumber"] = (string)$se[1];
+        // dd($request);
 
-                            $seatsArray[] = $seatiner;
+        try {
+            if (isset($request['seat'])) {
+                foreach ($request['seat'] as $key => $seats) {
+                    if ($key == $p_type) {
+                        foreach ($seats[$paxCount + 1] as $key_2 => $seat) {
+                            if ($seat) {
+                                $se = explode('_', $seat);
+                                if (isset($LP_Array[$LFID]) && isset($LP_Array[$LFID][$key_2])) {
+                                    $seatiner = [];
+                                    $seatiner["PersonOrgID"] = (string)$poid;
+                                    $seatiner["LogicalFlightID"] = (string)$LFID;
+                                    $seatiner["PhysicalFlightID"] = (string)$key_2;
+                                    $seatiner["DepartureDate"] = $LP_Array[$LFID][$key_2];
+                                    $seatiner["SeatSelected"] = (string)$se[2];
+                                    $seatiner["RowNumber"] = (string)$se[1];
+
+                                    $seatsArray[] = $seatiner;
+                                }
+                            }
                         }
                     }
                 }
             }
+        } catch (\Throwable $th) {
+            dd(
+                [
+                    $request, $paxCount, $p_id, $poid, $LFID
+                ]
+            );
+            return [];
         }
+
         return $seatsArray;
     }
 
@@ -1509,23 +1523,40 @@ class FlyDubaiController extends Controller
             }
         }
 
+        $adt_array = $chd_array = $inf_array = [];
+
         foreach ($request->adult_title as $key => $adult) {
-            $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'adult');
+            $p = $this->createPassengerArray($passCount--, $request, $key, 'adult');
+            $passengers[] = $p;
+            $adt_array[$key] = array(
+                'PersonOrgID' =>  $p['PersonOrgID'],
+                'PTCID' =>  $p['PTCID'],
+            );
         }
 
         if (isset($request->child_title)) {
             foreach ($request->child_title as $key => $child) {
-                $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'child');
+                $p = $this->createPassengerArray($passCount--, $request, $key, 'child');
+                $passengers[] = $p;
+                $chd_array[$key] = array(
+                    'PersonOrgID' =>  $p['PersonOrgID'],
+                    'PTCID' =>  $p['PTCID'],
+                );
             }
         }
         if (isset($request->infant_title)) {
             foreach ($request->infant_title as $key => $infant) {
-                $passengers[] = $this->createPassengerArray($passCount--, $request, $key, 'infant');
+                $p = $this->createPassengerArray($passCount--, $request, $key, 'infant');
+                $passengers[] = $p;
+                $inf_array[$key] = array(
+                    'PersonOrgID' =>  $p['PersonOrgID'],
+                    'PTCID' =>  $p['PTCID'],
+                );
             }
         }
 
         foreach ($segmentsArray as $segment) {
-            foreach ($passengers as $key => $passenger) {
+            foreach ($adt_array as $key => $passenger) {
                 $seg = [];
                 $seg['PersonOrgID'] = $passenger['PersonOrgID'];
                 $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
@@ -1533,7 +1564,37 @@ class FlyDubaiController extends Controller
                 $seg['Seats'] = $this->generateSeatArray($request, $key, $passenger['PTCID'], $passenger['PersonOrgID'], $segment['LFID']);
                 $segments[] = $seg;
             }
+            foreach ($chd_array as $key => $passenger) {
+                $seg = [];
+                $seg['PersonOrgID'] = $passenger['PersonOrgID'];
+                $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
+                $seg['SpecialServices'] = [];
+                $seg['Seats'] = $this->generateSeatArray($request, $key, $passenger['PTCID'], $passenger['PersonOrgID'], $segment['LFID']);
+                $segments[] = $seg;
+            }
+            foreach ($inf_array as $key => $passenger) {
+                $seg = [];
+                $seg['PersonOrgID'] = $passenger['PersonOrgID'];
+                $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
+                $seg['SpecialServices'] = [];
+                $seg['Seats'] = [];
+                $segments[] = $seg;
+            }
         }
+
+        // dd($segments);
+
+        // foreach ($segmentsArray as $segment) {
+        //     foreach ($passengers as $key => $passenger) {
+        //         $seg = [];
+        //         $seg['PersonOrgID'] = $passenger['PersonOrgID'];
+        //         $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
+        //         $seg['SpecialServices'] = [];
+        //         $seg['Seats'] = [];
+        //         // $seg['Seats'] = $this->generateSeatArray($request, $key, $passenger['PTCID'], $passenger['PersonOrgID'], $segment['LFID']);
+        //         $segments[] = $seg;
+        //     }
+        // }
 
         $data = [];
         $data['ActionType'] =  'GetSummary';
@@ -1575,7 +1636,7 @@ class FlyDubaiController extends Controller
 
         $logger =  Log::build([
             'driver' => 'single',
-            'path' => storage_path('logs/se/' . $request->search_id . '/submit_req.json'),
+            'path' => storage_path('logs/se/' . $request->search_id . '/summery_req.json'),
         ]);
         $logger->info(json_encode($data));
 
@@ -1584,7 +1645,7 @@ class FlyDubaiController extends Controller
 
         $logger =  Log::build([
             'driver' => 'single',
-            'path' => storage_path('logs/se/' . $request->search_id . '/submit_res.json'),
+            'path' => storage_path('logs/se/' . $request->search_id . '/summery_res.json'),
         ]);
         $logger->info(json_encode($submit_response));
 
@@ -1647,14 +1708,15 @@ class FlyDubaiController extends Controller
                     'customer_phone' =>  $request->mobile_no,
                 ]);
 
-                $this->savePassengerDetails($request, $flight_booking->id);
+                $this->savePassengerDetails($request, $flight_booking->id, $commit_response['ConfirmationNumber']);
 
-                dd([
-                    'ok',
-                    $commit_response
-                ]);
-
+                // dd([
+                //     'ok',
+                //     $commit_response
+                // ]);
                 generateApiToken();
+
+                return $this->redirectSuccess($commit_response['ConfirmationNumber']);
             } else {
                 // dd([
                 //     'commit error',
@@ -1676,12 +1738,20 @@ class FlyDubaiController extends Controller
         return redirect()->route('flight.booking.fail');
     }
 
-    public function savePassengerDetails(Request $request, $flight_booking_id)
+    public function redirectSuccess($pnr)
+    {
+        return redirect()->route('flight.booking.success', [
+            'pnr' => $pnr
+        ]);
+    }
+
+    public function savePassengerDetails(Request $request, $flight_booking_id, $pnr)
     {
         foreach ($request->adult_title as $key => $adult) {
             FlightPassengers::create([
                 'booking_id' => $flight_booking_id,
                 'passenger_type' => "ADT",
+                'eticket_number' => $pnr,
                 'passenger_first_name' => $request->adult_first_name[$key],
                 'passenger_last_name' => $request->adult_last_name[$key],
                 'passenger_title' => $request->adult_title[$key],
@@ -1700,6 +1770,7 @@ class FlyDubaiController extends Controller
                 FlightPassengers::create([
                     'booking_id' => $flight_booking_id,
                     'passenger_type' => "ADT",
+                    'eticket_number' => $pnr,
                     'passenger_first_name' => $request->child_first_name[$key],
                     'passenger_last_name' => $request->child_last_name[$key],
                     'passenger_title' => $request->child_title[$key],
@@ -1718,6 +1789,7 @@ class FlyDubaiController extends Controller
                 FlightPassengers::create([
                     'booking_id' => $flight_booking_id,
                     'passenger_type' => "ADT",
+                    'eticket_number' => $pnr,
                     'passenger_first_name' => $request->infant_first_name[$key],
                     'passenger_last_name' => $request->infant_last_name[$key],
                     'passenger_title' => $request->infant_title[$key],

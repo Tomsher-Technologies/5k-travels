@@ -25,13 +25,15 @@ use Illuminate\Support\Facades\Http;
 
 Route::get('/cur', function () {
 
+    
 
-    $booking = FlightBookings::find(2);
-    $action = "cancelBooking";
-    if ($booking->created_at > Carbon::parse('-24 hours') && $booking->created_at < Carbon::now()) {
-        dd($booking);
-    }
-    dd(Carbon::parse('-24 hours'));
+
+    // $booking = FlightBookings::find(2);
+    // $action = "cancelBooking";
+    // if ($booking->created_at > Carbon::parse('-24 hours') && $booking->created_at < Carbon::now()) {
+    //     dd($booking);
+    // }
+    // dd(Carbon::parse('-24 hours'));
 
     // $data = [
     //     "channel" => "OTA",
@@ -140,6 +142,7 @@ Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name
 // Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
 
 Route::get('/flights/booking/fail', [FlightsController::class, 'bookingFail'])->name('flight.booking.fail');
+Route::get('/flights/booking/success', [FlightsController::class, 'bookingSuccess'])->name('flight.booking.success');
 
 Route::group(['middleware' => ['auth', 'web']], function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');

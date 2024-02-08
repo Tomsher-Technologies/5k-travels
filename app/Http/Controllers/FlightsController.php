@@ -239,4 +239,16 @@ class FlightsController extends Controller
     {
         return view('web.booking_fail');
     }
+
+    public function bookingSuccess(Request $request)
+    {
+        if ($request->pnr) {
+            $booking = FlightBookings::where('unique_booking_id', $request->pnr)->firstOrFail();
+            $booking['passengers'] = FlightPassengers::where('booking_id',$booking->id)->get();
+            // dd($booking);
+            return view('web.booking_success', compact('booking'));
+        } else {
+            abort(404);
+        }
+    }
 }
