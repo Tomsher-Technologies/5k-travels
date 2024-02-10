@@ -11,6 +11,7 @@ class FlightBookings extends Model
     protected $fillable = [
         'user_id', 
         'unique_booking_id', 
+        'direction',
         'client_ref', 
         'fare_type', 
         'origin', 
@@ -23,12 +24,26 @@ class FlightBookings extends Model
         'infant_count', 
         'booking_status', 
         'ticket_status', 
+        'cancel_request',
+        'is_cancelled',
         'adult_amount', 
         'child_amount', 
         'infant_amount', 
         'total_amount', 
         'addon_amount', 
         'total_tax',
-        'created_at'
+        'created_at',
+        'currency',
+        'total_amount_actual', 
+        'total_tax_actual', 
+        'admin_margin', 
+        'admin_amount', 
+        'agents_amount',
+        'cancel_request',
+        'is_reissued',
+        'parent_id',
+        'customer_name',
+        'reschedule_fare_difference',
+        'is_domestic'
     ];
 }

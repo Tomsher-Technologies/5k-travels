@@ -48,6 +48,9 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::group(['middleware' => ['auth','admin']], function () {
         
         Route::get('/dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
+        Route::get('/dashboard-counts', [HomeController::class, 'dashboardCounts'])->name('dashboard-counts');
+        Route::get('/allusers-counts', [HomeController::class, 'allUsersCounts'])->name('allusers-counts');
+        Route::get('/flightbooking-counts', [HomeController::class, 'flightbookingCounts'])->name('flightbooking-counts');
 
         /* ------------------- Agents -----------------*/
         Route::get('/agent/', [AgentsController::class, 'index'])->name('agent.index');
@@ -59,7 +62,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('/agent/view/{agent}', [AgentsController::class, 'view'])->name('agent.view');
         Route::post('/agent/approve', [AgentsController::class, 'approve'])->name('agent.approve');
         Route::post('/agent/change-status', [AgentsController::class, 'statusChange'])->name('agent.change.status');
-
+        Route::get('/agent/graph', [AgentsController::class, 'agentGraph'])->name('agent.graph');
+        
         /* ------------------- Users -----------------*/
         Route::get('/user/', [UserController::class, 'index'])->name('user.index');
         Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
@@ -73,6 +77,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         /* ------------------- Flights -----------------*/
         Route::get('/flights/airports', [FlightController::class, 'storeAirport'])->name('flights.airports');
         Route::get('/flights/airlines', [FlightController::class, 'storeAirlines'])->name('flights.airlines');
+        Route::get('/flights/airlines/update', [FlightController::class, 'updateAirlineImages'])->name('flights.airlines.update');
 
         /* ------------------- General Settings -----------------*/
         Route::get('/settings/general', [HomeController::class, 'generalSettings'])->name('settings.general');
@@ -89,5 +94,10 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('/settings/faq/delete', [HomeController::class, 'faqDelete'])->name('settings.faq.delete');
         Route::post('/faq/change-status', [HomeController::class, 'faqStatusChange'])->name('faq.change.status');
         Route::post('/faq/delete/', [HomeController::class, 'deleteFaq'])->name('faq.category.delete');
+
+        Route::get('/flight-bookings', [HomeController::class, 'getAllBookings'])->name('bookings');
+        Route::get('/booking-view/{id}', [HomeController::class, 'getBookingDetails'])->name('booking.view');
+        Route::get('/flight-bookings-export', [HomeController::class, 'exportData'])->name('export');
+        
     });
 });

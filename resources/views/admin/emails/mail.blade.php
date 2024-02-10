@@ -5,7 +5,7 @@
 </head>
 <body>
     <p> Hi {{$name}},
-    <p>{{ $body }}</p>
+    <p>{!! $body !!}</p>
      
     <p>
         Thank you,

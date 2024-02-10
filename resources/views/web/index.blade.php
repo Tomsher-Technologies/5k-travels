@@ -72,9 +72,6 @@
     </div>
 </section>
 
-
-
-
 <!-- Holiday Destinations  Area-->
 <section id="holiday_destinations" class="section_padding">
     <div class="container">
@@ -91,7 +88,7 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-1.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -112,7 +109,7 @@
                             </a>
                         </div>
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-2.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -135,7 +132,7 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-3.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -162,7 +159,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="holiday_small_boxed">
-                            <a href="tour-details.html">
+                            <a href="#">
                                 <img src="{{ asset('assets/img/holiday-img/holiday-4.png') }}" alt="img">
                                 <div class="holiday_small_box_content">
                                     <div class="holiday_inner_content">
@@ -187,7 +184,7 @@
                         <div class="row">
                             <div class="col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="holiday_small_boxed">
-                                    <a href="tour-details.html">
+                                    <a href="#">
                                         <img src="{{ asset('assets/img/holiday-img/holiday-5.png') }}" alt="img">
                                         <div class="holiday_small_box_content">
                                             <div class="holiday_inner_content">
@@ -210,7 +207,7 @@
                             </div>
                             <div class="col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="holiday_small_boxed">
-                                    <a href="tour-details.html">
+                                    <a href="#">
                                         <img src="{{ asset('assets/img/holiday-img/holiday-6.png') }}" alt="img">
                                         <div class="holiday_small_box_content">
                                             <div class="holiday_inner_content">
@@ -239,7 +236,6 @@
     </div>
 </section>
 
-
 <!-- About Us -->
 <section id="about_us_top" class="section_padding">
     <div class="container">
@@ -256,12 +252,12 @@
                             <!-- <a href="tour-search.html" class="btn btn_theme btn_md">Find tours</a> -->
                         </div>
                         <div class="col-lg-6">
-                            <p>At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-                                no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
-                                dolor sit amet, consetetur sadipscing elitr
-                                At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-                                no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
-                                dolor sit amet, consetetur sadipscing elitr </p>
+                            <p>5k travels is a Dubai-based privately owned online flight booking agency in the travel industry. 
+                                With an unwavering commitment to providing customers with limitless and unrestricted journeys, 
+                                our company strives to become the globally recognized and trusted leader among e-commerce tourism 
+                                companies. We value your trust and aim to become your go-to platform for all your flight booking 
+                                needs. At 5k Travels, we invite you to embark on an exhilarating journey with us as we assist you 
+                                in exploring the world, one flight at a time. </p>
                         </div>
 
 
@@ -280,7 +276,7 @@
 </section>
 
 <!-- Our partners Area -->
-<section id="our_partners_four" class="section_padding">
+<!-- <section id="our_partners_four" class="section_padding">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -322,8 +318,7 @@
             </div>
         </div>
     </div>
-</section>
-
+</section> -->
 
 
 <!-- newsletter content -->
@@ -333,25 +328,19 @@
 @push('header')
 <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/css/search_flights.css') }}" />
+
 <style>
 
 </style>
 @endpush
 @push('footer')
+
 <script src="{{ asset('assets/js/select2.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
 <script src="{{ asset('assets/js/search_flights.js') }}"></script>
+
 <script  type="text/javascript">
-    let one_way_session = '{!! json_encode(Session::get("flight_search_oneway")) !!}';
-    one_way_session = JSON.parse(one_way_session);
-
-    let return_session = '{!! json_encode(Session::get("flight_search_return")) !!}';
-    return_session = JSON.parse(return_session);
-
-    let multi_session = '{!! json_encode(Session::get("flight_search_multi")) !!}';
-    multi_session = JSON.parse(multi_session);
-
- 
+   
 </script>
 
 @endpush

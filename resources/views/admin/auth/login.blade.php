@@ -7,15 +7,16 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.ico') }}">
+    <title>{{ env('APP_NAME') }} | Login</title>
 
-    <title>Gentelella Alela! |</title>
-
-    <!-- Bootstrap -->
-    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
+     <!-- Bootstrap -->
+     <link href="{{ asset('assets/plugins/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet" />
     <!-- Font Awesome -->
-    <link href="{{ asset('assets/css/font-awesome.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" />
     <!-- Custom Theme Style -->
     <link href="{{ asset('assets/css/custom.min.css') }}" rel="stylesheet" />
+	
 </head>
 
 <body class="login">
@@ -31,21 +32,27 @@
                         <h1>{{ __('Admin Login') }}</h1>
                         <div>
                             <input type="text" class="form-control @error('email') is-invalid @enderror"
-                                placeholder="{{ __('Email Address') }}" name="email" value="{{ old('email') }}" required
+                                placeholder="{{ __('Email') }}" name="email" value="{{ old('email') }}" required
                                 autocomplete="email" autofocus>
                             
                         </div>
                         <div>
                             <input id="password" type="password"
-                                class="form-control @error('email') is-invalid @enderror" name="password" required
+                                class="form-control @error('email') is-invalid @enderror" name="password" required  placeholder="{{ __('Password') }}"
                                 autocomplete="current-password">
                             @error('email')
-                                <span class="invalid-feedback" role="alert">
+                                <div class="alert alert-danger">
                                     <strong>{{ $message }}</strong>
-                                </span>
+                                </div>
                             @enderror
+
+                            @if(session()->has('status'))
+                                <div class="alert alert-danger">
+                                    <strong>{{ session()->get('status') }}</strong>
+                                </div>
+                            @endif
                         </div>
-                        <div class="text-start">
+                        <div style="text-align: start;">
                             <input class="" type="checkbox" name="remember" id="remember"
                                 {{ old('remember') ? 'checked' : '' }}>
 
@@ -80,6 +87,7 @@
             </div>
         </div>
     </div>
+
 </body>
 
 </html>

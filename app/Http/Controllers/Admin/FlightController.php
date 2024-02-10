@@ -27,11 +27,11 @@ class FlightController extends Controller
     public function search(){
         
         $response = Http::withOptions($this->options)->post('https://travelnext.works/api/aeroVE5/availability', [
-                                "user_id"=> config('global.api_user_id'),
-                                "user_password"=> config('global.api_user_password'),
-                                "access"=> config('global.api_access'),
-                                "ip_address"=> config('global.api_ip_address'),
-                                "requiredCurrency"=> config('global.api_requiredCurrency'),
+                                "user_id"=> env('API_USER_ID'),
+                                "user_password"=> env('API_USER_PASSWORD'),
+                                "access"=> env('API_ACCESS'),
+                                "ip_address"=> env('API_IP_ADDRESS'),
+                                "requiredCurrency"=> env('API_REQUIRED_CURRENCY'),
                                 "journeyType"=> "OneWay",
                                 "OriginDestinationInfo"=>
                                 [
@@ -57,11 +57,11 @@ class FlightController extends Controller
 
     public function storeAirport(){
         ini_set('max_execution_time', 400);
-        $response = Http::withOptions($this->options)->post('https://travelnext.works/api/aeroVE5/airport_list', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address')
+        $response = Http::withOptions($this->options)->post(env('API_BASE_URL').'airport_list', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS')
                     ]);
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
@@ -73,16 +73,30 @@ class FlightController extends Controller
 
     public function storeAirlines(){
         ini_set('max_execution_time', 400);
-        $response = Http::withOptions($this->options)->post('https://travelnext.works/api/aeroVE5/airline_list', [
-                        "user_id"=> config('global.api_user_id'),
-                        "user_password"=> config('global.api_user_password'),
-                        "access"=> config('global.api_access'),
-                        "ip_address"=> config('global.api_ip_address')
+        $response = Http::withOptions($this->options)->post(env('API_BASE_URL').'airline_list', [
+                        "user_id"=> env('API_USER_ID'),
+                        "user_password"=> env('API_USER_PASSWORD'),
+                        "access"=> env('API_ACCESS'),
+                        "ip_address"=> env('API_IP_ADDRESS')
                     ]);
         $result = $response->getBody()->getContents();
         $result = json_decode($result, true);
         foreach($result as $res){
             $user = Airlines::updateOrCreate(['AirLineCode' => $res['AirLineCode']],$res);
+        }
+        echo 'Airlines saved successfully';
+    }
+
+    public function updateAirlineImages(){
+        ini_set('max_execution_time', 400);
+        $result = Airlines::where('id','>',7)->get();
+        foreach($result as $res){
+            $filename = $res['AirLineCode'].'.gif';
+            $img = $_SERVER['DOCUMENT_ROOT'].'/assets/images/airlines/'.$filename;
+            $imglink = '/assets/images/airlines/'.$filename;
+            file_put_contents($img, file_get_contents($res['AirLineLogo']));
+            
+            $user = Airlines::where('id',$res['id'])->update(['AirLineLogo' => $imglink]);
         }
         echo 'Airlines saved successfully';
     }

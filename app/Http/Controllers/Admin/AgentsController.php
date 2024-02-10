@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\Models\Countries;
+use App\Models\FlightMarginAmounts;
 use Helper;
 use Validator;
 use Hash;
@@ -23,12 +24,17 @@ class AgentsController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search = null;
+        $sort_search = $agent_search = null;
         if ($request->has('search')) {
             $sort_search = $request->search;
         }
+        if ($request->has('agent')) {
+            $agent_search = $request->agent;
+        }
       
-        $query = User::leftJoin('user_details as ud','ud.user_id','=','users.id')
+        $query = User::select('users.*','ud.*','pud.code as parent_code')->leftJoin('user_details as ud','ud.user_id','=','users.id')
+                            ->leftJoin('users as pu', 'pu.id','=','users.parent_id')
+                            ->leftJoin('user_details as pud', 'pud.user_id','=','pu.id')
                             ->where('users.user_type','agent')
                             ->where('users.is_deleted',0);
         if($sort_search){  
@@ -44,11 +50,53 @@ class AgentsController extends Controller
                 }); 
             }               
         }
+        if($agent_search){
+            $parent = User::with(['user_details'])->where('id', $agent_search)->first();
+            $allChilds = $parent->children->pipe(function ($collection){
+                $array = $collection->toArray();
+                $ids = [];
+                array_walk_recursive($array, function ($value, $key) use (&$ids) {
+                    if ($key === 'id') {
+                        $ids[] = $value;
+                    };
+                });
+                return $ids;
+            });
+            $query->whereIn('users.id',$allChilds);
+        }
 
         $agents = $query->orderBy('users.id','DESC')->paginate(10);
-        return view('admin.agents.index', compact('agents', 'sort_search'));
+        $mainAgents = User::where('user_type','agent')->where('is_deleted',0)->where('is_approved',1)->get();
+        return view('admin.agents.index', compact('agents', 'agent_search','sort_search','mainAgents'));
     }
 
+
+    public function agentGraph(){
+        $data = [];
+        $agents = User::select('users.*')->leftJoin('user_details as ud','ud.user_id','=','users.id')
+                            ->where('users.user_type','agent')
+                            // ->where('is_approved',1)
+                            ->where('users.is_deleted',0)
+                            ->orderBy('parent_id','ASC')
+                            ->get();
+        $data[] = array(
+            'id' => "0",
+            'parent' => '',
+            'name' => 'Admin'
+        );
+        if($agents){
+            foreach($agents as $agt){
+                $data[] = array(
+                    'id' => "$agt->id",
+                    'parent' => ( $agt->parent_id != '') ? "$agt->parent_id" : "0",
+                    'name' => "$agt->name"
+                );
+            }
+        }
+        $graph = json_encode($data);
+
+        return view('admin.agents.graph', compact('graph'));
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -84,12 +132,12 @@ class AgentsController extends Controller
 
         $user = User::create([
             'user_type' => 'agent',
-            'parent_id' => (isset($request->main_agent) ? $request->main_agent : NULL),
+            'parent_id' => ((isset($request->main_agent) && $request->agent_type == 'sub') ? $request->main_agent : NULL),
             'name' => $request->first_name.' '.$request->last_name,
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
             'is_approved' => 0,
-            'is_active' => 0,
+            'is_active' => 1,
         ]);
 
         if($user->id){
@@ -125,6 +173,16 @@ class AgentsController extends Controller
                 'admin_margin' => $request->admin_margin,
                 'agent_margin' => $request->agent_margin,
                 'credit_balance' => $request->credit_balance,
+            ]);
+
+            $agentMargins = FlightMarginAmounts::create([
+                'booking_id' => NULL,
+                'agent_id'   => $user->id,
+                'currency' => 'USD',
+                'usd_amount' => $request->credit_balance,
+                'transaction_type' => 'cr',
+                'credit_balance' => $request->credit_balance,
+                'created_at' => date('Y-m-d H:i:s')
             ]);
         }
 
@@ -217,6 +275,40 @@ class AgentsController extends Controller
                 'credit_balance' => $request->credit_balance,
         ];
 
+        $currentCredit = $userData->user_details->credit_balance;
+        if($request->credit_balance != $currentCredit){
+            if($request->credit_balance > $currentCredit){
+                FlightMarginAmounts::create([
+                        'booking_id' => NULL,
+                        'agent_id'   => $userData->id,
+                        'currency' => 'USD',
+                        'usd_amount' => number_format(($request->credit_balance - $currentCredit), 2, '.', ''),
+                        'transaction_type' => 'cr',
+                        'credit_balance' => $request->credit_balance,
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]);
+            }else{
+                FlightMarginAmounts::create([
+                    'booking_id' => NULL,
+                    'agent_id'   => $userData->id,
+                    'currency' => 'USD',
+                    'usd_amount' => number_format(($currentCredit - $request->credit_balance), 2, '.', ''),
+                    'transaction_type' => 'dr',
+                    'credit_balance' => $request->credit_balance,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+
+        // $agentMargins = FlightMarginAmounts::create([
+        //     'booking_id' => NULL,
+        //     'agent_id'   => $user->id,
+        //     'currency' => 'USD',
+        //     'usd_amount' => $request->credit_balance,
+        //     'transaction_type' => 'cr',
+        //     'created_at' => date('Y-m-d H:i:s')
+        // ]);
+
         UserDetails::where('user_id',$request->agent_id)->update($data);
         return back()->with('status', 'Agent Details Updated!');
     }
@@ -224,8 +316,8 @@ class AgentsController extends Controller
     public function approve(Request $request){
         $user = User::find($request->id);
         $user->update(['is_approved' => 1]);
-        $site_url = config('app.url');
-        $content = 'Welcome to '.env('APP_NAME').'. Your account has been approved. Click <a href="{{ '.$site_url.' }}">Here to login</a> to the site.';
+        $site_url = env('APP_URL');
+        $content = 'Welcome to '.env('APP_NAME').'. Your account has been approved by the Administrator. Click <a href="'.$site_url.'">Here to login</a> to the site.';
 
         $info = array(
             'name' => $user->name,
@@ -255,5 +347,6 @@ class AgentsController extends Controller
     public function destroy(string $id)
     {
         //
+       
     }
 }

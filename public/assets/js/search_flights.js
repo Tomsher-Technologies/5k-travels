@@ -3,45 +3,137 @@ $(document).on('select2:open', () => {
 });
 
 $(document).ready(function () {
-    initailizeSelect2(); 
+
+
+
+
+    let oDateCalendar = $("#oDate").flatpickr({
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+    });
+    $('#oFromForm .form_search_date').on('click', function () {
+        oDateCalendar.open()
+    })
+
+    let rReturnDateCalendar = $("#rReturnDate").flatpickr({
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+    });
+
+    let rDateCalendar = $("#rDate").flatpickr({
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+        onChange: function (selectedDates, dateStr, instance) {
+            $("#rReturnDate").flatpickr().destroy();
+            let rReturnDateCalendar = $("#rReturnDate").flatpickr({
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                minDate: dateStr,
+            });
+        }
+        // plugins: [new rangePlugin({ input: "#rReturnDate" })]
+    });
 
     // on load of the page: switch to the currently selected tab
     // var hash = window.location.hash;
     var currentUrl = window.location.href;
     var urlFormatted = new URL(currentUrl);
     var searchType = urlFormatted.searchParams.get("search_type");
-   
-    if(searchType == "OneWay"){
+
+    if (searchType == "OneWay") {
         $('#searchTab a[href="#oneway_flight"]').tab('show');
-    }else if(searchType == "Return"){
+
+        $('#oFromForm input[name="oFrom"]').val(urlFormatted.searchParams.get("oFrom"));
+        $('#oFromForm input[name="oTo"]').val(urlFormatted.searchParams.get("oTo"));
+
+        $('#oFrom').val(urlFormatted.searchParams.get("oFrom_label") + ' (' + urlFormatted.searchParams.get("oFrom") + ')');
+        $('#oTo').val(urlFormatted.searchParams.get("oTo_label") + ' (' + urlFormatted.searchParams.get("oTo") + ')');
+
+        $('#oFrom_label').val(urlFormatted.searchParams.get("oFrom_label"));
+        $('#oTo_label').val(urlFormatted.searchParams.get("oTo_label"));
+
+        oDateCalendar.setDate(urlFormatted.searchParams.get("oDate"))
+        // $('#oDate').val(urlFormatted.searchParams.get("oDate")).trigger('change');;
+
+    } else if (searchType == "Return") {
         $('#searchTab a[href="#roundtrip"]').tab('show');
-    }else if(searchType == "Circle"){
+
+
+        $('#rForm input[name="rFrom"]').val(urlFormatted.searchParams.get("rFrom"));
+        $('#rForm input[name="rTo"]').val(urlFormatted.searchParams.get("rTo"));
+
+        $('#rFrom').val(urlFormatted.searchParams.get("rFrom_label") + ' (' + urlFormatted.searchParams.get("rFrom") + ')');
+        $('#rTo').val(urlFormatted.searchParams.get("rTo_label") + ' (' + urlFormatted.searchParams.get("rTo") + ')');
+
+        $('#rFrom_label').val(urlFormatted.searchParams.get("rFrom_label"));
+        $('#rTo_label').val(urlFormatted.searchParams.get("rTo_label"));
+
+        // $('#rFrom_labels').html(return_session.rFrom_label);
+        // $('#rTo_labels').html(return_session.rTo_label);
+
+        rDateCalendar.setDate(urlFormatted.searchParams.get("rDate"))
+        rReturnDateCalendar.setDate(urlFormatted.searchParams.get("rReturnDate"))
+        // $('#rDate').val(urlFormatted.searchParams.get("rDate")).trigger('change');;
+        // $('#rReturnDate').val(urlFormatted.searchParams.get("rReturnDate")).trigger('change');;
+
+    } else if (searchType == "Circle") {
         $('#searchTab a[href="#multi_city"]').tab('show');
     }
-    
-    
-    if(one_way_session){
-        $('#oFrom').val(one_way_session.oFrom).trigger('change');
-        $('#oTo').val(one_way_session.oTo).trigger('change');
-        $('#oDate').val(one_way_session.oDate).trigger('change');
+
+
+    if (one_way_session) {
+        // $('#oFrom').val(one_way_session.oFrom);
+        // $('#oTo').val(one_way_session.oTo);
+
+        // $('#oFrom_label').val(one_way_session.oFrom_label);
+        // $('#oTo_label').val(one_way_session.oTo_label);
+
+        // $('#oFrom_labels').html(one_way_session.oFrom_label);
+        // $('#oTo_labels').html(one_way_session.oTo_label);
+
+        // $('#oDate').val(one_way_session.oDate).trigger('change');;
     }
-    if(return_session){
-        $('#rFrom').val(return_session.rFrom).trigger('change');
-        $('#rTo').val(return_session.rTo).trigger('change');
-        $('#rDate').val(return_session.rDate).trigger('change');
-        $('#rReturnDate').val(return_session.rReturnDate).trigger('change');
+    if (return_session) {
+        // $('#rFrom').val(return_session.rFrom);
+        // $('#rTo').val(return_session.rTo);
+
+        // $('#rFrom_label').val(return_session.rFrom_label);
+        // $('#rTo_label').val(return_session.rTo_label);
+
+        // $('#rFrom_labels').html(return_session.rFrom_label);
+        // $('#rTo_labels').html(return_session.rTo_label);
+
+        // $('#rDate').val(return_session.rDate).trigger('change');;
+        // $('#rReturnDate').val(return_session.rReturnDate).trigger('change');;
     }
 
-    if(multi_session){
+    if (multi_session) {
         let fromPlacesCount = (multi_session.mFrom).length;
+
         for (let step = 0; step < fromPlacesCount; step++) {
-            if(step >=2){
+            if (step >= 2) {
                 generateMultiFields(step);
             }
-            
-            $('#mFrom'+step).val(multi_session.mFrom[step]).trigger('change');
-            $('#mTo'+step).val(multi_session.mTo[step]).trigger('change');
-            $('#mDate'+step).val(multi_session.mDate[step]).trigger('change');
+            var mFrom_label = 'mFrom_label' + step;
+            var mTo_label = 'mTo_label' + step;
+            console.log(multi_session + mFrom_label);
+            $('#mFrom' + step).val(multi_session.mFrom[step]);
+            $('#mTo' + step).val(multi_session.mTo[step]);
+
+            $('#mFrom_label' + step).val(eval(`multi_session.${mFrom_label}`));
+            $('#mTo_label' + step).val(eval(`multi_session.${mTo_label}`));
+
+            $('#mFrom_labels' + step).html(eval(`multi_session.${mFrom_label}`));
+            $('#mTo_labels' + step).html(eval(`multi_session.${mTo_label}`));
+
+            $('#mDate' + step).val(multi_session.mDate[step]).trigger('change');
         }
 
         // $('#rFrom').val(return_session.rFrom).trigger('change');
@@ -82,87 +174,87 @@ $(document).ready(function () {
         cabin = (cabin == 'First') ? 'First Class' : cabin;
         $('#mClass_label').html(cabin);
     });
-    
+
 });
 
-$(document).on("change", ".travel_date", function(){
+$(document).on("change", ".travel_date", function () {
     var day = getDay($(this).val());
     $(this).parent().find('span.day_label').text(day);
- });
- 
-function getDay(value){
-    var weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+});
+
+function getDay(value) {
+    var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     var a = new Date(value);
     return weekday[a.getDay()];
 }
-
-
-function initailizeSelect2(){
-    $('.selectAirportFrom').select2({
-        placeholder: 'From',
-        selectOnClose: true,
-        templateResult: templateResults,
-        templateSelection: formatState
+loadAutocomplete();
+function loadAutocomplete() {
+    $(".load_airports").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: ROUTES.autocomplete_airports,
+                data: {
+                    term: request.term
+                },
+                dataType: "json",
+                success: function (data) {
+                    response(data);
+                }
+            });
+        },
+        select: function (event, ui) {
+            $(this).val(ui.item.airport + ' (' + ui.item.value + ')');
+            $(this).parent().find('span').text(ui.item.labelText);
+            $(this).parent().find('.itaCode').val(ui.item.value);
+            $(this).parent().find('.airport').val(ui.item.airport);
+            return false;
+        },
+        minLength: 1,
+        change: function (event, ui) {
+            if ($(this).val() == '') {
+                $(this).parent().find('span').text('');
+                $(this).parent().find('.itaCode').val('');
+                $(this).parent().find('.airport').val('');
+            }
+        }
+        // open: function() {
+        //     $("ul.ui-menu").width('300px');
+        // }
     });
 
-    $('.selectAirportTo').select2({
-        placeholder: 'To',
-        selectOnClose: true,
-        templateResult: templateResults,
-        templateSelection: formatState
+    $('.load_airports').each(function () {
+        $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
+            return $("<li></li>")
+                .data("item.autocomplete", item)
+                .append("<a>" + item.label + "</a>")
+                .appendTo(ul);
+        };
     });
-
-    function templateResults(state) {
-        if (!state.id) {
-          return state.text;
-        }
-        var html = '<div class="row"><div class="col-sm-1">'+
-        '<i class="fa fa-plane"></i>'+
-        '</div><div class="col-sm-10">'+
-        '<b>'+$(state.element).attr('data-city')+', '+$(state.element).attr('data-country')+'</b>'+
-        '<span class="float-end">'+$(state.element).attr('data-airportCode')+'</span>'+
-        '</div><div class="col-sm-10 offset-sm-1"><small>'+$(state.element).attr('data-airportName')+'</small></div></div>';
-        return $(html);
-    };
-
-    function formatState(state) {
-        if (!state.id) {
-          return state.text;
-        }
-        return $(state.element).attr('data-title');
-    };
-
 }
 
 
-$('.selectAirportFrom').on("change", function(e) { 
-   $(this).parent().find('span.from_airport').text($(this).find(':selected').attr('data-airportCode')+' - '+$(this).find(':selected').attr('data-airportName'));
- });
-
-$('.selectAirportTo').on("change", function(e) { 
-    $(this).parent().find('span.to_airport').text($(this).find(':selected').attr('data-airportCode')+' - '+$(this).find(':selected').attr('data-airportName'));
- });
-
-
 $("#oFromForm").validate({
+    ignore: [],
     rules: {
-        oFrom: 'required',
-        oTo: 'required',
+        oFrom: {
+            required: true,
+            minlength: 3
+        },
+        oTo: {
+            required: true,
+            minlength: 3
+        },
         oDate: 'required'
     },
-    messages: {
-        oFrom: 'This field is required',
-        oTo: 'This field is required',
-        oDate: 'This field is required',
-    },
     errorPlacement: function (error, element) {
-        if(element.hasClass('select2')) {
+        if (element.hasClass('select2')) {
             error.insertAfter(element.next('.select2-container'));
-        }else{
+        } else {
             error.appendTo(element.parent("div"));
         }
     },
-    submitHandler: function(form) {
+    submitHandler: function (form) {
+        $('.ajaxloader').css('display', 'block');
         form.submit();
     }
 });
@@ -177,10 +269,10 @@ function addOnewayValue(elemId) {
 
 $('.oAdult').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#oAdult').val();
+    var counter = $('#oAdult').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result !=0){
+    if (result != 0) {
         $('#oAdult').val(result);
         addOnewayValue(elemId);
     }
@@ -190,10 +282,10 @@ $('.oAdult').on('click touchstart', function (event) {
 
 $('.oChild').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#oChild').val();
+    var counter = $('#oChild').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#oChild').val(result);
         addOnewayValue(elemId);
     }
@@ -203,10 +295,10 @@ $('.oChild').on('click touchstart', function (event) {
 
 $('.oInfant').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#oInfant').val();
+    var counter = $('#oInfant').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#oInfant').val(result);
         addOnewayValue(elemId);
     }
@@ -224,10 +316,10 @@ function addReturnValue(elemId) {
 
 $('.rAdult').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#rAdult').val();
+    var counter = $('#rAdult').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result !=0){
+    if (result != 0) {
         $('#rAdult').val(result);
         addReturnValue(elemId);
     }
@@ -237,10 +329,10 @@ $('.rAdult').on('click touchstart', function (event) {
 
 $('.rChild').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#rChild').val();
+    var counter = $('#rChild').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#rChild').val(result);
         addReturnValue(elemId);
     }
@@ -250,10 +342,10 @@ $('.rChild').on('click touchstart', function (event) {
 
 $('.rInfant').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#rInfant').val();
+    var counter = $('#rInfant').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#rInfant').val(result);
         addReturnValue(elemId);
     }
@@ -271,10 +363,10 @@ function addmultiValue(elemId) {
 
 $('.mAdult').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#mAdult').val();
+    var counter = $('#mAdult').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result !=0){
+    if (result != 0) {
         $('#mAdult').val(result);
         addmultiValue(elemId);
     }
@@ -284,10 +376,10 @@ $('.mAdult').on('click touchstart', function (event) {
 
 $('.mChild').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#mChild').val();
+    var counter = $('#mChild').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#mChild').val(result);
         addmultiValue(elemId);
     }
@@ -297,10 +389,10 @@ $('.mChild').on('click touchstart', function (event) {
 
 $('.mInfant').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#mInfant').val();
+    var counter = $('#mInfant').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#mInfant').val(result);
         addmultiValue(elemId);
     }
@@ -309,58 +401,60 @@ $('.mInfant').on('click touchstart', function (event) {
 });
 
 $("#rForm").validate({
+    ignore: [],
     rules: {
-        rFrom: 'required',
-        rTo: 'required',
+        rFrom: {
+            required: true,
+            minlength: 3
+        },
+        rTo: {
+            required: true,
+            minlength: 3
+        },
         rDate: 'required',
         rReturnDate: 'required'
     },
-    messages: {
-        rFrom: 'This field is required',
-        rTo: 'This field is required',
-        rDate: 'This field is required',
-        rReturnDate: 'This field is required',
-    },
+
     errorPlacement: function (error, element) {
-        if(element.hasClass('select2')) {
+        if (element.hasClass('select2')) {
             error.insertAfter(element.next('.select2-container'));
-        }else{
+        } else {
             error.appendTo(element.parent("div"));
         }
     },
-    submitHandler: function(form) {
+    submitHandler: function (form) {
+        $('.ajaxloader').css('display', 'block');
         form.submit();
     }
 });
 
-var list = '<option value=""></option>'; 
-$.each(airportsList , function(index, val) { 
-    list += '<option value="'+val.AirportCode+'" data-city="'+val.City+'" data-country="'+val.Country+'" data-airportCode="'+val.AirportCode+'"  data-airportName="'+val.AirportName+'" data-title="'+val.City+', '+val.Country+'">'+val.City+', '+val.Country+', '+val.AirportCode+', '+val.AirportName+' </option>';
-});
+var list = '<option value=""></option>';
+
 // For Add or Remove Flight Multi City Option Start
 let mCity = 2;
 $("#addMulticityRow").on('click', (function () {
     generateMultiFields(mCity);
 }))
 
-function generateMultiFields(mCount){
+function generateMultiFields(mCount) {
     let a = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
 
     if (document.querySelectorAll('.multi_city_form').length === 5) {
         alert("Max Citry Limit Reached!!")
         return;
     }
-    
+
     mCity = mCity + 1;
     $(".multi_city_form_wrapper").append(`<div class="multi_city_form">
                                         <div class="row">
                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                 <div class="flight_Search_boxed">
                                                     <p>From</p>
-                                                    <select name="mFrom[]" class="selectAirportFrom col-sm-12 " id="mFrom`+mCount+`">
-                                                    `+list+`
-                                                    </select>
-                                                    <span class="place-label from_airport" id="mFrom_label"></span>
+                                                   
+                                                    <input type="text" name="mFrom[]"  placeholder="Enter Departure City" class="selectAirportFrom load_airports col-sm-12 " id="mFrom`+ mCount + `">
+                                                    <input type="hidden"  class="airport" name="mFrom_label`+ mCount + `"  id="mFrom_label` + mCount + `">
+
+                                                    <span class="place-label from_airport" id="mFrom_labels`+ mCount + `"></span>
                                                     <div class="plan_icon_posation">
                                                         <i class="fas fa-plane-departure"></i>
                                                     </div>
@@ -369,10 +463,10 @@ function generateMultiFields(mCount){
                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                 <div class="flight_Search_boxed">
                                                     <p>To</p>
-                                                    <select name="mTo[]" class="selectAirportTo col-sm-12 " id="mTo`+mCount+`">
-                                                    `+list+`
-                                                    </select>
-                                                    <span class="place-label to_airport" id="mTo_label"></span>
+                                    
+                                                    <input type="text" name="mTo[]" placeholder="Enter Destination City" class="selectAirportTo load_airports col-sm-12 " id="mTo`+ mCount + `">
+                                                    <input type="hidden"  class="airport" name="mTo_label`+ mCount + `"  id="mTo_label` + mCount + `">
+                                                    <span class="place-label to_airport" id="mTo_labels`+ mCount + `"></span>
                                                     <div class="plan_icon_posation">
                                                         <i class="fas fa-plane-departure"></i>
                                                     </div>
@@ -383,8 +477,8 @@ function generateMultiFields(mCount){
                                                     <div class="flight_Search_boxed date_flex_area">
                                                         <div class="Journey_date">
                                                             <p>Journey date</p>
-                                                            <input type="date" value="" class="travel_date" id="mDate`+mCount+`" name="mDate[]">
-                                                            <span class="place-label day_label mDate_label`+mCount+`" id=""></span>
+                                                            <input type="date" value="" class="travel_date" id="mDate`+ mCount + `" name="mDate[]">
+                                                            <span class="place-label day_label mDate_labels`+ mCount + `" id=""></span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -397,130 +491,301 @@ function generateMultiFields(mCount){
                                             </div>
                                         </div>
                                     </div>`);
-        initailizeSelect2();
-
+    loadAutocomplete();
 }
 // Remove Button Click 
 $(document).on('click', (function (e) {
     if (e.target.id === "remove_multi_city") {
         $(e.target).parent().closest('.multi_city_form').remove()
     }
-}) );
+}));
 
 $("#mForm").validate({
+    ignore: [],
     rules: {
-        'mFrom[]': 'required',
-        'mTo[]': 'required',
+        'mFrom[]': {
+            required: true,
+            minlength: 3
+        },
+        'mTo[]': {
+            required: true,
+            minlength: 3
+        },
         'mDate[]': 'required',
     },
-    messages: {
-        'mFrom[]': 'This field is required',
-        'mTo[]': 'This field is required',
-        'mDate[]': 'This field is required',
-    },
     errorPlacement: function (error, element) {
-        if(element.hasClass('select2')) {
+        if (element.hasClass('select2')) {
             error.insertAfter(element.next('.select2-container'));
-        }else{
+        } else {
             error.appendTo(element.parent("div"));
         }
     },
-    submitHandler: function(form) {
+    submitHandler: function (form) {
+        $('.ajaxloader').css('display', 'block');
         form.submit();
     }
 });
 
 
-$('.stopFilter').click(function () {
-    var str ="";
-    $('.stopFilter:checked').each(function()
-    {
-        str+= $(this).val()+",";
+$('.stopFilter').on('change', function () {
+    var str = "";
+    $('.stopFilter:checked').each(function () {
+        str += $(this).val() + ",";
     });
     var type = $('#search_typeResult').val();
-    if(type == "OneWay"){
+    if (type == "OneWay") {
         $('#ostop_filter').val(str);
-    }else if(type == "Return"){
+    } else if (type == "Return") {
         $('#rstop_filter').val(str);
-    }else if(type == "Circle"){
+    } else if (type == "Circle") {
         $('#mstop_filter').val(str);
     }
-    submitSearch();
+
+    var arr = str.split(',')
+    $('.flight_search_result_wrapper .flight_search_item_wrappper').addClass('hide');
+    arr.forEach(e => {
+        if (e !== '') {
+            $('.flight_search_result_wrapper [data-stops="' + e + '"]').removeClass('hide');
+        }
+    });
+
+    checkFlightCount()
+
+    // submitSearch();
 });
 
 
-$('.airlineFilter').click(function () {
-    var airstr ="";
-    $('.airlineFilter:checked').each(function()
-    {
-        airstr+= $(this).val()+",";
+$('.airlineFilter').on('click', function () {
+    var airstr = "";
+    $('.airlineFilter:checked').each(function () {
+        airstr += $(this).val() + ",";
     });
     var type = $('#search_typeResult').val();
-    if(type == "OneWay"){
+    if (type == "OneWay") {
         $('#oairline_filter').val(airstr);
-    }else if(type == "Return"){
+    } else if (type == "Return") {
         $('#rairline_filter').val(airstr);
-    }else if(type == "Circle"){
+    } else if (type == "Circle") {
         $('#mairline_filter').val(airstr);
     }
-    submitSearch();
+
+    var arr = airstr.split(',')
+    $('.flight_search_result_wrapper .flight_search_item_wrappper').addClass('hide');
+    arr.forEach(e => {
+        if (e !== '') {
+            $('.flight_search_result_wrapper [data-airline="' + e + '"]').removeClass('hide');
+        }
+    });
+    checkFlightCount()
+    // noFlightDiv
+
+    // submitSearch();
 });
 
 
+
+
+function checkFlightCount() {
+    var total = $('.flight_search_result_wrapper .flight_search_item_wrappper').length;
+    var totalHidden = $('.flight_search_result_wrapper .flight_search_item_wrappper.hide').length;
+
+    if (total > 0 && total === totalHidden) {
+        $('#noFlightDiv').show();
+    } else {
+        $('#noFlightDiv').hide();
+    }
+}
+
+// checkFlightCount();
+
 $('.refundFilter').click(function () {
-    var refundstr ="";
-    $('.refundFilter:checked').each(function()
-    {
-        refundstr+= $(this).val()+",";
+    var refundstr = "";
+    $('.refundFilter:checked').each(function () {
+        refundstr += $(this).val() + ",";
     });
-   
+
     var type = $('#search_typeResult').val();
-    if(type == "OneWay"){
+    if (type == "OneWay") {
         $('#orefund_filter').val(refundstr);
-    }else if(type == "Return"){
+    } else if (type == "Return") {
         $('#rrefund_filter').val(refundstr);
-    }else if(type == "Circle"){
+    } else if (type == "Circle") {
         $('#mrefund_filter').val(refundstr);
     }
     submitSearch();
 });
 
-function submitSearch(str){
+function submitSearch(str) {
     var type = $('#search_typeResult').val();
-    if(type == "OneWay"){
-       $('#oFromForm').submit();
-    }else if(type == "Return"){
+    if (type == "OneWay") {
+        $('#oFromForm').submit();
+    } else if (type == "Return") {
         $('#rForm').submit();
-    }else if(type == "Circle"){
+    } else if (type == "Circle") {
         $('#mForm').submit();
     }
 }
 
-$('#searchTab a').click(function(e) {
-    e.preventDefault();
+$('#searchTab a').click(function (e) {
+    // e.preventDefault();
     $(this).tab('show');
 });
 
-$("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+$("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
     var id = $(e.target).attr("href").substr(1);
     window.location.hash = id;
 });
-  
-function returnCheckFilter(){
+
+function returnCheckFilter() {
     $('#rstop_filter').val('');
     $('#rairline_filter').val('');
     $('#rrefund_filter').val('');
     return true;
 }
-function oneWayCheckFilter(){
+function oneWayCheckFilter() {
     $('#ostop_filter').val('');
     $('#oairline_filter').val('');
     $('#orefund_filter').val('');
     return true;
 }
-function multiCheckFilter(){
+function multiCheckFilter() {
     $('#mstop_filter').val('');
     $('#mairline_filter').val('');
     $('#mrefund_filter').val('');
     return true;
 }
+
+$(document).on('click', '.viewFlightDetails', function () {
+    var id = $(this).attr('data-id');
+    var that = $(this);
+    if ($('#detialsView_' + id).hasClass('show')) {
+        $('#detialsView_' + id).removeClass('show');
+    } else {
+        $('.ajaxloader').css('display', 'block');
+
+        if (that.attr('data-data_loaded') == 'false') {
+            var viewdata = {
+                id: $(this).attr('data-id'),
+                session_id: $(this).attr('data-session_id'),
+                search_type: $(this).attr('data-search_type'),
+                fareCode: $(this).attr('data-fareCode'),
+                api_provider: $(this).attr('data-api_provider'),
+                cabin_type: $(this).attr('data-cabin_type')
+            }
+
+            if ($(this).attr('data-api_provider') == 'flydubai') {
+                viewdata.LFID = $(this).attr('data-LFID')
+            }
+
+            $.ajax({
+                url: ROUTES.flight_view_details,
+                data: viewdata,
+                success: function (response) {
+                    $('.ajaxloader').css('display', 'none');
+                    var resp = JSON.parse(response);
+                    if (resp.status == true) {
+                        $('#detialsView_' + id).html(resp.data);
+                        $('#detialsView_' + id).addClass('show');
+                        that.attr('data-data_loaded', true)
+                        $('html, body').animate({
+                            scrollTop: $('#detialsView_' + id).offset().top
+                        }, 1000);
+                        $(document).trigger("rtn_details_loaded");
+                    } else {
+                        swal({
+                            title: "Not Available",
+                            text: "Flights fare may have changed. Please refresh the page.",
+                            icon: "warning"
+                        }).then(function () {
+                            // window.location.reload();
+                        });
+                    }
+
+                }
+            });
+        } else {
+            $('.ajaxloader').css('display', 'none');
+            $('#detialsView_' + id).addClass('show');
+            $(document).trigger("rtn_details_loaded");
+        }
+    }
+});
+
+$(document).on('click', '.viewDomFlightDetails', function () {
+    var id = $(this).attr('data-id');
+    var type = $(this).attr('data-type');
+    var viewdata = {
+        "_token": "{{ csrf_token() }}",
+        id: $(this).attr('data-id'),
+        session_id: $(this).attr('data-session_id'),
+        search_type: $(this).attr('data-search_type'),
+        fareCode: $(this).attr('data-fareCode'),
+        type: type
+    }
+
+    if (type == 'return') {
+        if ($('#detialsDomReturnView_' + id).hasClass('show')) {
+            $('#detialsDomReturnView_' + id).removeClass('show');
+        } else {
+            $('.ajaxloader').css('display', 'block');
+
+            $.ajax({
+                url: ROUTES.flight_view_details,
+                data: viewdata,
+                success: function (response) {
+                    $('.ajaxloader').css('display', 'none');
+                    var resp = JSON.parse(response);
+                    if (resp.status == true) {
+                        $('#detialsDomReturnView_' + id).html(resp.data);
+                        $('#detialsDomReturnView_' + id).addClass('show');
+                        $('html, body').animate({
+                            scrollTop: $('#detialsDomReturnView_' + id).offset().top
+                        }, 1000);
+                    } else {
+                        swal({
+                            title: "Not Available",
+                            text: "Flights fare may have changed. Please refresh the page.",
+                            icon: "warning"
+                        }).then(function () {
+                            // window.location.reload();
+                        });
+                    }
+
+                }
+            });
+        }
+    } else {
+        if ($('#detialsDomDepView_' + id).hasClass('show')) {
+            $('#detialsDomDepView_' + id).removeClass('show');
+        } else {
+            $('.ajaxloader').css('display', 'block');
+
+            $.ajax({
+                url: ROUTES.flight_view_details,
+                data: viewdata,
+                success: function (response) {
+                    $('.ajaxloader').css('display', 'none');
+                    var resp = JSON.parse(response);
+                    if (resp.status == true) {
+                        $('#detialsDomDepView_' + id).html(resp.data);
+                        $('#detialsDomDepView_' + id).addClass('show');
+                        $('html, body').animate({
+                            scrollTop: $('#detialsDomDepView_' + id).offset().top
+                        }, 1000);
+                    } else {
+                        swal({
+                            title: "Not Available",
+                            text: "Flights fare may have changed. Please refresh the page.",
+                            icon: "warning"
+                        }).then(function () {
+                            // window.location.reload();
+                        });
+                    }
+
+                }
+            });
+        }
+    }
+
+});
+

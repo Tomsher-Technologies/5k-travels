@@ -3,8 +3,11 @@
 use Carbon\Carbon;
 use App\Models\UserDetails;
 use App\Models\GeneralSettings;
+use App\Models\FlightBookings;
 use App\Models\Airlines;
-  
+use App\Models\Airports;
+use App\Models\User;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Write code on Method
@@ -100,3 +103,161 @@ if (! function_exists('getAirlines')) {
     }
 }
  
+if (! function_exists('getAgentMarginData')) {
+    function getAgentMarginData($userId) {
+        $parents = User::with(['user_details'])->where('id', $userId)->first();
+        // $parents->user_details();
+        $allParents = $parents->getAllParents();
+        // print_r($parents); die;
+        $adminMargin = $parents->user_details->admin_margin;
+        $agentMargin = $parents->user_details->agent_margin;
+        $data['admin_margin'] = ($adminMargin != '') ? $adminMargin : 0;
+        $data['agent_margin'] = ($agentMargin != '') ? $agentMargin : 0;
+        // print_r($allParents); 
+        $margins = 0;
+        foreach( $allParents  as $prts){
+            $data['main_agents'][$prts->user_id] = $prts->agent_margin;
+            $margins = $margins + $prts->agent_margin;
+        }
+        $data['totalmargin'] = $data['admin_margin'] + $data['agent_margin'] + $margins;
+        return $data;
+    }
+}
+
+
+if (! function_exists('getUserMarginData')) {
+    function getUserMarginData() {
+        $margin = GeneralSettings::where('type','admin_margin_users')->first();
+        $data['admin_margin'] = $margin->value;
+        $data['totalmargin'] = $margin->value;
+        return $data;
+    }
+}
+
+if (! function_exists('getAgentWalletBalance')) {
+    function getAgentWalletBalance($userId) {
+        $balance = User::with(['user_details'])->where('id', $userId)->first();
+        return $balance->user_details->credit_balance;
+    }
+}
+
+if (! function_exists('getUserDetails')) {
+    function getUserDetails($userId) {
+        $details = User::select('users.*','ud.*')
+                        ->leftJoin('user_details as ud','ud.user_id','=','users.id')
+                        ->where('users.id',$userId)
+                        ->get();
+        return $details;
+    }
+}
+
+if (! function_exists('getAirlineData')) {
+    function getAirlineData($code) {
+        $details = Airlines::select('*')->where('AirLineCode',$code)
+                        ->get()->toArray();
+        if(isset($details[0])){
+            $details = $details;
+        }else{
+            $details[] = array(
+                "id" => "",
+                "AirLineCode"=>$code,
+                "AirLineName"=>$code,
+                "AirLineLogo"=>''
+            );
+        }
+                        // echo '<pre>';
+                        // print_r($details);die;
+        return $details;
+    }
+}
+
+if (! function_exists('getAirportData')) {
+    function getAirportData($code) {
+        $details = Airports::select('*')->where('AirportCode',$code)
+                        ->get()->toArray();
+        if(isset($details[0])){
+            $details = $details;
+        }else{
+            $details[] = array(
+                "id" => "",
+                "AirportCode"=>$code,
+                "AirportName"=>$code,
+                "City"=>'',
+                "Country"=>'',
+                "CountryCode"=>''
+            );
+        }
+                        // echo '<pre>';
+                        // print_r($details);die;
+        return $details;
+    }
+}
+
+if (! function_exists('getCurrencyValue')) {
+    function getCurrencyValue($currency) {
+        $oneCurrency = 1;
+        if(env('APP_ENV') != 'local'){
+            $oneCurrency = Currency::convert()
+                                    ->from($currency)
+                                    ->to('USD')
+                                    ->amount(1)
+                                    ->get();
+        }
+        return number_format(($oneCurrency), 6, '.', '');
+    }
+}
+
+if (! function_exists('getNewReissuedBooking')) {
+    function getNewReissuedBooking($id) {
+        $details = FlightBookings::select('id')->where('parent_id',$id)
+                        ->pluck('id')->toArray();
+                        // echo '<pre>';
+                        // print_r($details);die;
+        return $details;
+    }
+}
+
+if (! function_exists('getBookingDataByUniqueId')) {
+    function getBookingDataByUniqueId($uniqueid) {
+        $details = FlightBookings::select('*')->where('unique_booking_id',$uniqueid)
+                        ->get();
+            
+        return $details;
+    }
+}
+
+function generateApiToken(){
+    $data = [
+        "client_id"=> env('FLY_DUBAI_CLIENT_ID_TEST'),
+        "client_secret"=> env('FLY_DUBAI_CLIENT_SECRET_TEST'),
+        "grant_type"=> 'password',
+        "password"=> env('FLY_DUBAI_PASSWORD_TEST'),
+        "scope"=> 'res',
+        "username" =>  env('FLY_DUBAI_USERNAME_TEST'),
+    ];
+   
+    $response = Http::timeout(300)->withOptions(['verify'=>false])->asForm()->post(env('FLY_DUBAI_API_URL_TEST').'authenticate', $data);
+    $result = $response->getBody()->getContents();
+    $res = json_decode($result);
+
+    $nowTime = strtotime(date("Y-m-d H:i:s"));
+    $expiryTime = date("Y-m-d H:i:s", strtotime('+2399 seconds', $nowTime));
+    session(['api_token' => $res->access_token]);
+    session(['api_token_expiry' => $expiryTime]);
+    session()->save();
+    
+    return $res->access_token;
+}
+
+ function getToken(){
+    if (session()->has('api_token') && session()->has('api_token_expiry')) {
+        if(session('api_token_expiry') > date("Y-m-d H:i:s")){
+            return session('api_token');
+        }else{
+            return generateApiToken();
+        }
+    }else{
+        return generateApiToken();
+    }
+}
+

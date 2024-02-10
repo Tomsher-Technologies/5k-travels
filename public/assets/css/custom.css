@@ -75,8 +75,8 @@ label{
 .back-btn{
     float: right;
     border-radius: 20px;
-    background-color: #2a3f54;
-    border-color: #2a3f54;
+    background-color: #1fba71;
+    border-color: #1fba71;
     color: white;
 }
 
@@ -84,6 +84,20 @@ label{
     color: white;
     text-decoration: none;
 }
+.table td, .table th {
+    vertical-align: middle;
+}
+.btn-app{
+    margin-bottom: 0;
+}
+
+.w-60{
+    width: 60%;
+}
+.pt-25{
+    padding-top: 25px !important;
+}
+
 .p-10px{
     padding: 0px 10px 0px;
 }
@@ -163,7 +177,40 @@ label{
     -ms-transform: translateX(26px);
     transform: translateX(26px);
   }
-  
+  .count{
+    color:#039c0d!important ;
+  }
+
+  .tile-stats .icon i {
+        margin: 9px;
+        font-size: 38px;
+        
+    }
+
+    .daterangepicker .ranges li.active {
+        background-color: #1fba71 !important;
+        color: #fff;
+    }
+    .daterangepicker .ranges li:hover {
+        background-color:#43de95 !important;
+    }
+  .ml-10{
+    margin-left: 10px;
+  }
+
+  .drp-buttons .btn-primary{
+    background-color: #1fba71 !important;
+    border-color: #1fba71 !important;
+  }
+  .daterangepicker td.active, .daterangepicker td.active:hover {
+    background-color: #1fba71 !important;
+  }
+  .readonly{
+    pointer-events: none;
+  }
+  .pointer{
+    cursor: pointer;
+  }
   /* Rounded sliders */
   .slider.round {
     border-radius: 34px;
@@ -185,4 +232,81 @@ label{
  .no-padding-left{
     padding-left: 0;
  }
- 
+ .mb-15{
+    margin-bottom: 15px;
+ }
+  .highcharts-credits{
+    display: none;
+  }
+.input-right{
+    float: right;
+    clear: both;
+}
+.font-size20{
+    font-size: 20px !important;
+}
+.bold{
+    font-weight: 600 !important;
+}
+
+
+.mc-float-card.sm {
+    padding: 20px
+}
+
+.mc-float-card.sm h3 {
+    font-size: 22px;
+    margin-bottom: 4px
+}
+
+.mc-float-card.sm p {
+    font-size: 14px
+}
+
+.mc-float-card.md {
+    padding: 24px
+}
+
+.mc-float-card.md h3 {
+    font-size: 24px;
+    margin-bottom: 6px
+}
+
+.mc-float-card.md p {
+    font-size: 15px
+}
+
+.mc-float-card.lg {
+    padding: 28px
+}
+
+.mc-float-card.lg h3 {
+    font-size: 26px;
+    margin-bottom: 8px
+}
+
+.mc-float-card.lg p {
+    font-size: 16px
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

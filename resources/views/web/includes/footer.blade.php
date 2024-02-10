@@ -1,106 +1,106 @@
 <footer id="footer_area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                    <div class="footer_heading_area">
-                        <h5>Need any help?</h5>
-                    </div>
-                    <div class="footer_first_area">
-                        <div class="footer_inquery_area">
-                            <h5>Call 24/7 for any help</h5>
-                            <h3> <a href="tel:+00-123-456-789">+971 123 4567</a></h3>
-                        </div>
-                        <div class="footer_inquery_area">
-                            <h5>Mail to our support team</h5>
-                            <h3> <a href="mailto:support@domain.com">5k@info.com</a></h3>
-                        </div>
-                        <div class="footer_inquery_area">
-                            <h5>Follow us on</h5>
-                            <ul class="soical_icon_footer">
-                                <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
-                                <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
-                                <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
-                                <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+                <div class="footer_heading_area">
+                    <h5>Need any help?</h5>
                 </div>
-                <div class="col-lg-2 offset-lg-1 col-md-6 col-sm-6 col-12">
-                    <div class="footer_heading_area">
-                        <h5>Company</h5>
+                <div class="footer_first_area">
+                    <div class="footer_inquery_area">
+                        <h5>Call 24/7 for any help</h5>
+                        <h3> <a href="tel:+971507966883">+971 50 796 6883</a></h3>
                     </div>
-                    <div class="footer_link_area">
-                        <ul>
-                            <li><a href="about.html">About Us</a></li>
-                            <li><a href="testimonials.html">Testimonials</a></li>
-                            <li><a href="faqs.html">Rewards</a></li>
-                            <li><a href="terms-service.html">Work with Us</a></li>
-                            <li><a href="tour-guides.html">Meet the Team </a></li>
-                            <li><a href="news.html">Blog</a></li>
-                        </ul>
+                    <div class="footer_inquery_area">
+                        <h5>Mail to our support team</h5>
+                        <h3> <a href="mailto:info@5ktravels.com">info@5ktravels.com</a></h3>
                     </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                    <div class="footer_heading_area">
-                        <h5>Support</h5>
-                    </div>
-                    <div class="footer_link_area">
-                        <ul>
-                            <li><a href="dashboard.html">Account</a></li>
-                            <li><a href="faq.html">Faq</a></li>
-                            <li><a href="testimonials.html">Legal</a></li>
-                            <li><a href="contact.html">Contact</a></li>
-                            <li><a href="top-destinations.html"> Affiliate Program</a></li>
-                            <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                    <div class="footer_heading_area">
-                        <h5>Other Services</h5>
-                    </div>
-                    <div class="footer_link_area">
-                        <ul>
-                            <li><a href="tour-details.html">Community program</a></li>
-                            <li><a href="tour-details.html">Investor Relations</a></li>
-                            <li><a href="flight-search-result.html">Rewards Program</a></li>
-                            <li><a href="room-booking.html">PointsPLUS</a></li>
-                            <li><a href="testimonials.html">Partners</a></li>
-                            <li><a href="hotel-search.html">List My Hotel</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                    <div class="footer_heading_area">
-                        <h5>Top cities</h5>
-                    </div>
-                    <div class="footer_link_area">
-                        <ul>
-                            <li><a href="room-details.html">Chicago</a></li>
-                            <li><a href="hotel-details.html">New York</a></li>
-                            <li><a href="hotel-booking.html">San Francisco</a></li>
-                            <li><a href="tour-search.html">California</a></li>
-                            <li><a href="tour-booking.html">Ohio </a></li>
-                            <li><a href="tour-guides.html">Alaska</a></li>
+                    <div class="footer_inquery_area">
+                        <h5>Follow us on</h5>
+                        <ul class="soical_icon_footer">
+                            <li><a href="#!"><i class="fab fa-facebook"></i></a></li>
+                            <li><a href="#!"><i class="fab fa-twitter-square"></i></a></li>
+                            <li><a href="#!"><i class="fab fa-instagram"></i></a></li>
+                            <li><a href="#!"><i class="fab fa-linkedin"></i></a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-        </div>
-    </footer>
-    <div class="copyright_area">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="co-lg-6 col-md-6 col-sm-12 col-12">
-                    <div class="copyright_left">
-                        <p>Copyright © 2022 All Rights Reserved</p>
-                    </div>
+            <div class="col-lg-2 offset-lg-1 col-md-6 col-sm-6 col-12">
+                <div class="footer_heading_area">
+                    <h5>Company</h5>
                 </div>
-                <div class="co-lg-6 col-md-6 col-sm-12 col-12">
-                    <div class="copyright_right">
-                        <img src="assets/img/common/cards.png" alt="img">
-                    </div>
+                <div class="footer_link_area">
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Testimonials</a></li>
+                        <li><a href="#">Rewards</a></li>
+                        <li><a href="#">Work with Us</a></li>
+                        <li><a href="#">Meet the Team </a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-12">
+                <div class="footer_heading_area">
+                    <h5>General</h5>
+                </div>
+                <div class="footer_link_area">
+                    <ul>
+                        <!--<li><a href="#">Account</a></li>-->
+                        <!--<li><a href="#">Faq</a></li>-->
+                        <!--<li><a href="#">Legal</a></li>-->
+                        <!--<li><a href="#">Contact</a></li>-->
+                        <li><a href="/terms"> Terms & Conditions</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-12">
+                <div class="footer_heading_area">
+                    <h5>Other Services</h5>
+                </div>
+                <div class="footer_link_area">
+                    <ul>
+                        <li><a href="#">Community program</a></li>
+                        <li><a href="#">Investor Relations</a></li>
+                        <li><a href="#">Rewards Program</a></li>
+                        <li><a href="#">PointsPLUS</a></li>
+                        <li><a href="#">Partners</a></li>
+                        <li><a href="#">List My Hotel</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6 col-12">
+                <div class="footer_heading_area">
+                    <h5>Top cities</h5>
+                </div>
+                <div class="footer_link_area">
+                    <ul>
+                        <li><a href="#">Chicago</a></li>
+                        <li><a href="#">New York</a></li>
+                        <li><a href="#">San Francisco</a></li>
+                        <li><a href="#">California</a></li>
+                        <li><a href="#">Ohio </a></li>
+                        <li><a href="#">Alaska</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
+</footer>
+<div class="copyright_area">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="co-lg-6 col-md-6 col-sm-12 col-12">
+                <div class="copyright_left">
+                    <p>Copyright © <?php echo date("Y"); ?> All Rights Reserved</p>
+                </div>
+            </div>
+            <div class="co-lg-6 col-md-6 col-sm-12 col-12">
+                <div class="copyright_right">
+                    <img src="{{ asset('assets/img/common/cards.png') }}" alt="img">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

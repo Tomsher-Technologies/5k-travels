@@ -21,27 +21,59 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="card-box table-responsive">
-                                    <form class="" id="sort_sellers" action="" method="GET">
-                                        <div class="title_right">
-                                            <div class="col-md-5 col-sm-5  form-group pull-right top_search">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" id="search" name="search" @isset($sort_search) value="{{ $sort_search }}" @endisset
-                                                    placeholder="Type category or name or email or agent code & Enter">
-                                                    <i class="fa fa-search form-control-feedback right" ></i>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <form class="" id="sort_sellers" action="" method="GET">
+                                                <div class="title_right">
+                                                    <div class="col-md-4 col-sm-4  form-group pull-right top_search">
+                                                        <label> Search by category or name or email or agent code</label>
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control w-90" id="search" name="search" @isset($sort_search) value="{{ $sort_search }}" @endisset
+                                                            placeholder="Type category or name or email or agent code">
+                                                           
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-4  form-group pull-right top_search">
+                                                        <label> Filter Sub-Agents</label>
+                                                        <div class="form-group">
+                                                            <select class="form-control w-80 pointer" name="agent" id="agent">
+                                                                @if($mainAgents)
+                                                                    <option value="" >Select Agent</option>
+                                                                    @foreach ($mainAgents as $agent )
+                                                                        @php 
+                                                                            $selected = '';
+                                                                            if(isset($agent_search)){
+                                                                                $selected = ($agent_search == $agent->id) ? 'selected' : '';
+                                                                            }  
+                                                                        @endphp
+                                                                        <option value="{{ $agent->id }}" {{ $selected }}>{{ ucfirst(strtolower($agent->name)) }} ({{ $agent->user_details->code }})</option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-4  pt-25">
+                                                        <button type="submit" class="btn btn-success"><i class="fa fa-search"></i> Search</button>
+                                                        <a href="{{ route('agent.index') }}" class="btn btn-primary" type="reset"><i class="fa fa-refresh"></i> Reset</a>
+                                                    </div>
+
                                                 </div>
-                                            </div>
+                                            </form>
                                         </div>
-                                    </form>
-                                    <table id="datatable-buttons" class="table table-bordered jambo_table" style="width:100%">
+                                    </div>
+                                    <table id="datatable-buttons" class="table table-bordered jambo_table mt-4" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th>Sl No.</th>
                                                 <th>Agent Code</th>
                                                 <th>Category</th>
+                                                <th>Main Agent Code</th>
                                                 <th>Agent Name</th>
+                                               
                                                 <th>Email</th>
                                                 <th>Phone</th>
-                                                <th>Credit Balance</th>
+                                                <th>Credit Balance (USD)</th>
                                                 <th class="text-center">Approval Status</th>
                                                 <th class="text-center">Agent Status</th>
                                                 <th class="text-center">Actions</th>
@@ -54,11 +86,12 @@
                                                     <td>{{$loop->iteration}}</td>
                                                     <td>{{$agent->code}}</td>
                                                     <td>{{ ($agent->parent_id == '') ? 'Agent' : 'Sub Agent' }}</td>
-
+                                                    <td>{{ ($agent->parent_code != '') ? $agent->parent_code : '-'}}</td>
+                                                    
                                                     <td>{{$agent->name}}</td>
                                                     <td>{{$agent->email}}</td>
                                                     <td>{{$agent->phone_number}}</td>
-                                                    <td>{{$agent->credit_balance}}</td>
+                                                    <td>USD {{$agent->credit_balance}}</td>
                                                     <td class="text-center" id="approve_{{$agent->user_id}}">
                                                         @if ($agent->is_approved == 1)
                                                             <span class="label label-success">Approved</span>
@@ -107,7 +140,11 @@
 @endsection
 
 @section('header')
-
+    <style>
+        .top_search .form-control {
+            border-radius : 0px !important;
+        }
+    </style>
 @endsection
 
 @section('footer')

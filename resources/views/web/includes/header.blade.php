@@ -2,38 +2,65 @@
         <!-- Top Bar -->
         <div class="topbar-area">
             <div class="container">
+                @php
+                    $settings = getGeneralSettings();
+                @endphp
                 <div class="row align-items-center">
                     <div class="col-lg-6 col-md-6">
                         <ul class="topbar-list">
                             <li>
-                                <a href="#!"><i class="fab fa-facebook"></i></a>
-                                <a href="#!"><i class="fab fa-twitter-square"></i></a>
-                                <a href="#!"><i class="fab fa-instagram"></i></a>
-                                <a href="#!"><i class="fab fa-linkedin"></i></a>
+                                <a href="{{ $settings['facebook']['value'] }}" target="_blank"><i class="fab fa-facebook"></i></a>
+                                <a href="{{ $settings['twitter']['value'] }}" target="_blank"><i class="fab fa-twitter-square"></i></a>
+                                <a href="{{ $settings['instagram']['value'] }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                                <a href="{{ $settings['linkedin']['value'] }}" target="_blank"><i class="fab fa-linkedin"></i></a>
                             </li>
-                            <li><a href="#!"><span>+971 234 56789</span></a></li>
-                            <li><a href="#!"><span>5k@info.com</span></a></li>
+                            <li><a href="#!"><span>{{ $settings['site_phone']['value'] }}</span></a></li>
+                            <li><a href="#!"><span>{{ $settings['site_mail']['value'] }}</span></a></li>
                         </ul>
                     </div>
                     <div class="col-lg-6 col-md-6">
                         <ul class="topbar-others-options">
-                            <li><a href="#common_author-forms" data-bs-toggle="modal"
+                            @if(Auth::check())
+                                <li><a href="{{ route('web.logout') }}" >Logout</a></li>
+                            @else
+                                <li><a href="#common_author-forms" data-bs-toggle="modal"
                                     data-bs-target="#common_author-forms">Login</a></li>
-
-
+                            @endif
+                            @if(Route::currentRouteName() != 'flight.booking')
                             <li>
                                 <div class="dropdown language-option">
+                                    @php
+                                        if(Session::has('user_currency') && Session::get('user_currency') == 'USD'){
+                                            $currency = 'USD';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'AFN'){
+                                            $currency = 'AFN';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'IRR'){
+                                            $currency = 'IRR';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'AED'){
+                                            $currency = 'AED';
+                                        }elseif(Session::has('user_currency') && Session::get('user_currency') == 'INR'){
+                                            $currency = 'INR';
+                                        }else{
+                                            $currency = 'USD';
+                                        }
+
+                                    @endphp
                                     <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                         aria-haspopup="true" aria-expanded="false">
-                                        <span class="lang-name"></span>
+                                        <span class="lang-name">{{ $currency }}</span>
                                     </button>
-                                    <div class="dropdown-menu language-dropdown-menu">
-                                        <a class="dropdown-item" href="#">USD</a>
-                                        <a class="dropdown-item" href="#">BD</a>
-                                        <a class="dropdown-item" href="#">URO</a>
+                                    
+                                    <div class="dropdown-menu language-dropdown-menu" style="min-width: 5rem;text-align: center;">
+                                        
+                                        <a class="dropdown-item {{ ($currency == 'AED') ? 'selected' : '' }}" href="{{ route('change-currency','AED') }}">AED</a>
+                                        <a class="dropdown-item {{ ($currency == 'AFN') ? 'selected' : '' }}" href="{{ route('change-currency','AFN') }}">AFN</a>
+                                        <a class="dropdown-item {{ ($currency == 'INR') ? 'selected' : '' }}" href="{{ route('change-currency','INR') }}">INR</a>
+                                        <a class="dropdown-item {{ ($currency == 'IRR') ? 'selected' : '' }}" href="{{ route('change-currency','IRR') }}">IRR</a>
+                                        <a class="dropdown-item {{ ($currency == 'USD') ? 'selected' : '' }}" href="{{ route('change-currency','USD') }}">USD</a>
                                     </div>
                                 </div>
                             </li>
+                            @endif
                         </ul>
                     </div>
                 </div>
@@ -46,7 +73,7 @@
                 <div class="container">
                     <div class="main-responsive-menu">
                         <div class="logo">
-                            <a href="index.html">
+                            <a href="{{ route('home') }}">
                                 <img src="{{ asset('assets/img/logo.png') }}" alt="logo">
                             </a>
                         </div>
@@ -62,10 +89,10 @@
                         </a>
                         <div class="collapse navbar-collapse mean-menu" id="navbarSupportedContent">
                             <ul class="navbar-nav">
-                                <li class="nav-item"><a href="super-offers.html" class="nav-link ">Super Offers</a>
-                                <li class="nav-item"><a href="top_destinations.html" class="nav-link ">Top Destinations</a>
-                                <li class="nav-item"><a href="support.html" class="nav-link ">Support</a>
-                                <li class="nav-item"><a href="business.html" class="nav-link ">5K for Business</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">Super Offers</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">Top Destinations</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">Support</a>
+                                <li class="nav-item"><a href="#" class="nav-link ">5K for Business</a>
                                 <li class="nav-item"><a href="#" class="nav-link ">Help</a>
                             </ul>
                             </li>
@@ -73,11 +100,16 @@
 
                             </ul>
                             <div class="others-options d-flex align-items-center">
-
-                                <div class="option-item">
-                                    <a href="#common_author-forms" data-bs-toggle="modal"
-                                    data-bs-target="#common_author-forms" class="btn  btn_navber">LOGIN</a>
-                                </div>
+                                @if(Auth::check())
+                                    <div class="option-item">
+                                        <a href="{{ route('dashboard') }}"  class="btn  btn_navber">My Account</a>
+                                    </div>
+                                @else
+                                    <div class="option-item">
+                                        <a href="#common_author-forms" data-bs-toggle="modal"
+                                        data-bs-target="#common_author-forms" class="btn  btn_navber">LOGIN</a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </nav>
