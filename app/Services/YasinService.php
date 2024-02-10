@@ -36,7 +36,6 @@ class YasinService
             // dd([env('YASEIN_API_URL') . $url, http_build_query($data)]);
 
             if ($response->failed()) {
-                dd('failed');
                 return null;
             }
 
@@ -48,10 +47,8 @@ class YasinService
                 return $response->getBody()->getContents();
             }
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            dd($e);
             return null;
         } catch (RequestException $e) {
-            dd($e);
             return null;
         }
 

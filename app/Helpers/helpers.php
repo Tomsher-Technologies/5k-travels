@@ -706,10 +706,7 @@ function convertCurrency($amount, $fromCurrency)
         return  $rates;
     });
 
-    $cur = $rates->where([
-        'from' =>  $fromCurrency,
-        'to' => $activeCurreny,
-    ])->get();
+    $cur = $rates->where('to', $activeCurreny)->where('from',  $fromCurrency)->first();
 
     if ($cur) {
         return priceFormat($amount * $cur->rate);

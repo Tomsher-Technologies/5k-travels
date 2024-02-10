@@ -273,13 +273,13 @@
                                         </p>
                                         <div class="included_baggage">
                                             <div class="row align-items-center justify-content-between g-2 mb-2">
-                                                @isset($baggage['BAGI'])
+                                                {{-- @isset($baggage['BAGI'])
                                                     <div class="col-12">
                                                         <p class="pt-2">{{ $baggage['BAGI']['description'] }}</p>
                                                     </div>
-                                                @endisset
+                                                @endisset --}}
                                                 @foreach ($baggage as $bag)
-                                                    @if ($bag['code'] !== 'BAGI')
+                                                @if (Str::contains($bag['description'], 'Upgrade'))
                                                         <div class="col-12">
                                                             <input class="input_baggage"
                                                                 data-user="Child {{ $ad }}"

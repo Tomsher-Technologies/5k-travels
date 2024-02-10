@@ -146,7 +146,7 @@
                                     $totalFareMargin = ($fdata['total_price'] / 100) * $totalmargin + $fdata['total_price'];
                                     $totalFareMargin = floor($totalFareMargin * 100) / 100;
                                     $displayAmount = $totalFareMargin;
-                                    // $displayAmount = convertCurrency($totalFareMargin, $data['currency'][$fdata['api_provider']]);
+                                    $displayAmount = convertCurrency($totalFareMargin, $data['currency'][$fdata['api_provider']]);
                                     echo $displayAmount;
                                 @endphp
                             </h2>

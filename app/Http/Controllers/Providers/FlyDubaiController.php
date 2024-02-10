@@ -1365,7 +1365,7 @@ class FlyDubaiController extends Controller
 
     public function generateSpecialServices(Request $request, $paxCount, $p_type)
     {
-        return [];
+        // return [];
         $acc_result = Cache::get('fd_search_ancillary_' . $request->search_id, null);
 
         // dd($acc_result);

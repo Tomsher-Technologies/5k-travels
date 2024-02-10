@@ -56,6 +56,9 @@ $(document).ready(function () {
         $('#oFrom').val(urlFormatted.searchParams.get("oFrom_label") + ' (' + urlFormatted.searchParams.get("oFrom") + ')');
         $('#oTo').val(urlFormatted.searchParams.get("oTo_label") + ' (' + urlFormatted.searchParams.get("oTo") + ')');
 
+        $('#oFrom_label').val(urlFormatted.searchParams.get("oFrom_label"));
+        $('#oTo_label').val(urlFormatted.searchParams.get("oTo_label"));
+
         oDateCalendar.setDate(urlFormatted.searchParams.get("oDate"))
         // $('#oDate').val(urlFormatted.searchParams.get("oDate")).trigger('change');;
 

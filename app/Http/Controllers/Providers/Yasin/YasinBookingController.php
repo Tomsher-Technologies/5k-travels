@@ -45,7 +45,7 @@ class YasinBookingController extends Controller
 
             // dd($result);
 
-            if ($result['Error'] == '' && isset($result['Items']) && count($result['Items']) > 0) {
+            if ($result && $result['Error'] == '' && isset($result['Items']) && count($result['Items']) > 0) {
                 if (Cache::has('yas_search_result_' . $search_id)) {
                     Cache::delete('yas_search_result_' . $search_id);
                 }
