@@ -18,7 +18,7 @@
     <div class="container container-bboking">
         <div class="row">
             <div class="col-lg-12">
-                <div class="tou_booking_form_Wrapper padding20">
+                <div class="tou_booking_form_Wrapper padding20" id="contentToPrint">
                     
                     @if(!empty($bookings))
                     <div class="col-sm-12">
@@ -321,6 +321,7 @@
                         <h3>{{$msg}}</h3>
                     @endif
                 </div>
+                <button onclick="printContent()">Print</button>
             </div>
         </div>
     </div>
@@ -351,5 +352,24 @@
 @push('footer')
 <script type="text/javascript">
 
+
+    function printContent() {
+        var contentToPrint = document.getElementById("contentToPrint").innerHTML;
+        var printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        // Add stylesheets from parent document to print window
+        var stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
+        stylesheets.forEach(function(sheet) {
+            printWindow.document.write(sheet.outerHTML);
+        });
+        printWindow.document.write('<html><head><title>Print</title></head><body>' + contentToPrint + '</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+
+        // Close the print window after 2 seconds (adjust as needed)
+        setTimeout(function(){
+            printWindow.close();
+        }, 2000); // Adjust delay as needed (in milliseconds)
+    }
 </script>
 @endpush

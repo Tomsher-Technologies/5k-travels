@@ -1540,6 +1540,12 @@ class FlightsController extends Controller
         return  view('web.booking_success',compact('msg','bookings'));
    }
 
+   public function printSuccessPage(){
+        $msg = 'success';
+        $bookings = $this->getBookingDetails(21);
+        return  view('web.booking_success',compact('msg','bookings'));
+   }
+
     public function sendBookingMail($bookings){
         $name = $to_name = $bookings[0]->customer_name;
         $to_email = $bookings[0]->customer_email;

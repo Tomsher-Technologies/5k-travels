@@ -50,6 +50,7 @@ Route::get('privacy',[HomeController::class,'privacy'])->name('privacy');
 Route::get('/search-flights', [FlightsApiController::class, 'searchFlights'])->name('search-flights');
 Route::get('/authorize', [FlightsApiController::class, 'getToken'])->name('authorize');
 
+Route::get('/print', [FlightsController::class, 'printSuccessPage'])->name('print');
 
 Route::group(['middleware' => ['auth','web']], function () {
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
