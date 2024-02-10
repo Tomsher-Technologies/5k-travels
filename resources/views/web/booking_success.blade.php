@@ -23,16 +23,54 @@
                     @if(!empty($bookings))
                     <div class="col-sm-12">
                         <div class="card-box table-responsive">
+                           
                             <div class="dashboard_common_table col-sm-12">
                                 <div id="tab-booking-details">
+                                    
                                     <div class="tab-content">
-                                        <div class="tab-pane fade show active" id="family-house"
-                                            role="tabpanel">
+                                        <div class="tab-pane fade show active" id="family-house" role="tabpanel">
                                             <div class="accordion accordion--separated accordion--secondary" id="accordionExample">
                                                 <div class="accordion-item">
                                                     @php $airlinePNR = ''; @endphp
                                                     <div id="collapseOne" style="">
                                                         <div class="">
+
+                                                            @php   
+                                                                $userDetails = getUserDetails(Auth::user()?->id);
+                                                            @endphp
+
+                                                            @if (isset($userDetails[0]))
+                                                                <div class="col-sm-12 m-4" >
+                                                                    @if($userDetails[0]->logo != '')
+                                                                        <img class="logo-main" src="{{ asset($userDetails[0]->logo) }}" alt="logo" style="height: 55px;">
+                                                                    @else
+                                                                        <img class="logo-main" src="{{ asset('assets/img/logo.png') }}" alt="logo" style="height: 55px;">
+                                                                    @endif  
+                                                                    
+                                                                </div>
+                                                                <div class="col-sm-12"  style="margin-left: 1.5rem!important;">
+                                                                    <p>{{$userDetails[0]->company_name ?? ''}}</p>
+                                                                    <p>{{$userDetails[0]->address ?? ''}}</p>
+                                                                    <p>{{$userDetails[0]->city ?? ''}}, {{$userDetails[0]->state ?? ''}}</p>
+                                                                    <p>{{$userDetails[0]->email ?? ''}}</p>
+                                                                    <p>{{$userDetails[0]->phone_number ?? ''}}</p>
+                                                                </div>
+                                                            @else
+                                                                @php
+                                                                    $settings = getGeneralSettings();
+                                                                @endphp
+                                                                <div class="col-sm-12 m-4">
+                                                                    <img class="logo-main" src="{{ asset('assets/img/logo.png') }}" alt="logo" style="height: 55px;">
+                                                                    
+                                                                </div>
+                                                                <div class="col-sm-12" style="margin-left: 1.5rem!important;">
+                                                                    <p>{{ $settings['site_mail']['value'] ?? ''}}</p>
+                                                                    <p>{{ $settings['site_phone']['value'] ?? '' }}</p>
+                                                                </div>
+                                                            @endif
+                                                        
+                                                            
+
                                                             <div class="fb-cb" style="padding: 2%;">
                                                                 
                                                                 @if(isset($bookings[0]))
@@ -324,11 +362,13 @@
                 </div>
                
             </div>
-            <div class="col-lg-12">
-                <div class="col-sm-12 text-center">
-                    <button  class="btn btn_theme btn_md text-right" onclick="printContent()"><i class="fa fa-print" > </i> Print</button>
+            @if(!empty($bookings))
+                <div class="col-lg-12">
+                    <div class="col-sm-12 text-center">
+                        <button  class="btn btn_theme btn_md text-right" onclick="printContent()"><i class="fa fa-print" > </i> Print</button>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </section>
