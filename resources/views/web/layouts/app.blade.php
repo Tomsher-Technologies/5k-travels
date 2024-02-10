@@ -400,6 +400,12 @@
             $('.ajaxloader').hide();
         });
 
+        $('#theme_search_form .nav-link').click(function(e) {
+            if ($(this).hasClass('active')) {
+                e.preventDefault();
+            }
+        });
+
         window.ROUTES = {
             search_airports: '{{ route('search-airports') }}',
             autocomplete_airports: "{{ route('autocomplete-airports') }}",
