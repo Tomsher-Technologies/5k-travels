@@ -12,37 +12,63 @@ $(document).ready(function () {
 
     if (searchType == "OneWay") {
         $('#searchTab a[href="#oneway_flight"]').tab('show');
+
+        $('#oFromForm input[name="oFrom"]').val(urlFormatted.searchParams.get("oFrom"));
+        $('#oFromForm input[name="oTo"]').val(urlFormatted.searchParams.get("oTo"));
+
+        $('#oFrom').val(urlFormatted.searchParams.get("oFrom_label") + ' (' + urlFormatted.searchParams.get("oFrom") + ')');
+        $('#oTo').val(urlFormatted.searchParams.get("oTo_label") + ' (' + urlFormatted.searchParams.get("oTo") + ')');
+
+        $('#oDate').val(urlFormatted.searchParams.get("oDate")).trigger('change');;
+
     } else if (searchType == "Return") {
         $('#searchTab a[href="#roundtrip"]').tab('show');
+
+
+        $('#rForm input[name="rFrom"]').val(urlFormatted.searchParams.get("rFrom"));
+        $('#rForm input[name="rTo"]').val(urlFormatted.searchParams.get("rTo"));
+
+        $('#rFrom').val(urlFormatted.searchParams.get("rFrom_label") + ' (' + urlFormatted.searchParams.get("rFrom") + ')');
+        $('#rTo').val(urlFormatted.searchParams.get("rTo_label") + ' (' + urlFormatted.searchParams.get("rTo") + ')');
+
+        // $('#rFrom_label').val(return_session.rFrom_label);
+        // $('#rTo_label').val(return_session.rTo_label);
+
+        // $('#rFrom_labels').html(return_session.rFrom_label);
+        // $('#rTo_labels').html(return_session.rTo_label);
+
+        $('#rDate').val(urlFormatted.searchParams.get("rDate")).trigger('change');;
+        $('#rReturnDate').val(urlFormatted.searchParams.get("rReturnDate")).trigger('change');;
+
     } else if (searchType == "Circle") {
         $('#searchTab a[href="#multi_city"]').tab('show');
     }
 
 
     if (one_way_session) {
-        $('#oFrom').val(one_way_session.oFrom);
-        $('#oTo').val(one_way_session.oTo);
+        // $('#oFrom').val(one_way_session.oFrom);
+        // $('#oTo').val(one_way_session.oTo);
 
-        $('#oFrom_label').val(one_way_session.oFrom_label);
-        $('#oTo_label').val(one_way_session.oTo_label);
+        // $('#oFrom_label').val(one_way_session.oFrom_label);
+        // $('#oTo_label').val(one_way_session.oTo_label);
 
-        $('#oFrom_labels').html(one_way_session.oFrom_label);
-        $('#oTo_labels').html(one_way_session.oTo_label);
+        // $('#oFrom_labels').html(one_way_session.oFrom_label);
+        // $('#oTo_labels').html(one_way_session.oTo_label);
 
-        $('#oDate').val(one_way_session.oDate).trigger('change');;
+        // $('#oDate').val(one_way_session.oDate).trigger('change');;
     }
     if (return_session) {
-        $('#rFrom').val(return_session.rFrom);
-        $('#rTo').val(return_session.rTo);
+        // $('#rFrom').val(return_session.rFrom);
+        // $('#rTo').val(return_session.rTo);
 
-        $('#rFrom_label').val(return_session.rFrom_label);
-        $('#rTo_label').val(return_session.rTo_label);
+        // $('#rFrom_label').val(return_session.rFrom_label);
+        // $('#rTo_label').val(return_session.rTo_label);
 
-        $('#rFrom_labels').html(return_session.rFrom_label);
-        $('#rTo_labels').html(return_session.rTo_label);
+        // $('#rFrom_labels').html(return_session.rFrom_label);
+        // $('#rTo_labels').html(return_session.rTo_label);
 
-        $('#rDate').val(return_session.rDate).trigger('change');;
-        $('#rReturnDate').val(return_session.rReturnDate).trigger('change');;
+        // $('#rDate').val(return_session.rDate).trigger('change');;
+        // $('#rReturnDate').val(return_session.rReturnDate).trigger('change');;
     }
 
     if (multi_session) {
@@ -134,9 +160,12 @@ function loadAutocomplete() {
             });
         },
         select: function (event, ui) {
-            // Set selection
-            $(this).val(ui.item.value); // display the selected text
-            $(this).parent().find('span').text(ui.item.airport);
+
+            console.log(ui);
+
+            $(this).val(ui.item.airport + ' (' + ui.item.value + ')');
+            $(this).parent().find('span').text(ui.item.labelText);
+            $(this).parent().find('.itaCode').val(ui.item.value);
             $(this).parent().find('.airport').val(ui.item.airport);
             return false;
         },
@@ -144,9 +173,9 @@ function loadAutocomplete() {
         change: function (event, ui) {
             if ($(this).val() == '') {
                 $(this).parent().find('span').text('');
+                $(this).parent().find('.itaCode').val('');
                 $(this).parent().find('.airport').val('');
             }
-
         }
         // open: function() {
         //     $("ul.ui-menu").width('300px');
@@ -165,6 +194,7 @@ function loadAutocomplete() {
 
 
 $("#oFromForm").validate({
+    ignore: [],
     rules: {
         oFrom: {
             required: true,

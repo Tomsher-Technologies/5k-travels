@@ -6562,12 +6562,12 @@ textarea {
 }
 
 .flight_search_destination h6 {
-    padding-top: 5px;
+    padding: 5px 0;
     font-size: 12px;
-    text-overflow: ellipsis;
+    /* text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    width: 140px
+    width: 140px */
 }
 
 .flight-details h4 {
@@ -6605,7 +6605,8 @@ textarea {
 
 .flight_search_right {
     background: #d4f1e7;
-    padding: 5px
+    padding: 5px;
+    height: 100%;
 }
 
 .flight_search_right h5 {
@@ -8613,10 +8614,10 @@ only screen and (min-width:576px) and (max-width:767px),
     display: none
 }
 
-.flight_search_destination h6 {
+/* .flight_search_destination h6 {
     display: none
-}
-
+} */
+/* 
 .flight_search_right a {
     display: none
-}
+} */

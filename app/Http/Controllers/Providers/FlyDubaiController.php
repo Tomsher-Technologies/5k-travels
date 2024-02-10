@@ -45,7 +45,7 @@ class FlyDubaiController extends Controller
     }
 
 
-    public function search(Request $request)
+    public function search(Request $request, $search_id)
     {
 
         // Cache::clear();
@@ -144,7 +144,7 @@ class FlyDubaiController extends Controller
 
         $data['RetrieveFareQuoteDateRange']['RetrieveFareQuoteDateRangeRequest'] = $retrieveFareQuote;
 
-        $search_id = Str::random(10);
+        // $search_id = Str::random(10);
 
         $logger =  Log::build([
             'driver' => 'single',
@@ -1233,9 +1233,9 @@ class FlyDubaiController extends Controller
                 $acc_response = $this->flightBookingService->callAPI('pricing/ancillary', $data);
                 $seat_response = $this->flightBookingService->callAPI('pricing/seats', $data);
 
-                // if (Cache::has('fd_search_ancillary_' . $request->search_id)) {
-                //     Cache::forget('fd_search_ancillary_' . $request->search_id);
-                // }
+                if (Cache::has('fd_search_ancillary_' . $request->search_id)) {
+                    Cache::forget('fd_search_ancillary_' . $request->search_id);
+                }
                 // if (Cache::has('fd_seat_req_' . $request->search_id)) {
                 //     Cache::forget('fd_seat_req_s' . $request->search_id);
                 // }
@@ -1249,7 +1249,7 @@ class FlyDubaiController extends Controller
                 ]);
                 $logger->info(json_encode($acc_response));
 
-                // Cache::set('fd_search_ancillary_' . $request->search_id, $acc_response);
+                Cache::set('fd_search_ancillary_' . $request->search_id, $acc_response);
                 // Cache::set('fd_seat_req_' . $request->search_id, $data);
 
                 $res_data = array_merge($res_data, array(
@@ -1367,11 +1367,19 @@ class FlyDubaiController extends Controller
     {
         // return [];
         $acc_result = Cache::get('fd_search_ancillary_' . $request->search_id, null);
+
+        // dd($acc_result);
+
         $services = [];
         if (!$acc_result) {
             return [];
         }
         // Bag
+
+        $paxCount += 1;
+
+        // dd($request['bag'][$p_type][$paxCount]);
+
         if (isset($request['bag'][$p_type][$paxCount])) {
             $arr_key = key($request['bag'][$p_type][$paxCount]);
             $arr_value = $request['bag'][$p_type][$paxCount][$arr_key];
@@ -1434,12 +1442,7 @@ class FlyDubaiController extends Controller
         }
 
         $seatsArray = [];
-        // return $seatsArray;
-
         $LP_Array = getFDLfidPfid($request->search_id);
-
-        // dd($request);
-
         try {
             if (isset($request['seat'])) {
                 foreach ($request['seat'] as $key => $seats) {
@@ -1464,11 +1467,6 @@ class FlyDubaiController extends Controller
                 }
             }
         } catch (\Throwable $th) {
-            dd(
-                [
-                    $request, $paxCount, $p_id, $poid, $LFID
-                ]
-            );
             return [];
         }
 
@@ -1560,7 +1558,7 @@ class FlyDubaiController extends Controller
                 $seg = [];
                 $seg['PersonOrgID'] = $passenger['PersonOrgID'];
                 $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
-                $seg['SpecialServices'] = [];
+                $seg['SpecialServices'] = $this->generateSpecialServices($request, $key, 'ADT');
                 $seg['Seats'] = $this->generateSeatArray($request, $key, $passenger['PTCID'], $passenger['PersonOrgID'], $segment['LFID']);
                 $segments[] = $seg;
             }
@@ -1568,7 +1566,7 @@ class FlyDubaiController extends Controller
                 $seg = [];
                 $seg['PersonOrgID'] = $passenger['PersonOrgID'];
                 $seg['FareInformationID'] = $fareID[$segment['LFID']][$passenger['PTCID']];
-                $seg['SpecialServices'] = [];
+                $seg['SpecialServices'] = $this->generateSpecialServices($request, $key, 'CHD');;
                 $seg['Seats'] = $this->generateSeatArray($request, $key, $passenger['PTCID'], $passenger['PersonOrgID'], $segment['LFID']);
                 $segments[] = $seg;
             }

@@ -77,7 +77,7 @@
                             @php
                                 $totalFareMargin = ($fdata['lowest_fare'] / 100) * $totalmargin + $fdata['lowest_fare'];
                                 $totalFareMargin = floor($totalFareMargin * 100) / 100;
-                                $displayAmount = convertCurrency($totalFareMargin, $data['currency']);
+                                $displayAmount = convertCurrency($totalFareMargin, $data['currency'][$fdata['api_provider']]);
                             @endphp
                             <p class="text-center">Lowest Fare</p>
                             <h2 class="d_fare">
@@ -171,7 +171,7 @@
                                 @php
                                     $totalFareMargin = ($fdata['lowest_fare'] / 100) * $totalmargin + $fdata['lowest_fare'];
                                     $totalFareMargin = floor($totalFareMargin * 100) / 100;
-                                    $displayAmount = convertCurrency($totalFareMargin, $data['currency']);
+                                    $displayAmount = convertCurrency($totalFareMargin, $data['currency'][$fdata['api_provider']]);
                                 @endphp
                                 <p class="text-center">Lowest Fare</p>
                                 <h2 class="d_fare">

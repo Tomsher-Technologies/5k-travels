@@ -108,9 +108,9 @@
                                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>From</p>
+                                                                    <input type="hidden" class="itaCode" name="oFrom"
+                                                                        oninput="this.value = this.value.toUpperCase()">
                                                                     <input type="text"
-                                                                        oninput="this.value = this.value.toUpperCase()"
-                                                                        name="oFrom"
                                                                         placeholder="Enter Departure City"
                                                                         class="selectAirportFrom load_airports col-sm-12 "
                                                                         id="oFrom">
@@ -127,9 +127,11 @@
                                                             <div class="col-lg-3 col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>To </p>
+
+                                                                    <input type="hidden" class="itaCode" name="oTo"
+                                                                        oninput="this.value = this.value.toUpperCase()">
+
                                                                     <input type="text"
-                                                                        oninput="this.value = this.value.toUpperCase()"
-                                                                        name="oTo"
                                                                         placeholder="Enter Destination City"
                                                                         class="selectAirportTo load_airports col-sm-12 "
                                                                         id="oTo">
@@ -357,7 +359,10 @@
                                                                 <div class="flight_Search_boxed">
                                                                     <p>From</p>
 
-                                                                    <input type="text" name="rFrom"
+                                                                    <input type="hidden" class="itaCode" name="rFrom"
+                                                                        oninput="this.value = this.value.toUpperCase()">
+
+                                                                    <input type="text" 
                                                                         placeholder="Enter Departure City"
                                                                         class="selectAirportFrom load_airports col-sm-12 "
                                                                         id="rFrom">
@@ -373,8 +378,9 @@
                                                             <div class="col-lg-3  col-md-6 col-sm-12 col-12">
                                                                 <div class="flight_Search_boxed">
                                                                     <p>To</p>
-
-                                                                    <input type="text" name="rTo"
+                                                                    <input type="hidden" class="itaCode" name="rTo"
+                                                                    oninput="this.value = this.value.toUpperCase()">
+                                                                    <input type="text" 
                                                                         placeholder="Enter Destination City"
                                                                         class="selectAirportTo load_airports col-sm-12 "
                                                                         id="rTo">
@@ -974,35 +980,43 @@
     @push('footer')
         <script>
             $('.swap_oneway').on('click', function() {
+                var oFromCode = $('#oFromForm input[name="oFrom"]').val()
                 var oFrom = $('#oFrom').val()
                 var oFrom_label = $('#oFrom_label').val()
                 var oFrom_labels = $('#oFrom_labels').html()
 
+                var oToCode = $('#oFromForm input[name="oTo"]').val()
                 var oTo = $('#oTo').val()
                 var oTo_label = $('#oTo_label').val()
                 var oTo_labels = $('#oTo_labels').html()
 
+                $('#oFromForm input[name="oFrom"]').val(oToCode)
                 $('#oFrom').val(oTo)
                 $('#oFrom_label').val(oTo_label)
                 $('#oFrom_labels').html(oTo_labels)
 
+                $('#oFromForm input[name="oTo"]').val(oFromCode)
                 $('#oTo').val(oFrom)
                 $('#oTo_label').val(oFrom_label)
                 $('#oTo_labels').html(oFrom_labels)
             });
             $('.swap_return').on('click', function() {
+                var oFromCode = $('#rForm input[name="rFrom"]').val()
                 var oFrom = $('#rFrom').val()
                 var oFrom_label = $('#rFrom_label').val()
                 var oFrom_labels = $('#rFrom_labels').html()
 
+                var oToCode = $('#rForm input[name="rTo"]').val()
                 var oTo = $('#rTo').val()
                 var oTo_label = $('#rTo_label').val()
                 var oTo_labels = $('#rTo_labels').html()
 
+                $('#rForm input[name="rFrom"]').val(oToCode)
                 $('#rFrom').val(oTo)
                 $('#rFrom_label').val(oTo_label)
                 $('#rFrom_labels').html(oTo_labels)
 
+                $('#rForm input[name="rTo"]').val(oFromCode)
                 $('#rTo').val(oFrom)
                 $('#rTo_label').val(oFrom_label)
                 $('#rTo_labels').html(oFrom_labels)

@@ -11,6 +11,7 @@
         content="Discover seamless flight booking solutions with 5k Travels, your trusted flight booking agency. Book now & save.">
     <link rel="canonical" href="https://5ktravels.com/" />
     <!-- Bootstrap css -->
+    
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
     <!-- animate css -->
     <link href="{{ asset('assets/css/animate.min.css') }}" rel="stylesheet" />
@@ -76,6 +77,8 @@
 
         gtag('config', 'G-Y9KMYW7Z2M');
     </script> --}}
+
+    @cookieconsentscripts
 </head>
 
 
@@ -352,6 +355,9 @@
             </div>
         </div>
     </div>
+
+    @cookieconsentview
+
     <!-- footer content -->
     @include('web.includes.footer')
     <!-- /footer content -->
@@ -552,6 +558,8 @@
     </script>
 
     @stack('footer')
+
+  
 </body>
 
 </html>

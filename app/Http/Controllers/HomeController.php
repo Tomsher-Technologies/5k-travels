@@ -64,7 +64,15 @@ class HomeController extends Controller
                 '<b>' . $air->City . ', ' . $air->Country . '</b>' .
                 '<span class="float-end">' . $air->AirportCode . '</span>' .
                 '</div><div class="col-sm-12">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>' . $air->AirportName . '</small></div></div>';
-            $response[] = array("value" => $air->AirportCode, "label" => $label, "airport" => $air->AirportName);
+
+
+
+            $response[] = array(
+                "value" => $air->AirportCode,
+                "label" => $label,
+                "labelText" => $air->City . ', ' . $air->Country,
+                "airport" => $air->AirportName
+            );
         }
 
         return response()->json($response);

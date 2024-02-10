@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class FlightsController extends Controller
 {
@@ -48,6 +49,9 @@ class FlightsController extends Controller
 
     public function search(Request $request)
     {
+
+        // dd($request);
+
         $data = $flightCodes = [];
 
         $cabin_type = 'Economy';
@@ -63,36 +67,37 @@ class FlightsController extends Controller
             Session::put('current_search_type', 'Circle');
             Session::put('flight_search_multi', $request->all());
         }
+        $search_id = Str::random(10);
+
+
+        $data['non_stop'] = 0;
+        $data['one_stop'] = 0;
+        $data['two_stop'] = 0;
+        $data['three_stop'] = 0;
+        $data['refund'] = 0;
+        $data['no_refund'] = 0;
 
         $data['flightData'] = Airlines::get()->keyBy('AirLineCode')->toArray();
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
         $data['search_type'] = $request->search_type;
         $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData();
         $data['cabin_type'] = $cabin_type;
+        $data['search_id'] = $search_id;
+
 
         $fly_dubai_con = new FlyDubaiController();
-        $fly_dubai_res = $fly_dubai_con->search($request);
-
-        // $yasin_con = new YasinBookingController();
-        // $yasin_res = $yasin_con->search($request);
-
-        // dd($yasin_res);
-
-        $data['non_stop'] = $fly_dubai_res['non_stop'];
-        $data['one_stop'] = $fly_dubai_res['one_stop'];
-        $data['two_stop'] = $fly_dubai_res['two_stop'];
-        $data['three_stop'] = $fly_dubai_res['three_stop'];
-        $data['refund'] = $fly_dubai_res['refund'];
-        $data['no_refund'] = $fly_dubai_res['no_refund'];
-        $data['currency'] = $fly_dubai_res['currency'];
-        $data['totalCount'] = count($fly_dubai_res['flights']);
-        $data['flightDetails'] = $fly_dubai_res['flights'];
+        $fly_dubai_res = $fly_dubai_con->search($request, $search_id);
         $data['taxDetails'] = $fly_dubai_res['taxDetails'];
         $data['serviceDetails'] = $fly_dubai_res['serviceDetails'];
         $data['legDetails'] = $fly_dubai_res['legDetails'];
-        $data['airlines'] = $fly_dubai_res['airlines'];
-        $data['search_id'] = $fly_dubai_res['search_id'];
         $data['combinability'] = getCombinability($fly_dubai_res['combinability']);
+
+        $yasin_con = new YasinBookingController();
+        $yasin_res = $yasin_con->search($request, $search_id);
+
+        $this->combineResults($data, $fly_dubai_res, $yasin_res);
+
+        // dd($data);
 
         // dd($data['serviceDetails']);
 
@@ -100,6 +105,28 @@ class FlightsController extends Controller
 
         // dd(Cache::get('fd_search_result_' . $data['search_id']));
         return  view('web.search_results', compact('data'));
+    }
+
+
+    public function combineResults(&$data, $fly_dubai_res, $yasin_res)
+    {
+
+        $data['non_stop'] = $fly_dubai_res['non_stop'] + $yasin_res['non_stop'];
+        $data['one_stop'] = $fly_dubai_res['one_stop'] + $yasin_res['one_stop'];;
+        $data['two_stop'] = $fly_dubai_res['two_stop'] + $yasin_res['two_stop'];
+        $data['three_stop'] = $fly_dubai_res['three_stop'] + $yasin_res['three_stop'];
+        $data['refund'] = $fly_dubai_res['refund'] + $yasin_res['refund'];
+        $data['no_refund'] = $fly_dubai_res['no_refund'] + $yasin_res['no_refund'];
+
+
+        $data['currency'] = array(
+            'flydubai' => $fly_dubai_res['currency'],
+            'yasin' => $yasin_res['currency'],
+        );
+        $data['flightDetails'] = array_merge($fly_dubai_res['flights'], $yasin_res['flights']);
+        $data['airlines'] = array_merge($fly_dubai_res['airlines'], $yasin_res['airlines']);
+
+        $data['totalCount'] = count($fly_dubai_res['flights']) + count($yasin_res['flights']);
     }
 
     public function booking(Request $request)
@@ -244,7 +271,7 @@ class FlightsController extends Controller
     {
         if ($request->pnr) {
             $booking = FlightBookings::where('unique_booking_id', $request->pnr)->firstOrFail();
-            $booking['passengers'] = FlightPassengers::where('booking_id',$booking->id)->get();
+            $booking['passengers'] = FlightPassengers::where('booking_id', $booking->id)->get();
             // dd($booking);
             return view('web.booking_success', compact('booking'));
         } else {

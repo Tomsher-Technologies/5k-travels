@@ -15,21 +15,23 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $url = 'https://api.currencybeacon.com/v1/convert';
-
         $schedule->call(function ($url) {
             $rates = ExchangeRate::all();
             foreach ($rates as $rate) {
-
                 $data = [
-                    'from' => 'AED',
-                    'to' => 'USD',
-                    'amount' => 10,
+                    'from' => $rate->from,
+                    'to' => $rate->to,
+                    'amount' => 1,
                     'api_key' => env('CURRENCY_API_KEY')
                 ];
-
                 $response = Http::timeout(300)->withOptions(['verify' => false])
                     ->get($url, $data);
+        
                 $apiResult = $response->json();
+                if ($apiResult && isset($apiResult['meta']['code']) && $apiResult['meta']['code'] == 200) {
+                    $rate->rate =  number_format((float)$apiResult['value'], 10, '.', '');
+                    $rate->save();
+                }
             }
         })->daily();
     }
