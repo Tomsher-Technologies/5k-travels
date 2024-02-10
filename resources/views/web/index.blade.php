@@ -72,9 +72,6 @@
     </div>
 </section>
 
-
-
-
 <!-- Holiday Destinations  Area-->
 <section id="holiday_destinations" class="section_padding">
     <div class="container">
@@ -239,7 +236,6 @@
     </div>
 </section>
 
-
 <!-- About Us -->
 <section id="about_us_top" class="section_padding">
     <div class="container">
@@ -323,7 +319,6 @@
         </div>
     </div>
 </section> -->
-
 
 
 <!-- newsletter content -->
