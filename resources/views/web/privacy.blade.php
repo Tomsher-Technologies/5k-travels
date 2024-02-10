@@ -24,7 +24,7 @@
 
     <!-- Common Banner Area -->
     <section id="common_banner"
-        style="background-image: url(https://images.unsplash.com/photo-1682687982501-1e58ab814714?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D); background-size: cover;">
+        style="background-image: url({{asset('assets/images/privacy.avif')}}); background-size: cover;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
