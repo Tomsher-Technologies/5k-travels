@@ -44,7 +44,8 @@ Route::get('reset-password/{token}', [LoginController::class, 'showResetPassword
 Route::post('reset-password', [LoginController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 // Logout Routes...
 Route::get('web-logout', [LoginController::class, 'logoutWeb'])->name('web.logout');
-
+Route::get('terms',[HomeController::class,'terms'])->name('terms');
+Route::get('privacy',[HomeController::class,'privacy'])->name('privacy');
 
 Route::get('/search-flights', [FlightsApiController::class, 'searchFlights'])->name('search-flights');
 Route::get('/authorize', [FlightsApiController::class, 'getToken'])->name('authorize');

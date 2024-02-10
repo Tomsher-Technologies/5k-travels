@@ -939,4 +939,14 @@ class HomeController extends Controller
         UserDetails::where('user_id', $request->agent_id)->update($data);
         return back()->with('status', 'Agent Details Updated!');
     }
+
+    public function terms()
+    {
+        return view('web.terms');
+    }
+    
+    public function privacy()
+    {
+        return view('web.privacy');
+    }
 }
