@@ -7350,3 +7350,16 @@ padding: 10px 0px;
 .modal-footer.log-for .common_author_form form .common_form_submit{
     padding-top: 0px;
 }
+
+.travel_date.form-control[readonly]{
+    background: transparent;
+}
+
+.flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover {
+    color: rgb(0 0 0 / 29%) !important;
+}
+
+.flatpickr-day.selected{
+    background: var(--main-color) !important;
+    border-color: var(--main-color) !important;
+}
