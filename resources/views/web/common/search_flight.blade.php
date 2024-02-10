@@ -153,7 +153,7 @@
                                                                         <div class="Journey_date">
                                                                             <p>Journey date</p>
                                                                             <input type="date" value=""
-                                                                                class="travel_date" id="oDate"
+                                                                                class="travel_date" placeholder="Select Date" id="oDate"
                                                                                 name="oDate">
                                                                             <span
                                                                                 class="place-label day_label oDate_label"
@@ -403,7 +403,7 @@
                                                                             <p>Journey date</p>
                                                                             <input type="date" value=""
                                                                                 class="travel_date" id="rDate"
-                                                                                name="rDate">
+                                                                                name="rDate" placeholder="Select start date">
                                                                             <span
                                                                                 class="place-label day_label rDate_label"
                                                                                 id=""></span>
@@ -412,7 +412,7 @@
                                                                             <p>Return date</p>
                                                                             <input type="date" value=""
                                                                                 class="travel_date" id="rReturnDate"
-                                                                                name="rReturnDate">
+                                                                                name="rReturnDate" placeholder="Select end date">
                                                                             <span
                                                                                 class="place-label day_label rReturnDate_label"
                                                                                 id=""></span>

@@ -8614,6 +8614,19 @@ only screen and (min-width:576px) and (max-width:767px),
     display: none
 }
 
+.travel_date.form-control[readonly]{
+    background: transparent;
+}
+
+.flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover {
+    color: rgb(0 0 0 / 29%) !important;
+}
+
+.flatpickr-day.selected{
+    background: var(--main-color) !important;
+    border-color: var(--main-color) !important;
+}
+
 /* .flight_search_destination h6 {
     display: none
 } */

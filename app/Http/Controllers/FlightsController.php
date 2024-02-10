@@ -49,9 +49,6 @@ class FlightsController extends Controller
 
     public function search(Request $request)
     {
-
-        // dd($request);
-
         $data = $flightCodes = [];
 
         $cabin_type = 'Economy';

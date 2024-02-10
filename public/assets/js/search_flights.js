@@ -4,6 +4,43 @@ $(document).on('select2:open', () => {
 
 $(document).ready(function () {
 
+
+
+
+    let oDateCalendar = $("#oDate").flatpickr({
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+    });
+    $('#oFromForm .form_search_date').on('click', function () {
+        oDateCalendar.open()
+    })
+
+    let rReturnDateCalendar = $("#rReturnDate").flatpickr({
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+    });
+
+    let rDateCalendar = $("#rDate").flatpickr({
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        minDate: "today",
+        onChange: function (selectedDates, dateStr, instance) {
+            $("#rReturnDate").flatpickr().destroy();
+            let rReturnDateCalendar = $("#rReturnDate").flatpickr({
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                minDate: dateStr,
+            });
+        }
+        // plugins: [new rangePlugin({ input: "#rReturnDate" })]
+    });
+
     // on load of the page: switch to the currently selected tab
     // var hash = window.location.hash;
     var currentUrl = window.location.href;
@@ -19,7 +56,8 @@ $(document).ready(function () {
         $('#oFrom').val(urlFormatted.searchParams.get("oFrom_label") + ' (' + urlFormatted.searchParams.get("oFrom") + ')');
         $('#oTo').val(urlFormatted.searchParams.get("oTo_label") + ' (' + urlFormatted.searchParams.get("oTo") + ')');
 
-        $('#oDate').val(urlFormatted.searchParams.get("oDate")).trigger('change');;
+        oDateCalendar.setDate(urlFormatted.searchParams.get("oDate"))
+        // $('#oDate').val(urlFormatted.searchParams.get("oDate")).trigger('change');;
 
     } else if (searchType == "Return") {
         $('#searchTab a[href="#roundtrip"]').tab('show');
@@ -31,14 +69,16 @@ $(document).ready(function () {
         $('#rFrom').val(urlFormatted.searchParams.get("rFrom_label") + ' (' + urlFormatted.searchParams.get("rFrom") + ')');
         $('#rTo').val(urlFormatted.searchParams.get("rTo_label") + ' (' + urlFormatted.searchParams.get("rTo") + ')');
 
-        // $('#rFrom_label').val(return_session.rFrom_label);
-        // $('#rTo_label').val(return_session.rTo_label);
+        $('#rFrom_label').val(urlFormatted.searchParams.get("rFrom_label"));
+        $('#rTo_label').val(urlFormatted.searchParams.get("rTo_label"));
 
         // $('#rFrom_labels').html(return_session.rFrom_label);
         // $('#rTo_labels').html(return_session.rTo_label);
 
-        $('#rDate').val(urlFormatted.searchParams.get("rDate")).trigger('change');;
-        $('#rReturnDate').val(urlFormatted.searchParams.get("rReturnDate")).trigger('change');;
+        rDateCalendar.setDate(urlFormatted.searchParams.get("rDate"))
+        rReturnDateCalendar.setDate(urlFormatted.searchParams.get("rReturnDate"))
+        // $('#rDate').val(urlFormatted.searchParams.get("rDate")).trigger('change');;
+        // $('#rReturnDate').val(urlFormatted.searchParams.get("rReturnDate")).trigger('change');;
 
     } else if (searchType == "Circle") {
         $('#searchTab a[href="#multi_city"]').tab('show');
@@ -361,6 +401,7 @@ $('.mInfant').on('click touchstart', function (event) {
 });
 
 $("#rForm").validate({
+    ignore: [],
     rules: {
         rFrom: {
             required: true,
@@ -460,6 +501,7 @@ $(document).on('click', (function (e) {
 }));
 
 $("#mForm").validate({
+    ignore: [],
     rules: {
         'mFrom[]': {
             required: true,

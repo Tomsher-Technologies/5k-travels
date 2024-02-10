@@ -53,6 +53,10 @@
                                             href="{{ route('change-currency', 'IRR') }}">IRR</a>
                                         <a class="dropdown-item {{ $currency == 'USD' ? 'selected' : '' }}"
                                             href="{{ route('change-currency', 'USD') }}">USD</a>
+                                        <a class="dropdown-item {{ $currency == 'EUR' ? 'selected' : '' }}"
+                                            href="{{ route('change-currency', 'EUR') }}">EUR</a>
+                                        <a class="dropdown-item {{ $currency == 'GBP' ? 'selected' : '' }}"
+                                            href="{{ route('change-currency', 'GBP') }}">GBP</a>
                                     </div>
                                 </div>
                             </li>

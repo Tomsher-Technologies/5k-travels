@@ -11,7 +11,7 @@
         content="Discover seamless flight booking solutions with 5k Travels, your trusted flight booking agency. Book now & save.">
     <link rel="canonical" href="https://5ktravels.com/" />
     <!-- Bootstrap css -->
-    
+
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
     <!-- animate css -->
     <link href="{{ asset('assets/css/animate.min.css') }}" rel="stylesheet" />
@@ -35,6 +35,10 @@
     <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
     @stack('header')
@@ -382,6 +386,10 @@
     <script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.min.js') }}"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/plugins/rangePlugin.js"></script> --}}
+    
+
     <script>
         window.ROUTES = {
             search_airports: '{{ route('search-airports') }}',
@@ -559,7 +567,7 @@
 
     @stack('footer')
 
-  
+
 </body>
 
 </html>

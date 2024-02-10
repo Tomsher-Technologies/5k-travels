@@ -1365,7 +1365,7 @@ class FlyDubaiController extends Controller
 
     public function generateSpecialServices(Request $request, $paxCount, $p_type)
     {
-        // return [];
+        return [];
         $acc_result = Cache::get('fd_search_ancillary_' . $request->search_id, null);
 
         // dd($acc_result);
@@ -1384,11 +1384,14 @@ class FlyDubaiController extends Controller
             $arr_key = key($request['bag'][$p_type][$paxCount]);
             $arr_value = $request['bag'][$p_type][$paxCount][$arr_key];
             $bagDetails = getBaggaeDetails($arr_key, $arr_value, $acc_result);
+
+        // dd($bagDetails);
+
             $bag = [];
             $bag["ServiceID"] = 0;
             $bag["CodeType"] = $arr_value;
             $bag["SSRCategory"] = 0;
-            $bag["LogicalFlightID"] = $arr_key;
+            $bag["LogicalFlightID"] = (int)$arr_key;
             $bag["DepartureDate"] = $bagDetails['depDate'];
             $bag["Amount"] = $bagDetails['bag']['amount'];
             $bag["OverrideAmount"] = false;
@@ -1412,7 +1415,7 @@ class FlyDubaiController extends Controller
                 $meal_arr["ServiceID"] = 0;
                 $meal_arr["CodeType"] = $meal;
                 $meal_arr["SSRCategory"] = 0;
-                $meal_arr["LogicalFlightID"] = $mealDetails['lfID'];
+                $meal_arr["LogicalFlightID"] = (int)$mealDetails['lfID'];
                 $meal_arr["DepartureDate"] = $mealDetails['depDate'];
                 $meal_arr["Amount"] = $mealDetails['meal']['amount'];
                 $meal_arr["OverrideAmount"] = false;
@@ -1422,13 +1425,15 @@ class FlyDubaiController extends Controller
                 $meal_arr["ChargeComment"] = $mealDetails['meal']['ruleID'];
                 $meal_arr["PersonOrgID"] = -$paxCount;
                 $meal_arr["AlreadyAdded"] = false;
-                $meal_arr["PhysicalFlightID"] = $key;
+                $meal_arr["PhysicalFlightID"] = (int)$key;
                 $meal_arr["secureHash"] = "";
 
                 $services[] = $meal_arr;
             }
         }
 
+        // dd($services);
+        // return [];
         return $services;
     }
 

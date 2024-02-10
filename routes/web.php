@@ -10,6 +10,7 @@ use App\Models\ExchangeRate;
 use App\Models\FlightBookings;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 /*
@@ -80,29 +81,35 @@ Route::get('/cur', function () {
 
     // return view('web.provides.flydubai.ancillary');
 
-    $url = 'https://api.currencybeacon.com/v1/convert';
 
-    $rates = ExchangeRate::all();
-    foreach ($rates as $rate) {
-        $data = [
-            'from' => $rate->from,
-            'to' => $rate->to,
-            'amount' => 1,
-            'api_key' => env('CURRENCY_API_KEY')
-        ];
 
-        $response = Http::timeout(300)->withOptions(['verify' => false])
-            ->get($url, $data);
+    Cache::remember('exchange_rates', now()->addDay(1), function () {
+        $url = 'https://api.currencybeacon.com/v1/convert';
 
-        $apiResult = $response->json();
+        $rates = ExchangeRate::all();
+        foreach ($rates as $rate) {
+            $data = [
+                'from' => $rate->from,
+                'to' => $rate->to,
+                'amount' => 1,
+                'api_key' => env('CURRENCY_API_KEY')
+            ];
 
-        if ($apiResult && isset($apiResult['meta']['code']) && $apiResult['meta']['code'] == 200) {
-            $rate->rate =  number_format((float)$apiResult['value'], 10, '.', '');
-            $rate->save();
+            $response = Http::timeout(300)->withOptions(['verify' => false])
+                ->get($url, $data);
+
+            $apiResult = $response->json();
+
+            if ($apiResult && isset($apiResult['meta']['code']) && $apiResult['meta']['code'] == 200) {
+                $rate->rate =  number_format((float)$apiResult['value'], 10, '.', '');
+                $rate->save();
+            }
         }
-    }
 
-    dd($rates);
+        return  $rates;
+    });
+
+    dd(Cache::get('exchange_rates'));
 
     // $resultData = json_decode($apiResult, true);
 

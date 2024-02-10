@@ -6,6 +6,7 @@ use App\Models\GeneralSettings;
 use App\Models\FlightBookings;
 use App\Models\Airlines;
 use App\Models\Airports;
+use App\Models\ExchangeRate;
 use App\Models\User;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
@@ -674,31 +675,47 @@ function convertCurrency($amount, $fromCurrency)
         return $amount;
     }
 
-    $apiToken = getToken();
+    // $apiToken = getToken();
 
-    $options = [];
+    // $options = [];
 
-    if (App::environment('local')) {
-        $options = ['verify' => false];
-    }
+    // if (App::environment('local')) {
+    //     $options = ['verify' => false];
+    // }
 
-    $response = Http::timeout(300)->withOptions($options)->withHeaders([
-        'Accept-Encoding' => 'gzip, deflate',
-        'Authorization' => 'Bearer ' . $apiToken
-    ])->get(env('FLY_DUBAI_API_URL') . 'order/payment/currencies/xrates', [
-        'from' => $fromCurrency,
+    // $response = Http::timeout(300)->withOptions($options)->withHeaders([
+    //     'Accept-Encoding' => 'gzip, deflate',
+    //     'Authorization' => 'Bearer ' . $apiToken
+    // ])->get(env('FLY_DUBAI_API_URL') . 'order/payment/currencies/xrates', [
+    //     'from' => $fromCurrency,
+    //     'to' => $activeCurreny,
+    //     'amt' => 1
+    // ]);
+
+    // $result = $response->getBody()->getContents();
+    // $result = json_decode($result, TRUE);
+
+    // if ($result && isset($result['xRate'])) {
+    //     return priceFormat($amount * $result['xRate']);
+    // } else {
+    //     return 0;
+    // }
+
+    $rates = Cache::remember('exchange_rates', now()->addDay(1), function () {
+        $rates = ExchangeRate::all();
+        return  $rates;
+    });
+
+    $cur = $rates->where([
+        'from' =>  $fromCurrency,
         'to' => $activeCurreny,
-        'amt' => 1
-    ]);
+    ])->get();
 
-    $result = $response->getBody()->getContents();
-    $result = json_decode($result, TRUE);
-
-    if ($result && isset($result['xRate'])) {
-        return priceFormat($amount * $result['xRate']);
-    } else {
-        return 0;
+    if ($cur) {
+        return priceFormat($amount * $cur->rate);
     }
+
+    return 1;
 }
 
 function priceFormat($amount, $decimals = 2, $sepperator = '.')
@@ -918,14 +935,17 @@ function getBaggaeDetails($lfid, $code, $ancillary)
 
     foreach ($ancillary['ancillaryQuotes']['flights'] as $flights) {
         $segments = $flights['segments'];
-        $arr['lfID'] = $segments['lfID'];
-        $arr['depDate'] = $segments['depDate'];
-        $arr['origin'] = $segments['origin'];
-        $arr['dest'] = $segments['dest'];
 
-        foreach ($segments['serviceQuotes'] as $bags) {
-            if ($bags['code'] == $code) {
-                $arr['bag'] = $bags;
+        if ($segments['lfID'] == $lfid) {
+            $arr['lfID'] = $segments['lfID'];
+            $arr['depDate'] = $segments['depDate'];
+            $arr['origin'] = $segments['origin'];
+            $arr['dest'] = $segments['dest'];
+
+            foreach ($segments['serviceQuotes'] as $bags) {
+                if ($bags['code'] == $code) {
+                    $arr['bag'] = $bags;
+                }
             }
         }
     }
