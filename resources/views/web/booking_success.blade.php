@@ -320,8 +320,14 @@
                         <i class="fa fa-xmark-circle" style=" color: #ff2121; font-size: 55px; margin-bottom: 20px;"> </i>
                         <h3>{{$msg}}</h3>
                     @endif
+                    
                 </div>
-                <button onclick="printContent()">Print</button>
+               
+            </div>
+            <div class="col-lg-12">
+                <div class="col-sm-12 text-center">
+                    <button  class="btn btn_theme btn_md text-right" onclick="printContent()"><i class="fa fa-print" > </i> Print</button>
+                </div>
             </div>
         </div>
     </div>
