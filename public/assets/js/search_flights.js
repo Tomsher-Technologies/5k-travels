@@ -541,17 +541,17 @@ $('.stopFilter').on('change', function () {
         $('#mstop_filter').val(str);
     }
 
-    var arr = str.split(',')
-    $('.flight_search_result_wrapper .flight_search_item_wrappper').addClass('hide');
-    arr.forEach(e => {
-        if (e !== '') {
-            $('.flight_search_result_wrapper [data-stops="' + e + '"]').removeClass('hide');
-        }
-    });
+    // var arr = str.split(',')
+    // $('.flight_search_result_wrapper .flight_search_item_wrappper').addClass('hide');
+    // arr.forEach(e => {
+    //     if (e !== '') {
+    //         $('.flight_search_result_wrapper [data-stops="' + e + '"]').removeClass('hide');
+    //     }
+    // });
 
-    checkFlightCount()
+    // checkFlightCount()
 
-    // submitSearch();
+    submitSearch();
 });
 
 
@@ -569,17 +569,17 @@ $('.airlineFilter').on('click', function () {
         $('#mairline_filter').val(airstr);
     }
 
-    var arr = airstr.split(',')
-    $('.flight_search_result_wrapper .flight_search_item_wrappper').addClass('hide');
-    arr.forEach(e => {
-        if (e !== '') {
-            $('.flight_search_result_wrapper [data-airline="' + e + '"]').removeClass('hide');
-        }
-    });
-    checkFlightCount()
+    // var arr = airstr.split(',')
+    // $('.flight_search_result_wrapper .flight_search_item_wrappper').addClass('hide');
+    // arr.forEach(e => {
+    //     if (e !== '') {
+    //         $('.flight_search_result_wrapper [data-airline="' + e + '"]').removeClass('hide');
+    //     }
+    // });
+    // checkFlightCount()
     // noFlightDiv
 
-    // submitSearch();
+    submitSearch();
 });
 
 
@@ -657,57 +657,41 @@ function multiCheckFilter() {
 
 $(document).on('click', '.viewFlightDetails', function () {
     var id = $(this).attr('data-id');
-    var that = $(this);
     if ($('#detialsView_' + id).hasClass('show')) {
         $('#detialsView_' + id).removeClass('show');
     } else {
         $('.ajaxloader').css('display', 'block');
-
-        if (that.attr('data-data_loaded') == 'false') {
-            var viewdata = {
-                id: $(this).attr('data-id'),
-                session_id: $(this).attr('data-session_id'),
-                search_type: $(this).attr('data-search_type'),
-                fareCode: $(this).attr('data-fareCode'),
-                api_provider: $(this).attr('data-api_provider'),
-                cabin_type: $(this).attr('data-cabin_type')
-            }
-
-            if ($(this).attr('data-api_provider') == 'flydubai') {
-                viewdata.LFID = $(this).attr('data-LFID')
-            }
-
-            $.ajax({
-                url: ROUTES.flight_view_details,
-                data: viewdata,
-                success: function (response) {
-                    $('.ajaxloader').css('display', 'none');
-                    var resp = JSON.parse(response);
-                    if (resp.status == true) {
-                        $('#detialsView_' + id).html(resp.data);
-                        $('#detialsView_' + id).addClass('show');
-                        that.attr('data-data_loaded', true)
-                        $('html, body').animate({
-                            scrollTop: $('#detialsView_' + id).offset().top
-                        }, 1000);
-                        $(document).trigger("rtn_details_loaded");
-                    } else {
-                        swal({
-                            title: "Not Available",
-                            text: "Flights fare may have changed. Please refresh the page.",
-                            icon: "warning"
-                        }).then(function () {
-                            // window.location.reload();
-                        });
-                    }
-
-                }
-            });
-        } else {
-            $('.ajaxloader').css('display', 'none');
-            $('#detialsView_' + id).addClass('show');
-            $(document).trigger("rtn_details_loaded");
+        var viewdata = {
+            "_token": "{{ csrf_token() }}",
+            id: $(this).attr('data-id'),
+            session_id: $(this).attr('data-session_id'),
+            search_type: $(this).attr('data-search_type'),
+            fareCode: $(this).attr('data-fareCode')
         }
+        $.ajax({
+            url: ROUTES.flight_view_details,
+            data: viewdata,
+            success: function (response) {
+                $('.ajaxloader').css('display', 'none');
+                var resp = JSON.parse(response);
+                if (resp.status == true) {
+                    $('#detialsView_' + id).html(resp.data);
+                    $('#detialsView_' + id).addClass('show');
+                    $('html, body').animate({
+                        scrollTop: $('#detialsView_' + id).offset().top
+                    }, 1000);
+                } else {
+                    swal({
+                        title: "Not Available",
+                        text: "Flights fare may have changed. Please refresh the page.",
+                        icon: "warning"
+                    }).then(function () {
+                        // window.location.reload();
+                    });
+                }
+
+            }
+        });
     }
 });
 
