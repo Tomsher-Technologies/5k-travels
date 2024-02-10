@@ -16,11 +16,11 @@
                                         aria-controls="roundtrip" aria-selected="false">Roundtrip</button> -->
                                     <a class="nav-link" href="#roundtrip">Roundtrip</a>
                                 </li>
-                                {{-- <li class="nav-item" role="presentation">
+                                <li class="nav-item" role="presentation">
                                     <!-- <button class="nav-link" id="multi_city-tab" data-bs-toggle="tab" data-bs-target="#multi_city" type="button" role="tab"
                                         aria-controls="multi_city" aria-selected="false">Multi city</button> -->
                                     <a class="nav-link" href="#multi_city">Multi city</a>
-                                </li> --}}
+                                </li>
 
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link" href="#hotels">Hotels</a>
