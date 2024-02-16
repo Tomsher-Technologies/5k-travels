@@ -10,6 +10,9 @@
                         @php
                             $segments = $flights['segments'];
                             $segment_details = getSegmentDetails($segments['lfID'], $segments['depDate'], $res_data['search_result']['segmentDetails']);
+
+                            dd([$flights, $segments, $segment_details, $res_data['search_result']['taxDetails'], $fare]);
+
                         @endphp
                         <div class="accordion" id="accordionExample{{ $segments['lfID'] }}">
                             <div class="accordion-item">
@@ -279,7 +282,7 @@
                                                     </div>
                                                 @endisset --}}
                                                 @foreach ($baggage as $bag)
-                                                @if (Str::contains($bag['description'], 'Upgrade'))
+                                                    @if (Str::contains($bag['description'], 'Upgrade'))
                                                         <div class="col-12">
                                                             <input class="input_baggage"
                                                                 data-user="Child {{ $ad }}"

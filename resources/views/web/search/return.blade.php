@@ -2,198 +2,72 @@
     @if ($data['flightDetails'])
 
         @php
-            $from_fligth = Arr::where($data['flightDetails'], function ($value, $key) {
-                return $value['leg_count'] == 1;
+            $seach_params = getOrginDestinationSession($data['search_type']);
+            $startRoute = $seach_params['origin'] . $seach_params['destination'];
+            $endRoute = $seach_params['destination'] . $seach_params['origin'];
+
+            $from_count = $to_count = 0;
+            $from_flight = Arr::where($data['flightDetails'], function ($value, $key) use ($startRoute, &$from_count) {
+                if ($value['api_provider'] == 'yasin') {
+                    if ($value['Route'] == $startRoute) {
+                        $from_count++;
+                        return true;
+                    }
+                    return;
+                } elseif ($value['api_provider'] == 'flydubai') {
+                    return $value['leg_count'] == 1;
+                }
             });
 
-            $to_fligth = Arr::where($data['flightDetails'], function ($value, $key) {
-                return $value['leg_count'] == 2;
+            $to_flight = Arr::where($data['flightDetails'], function ($value, $key) use ($startRoute, $endRoute, &$to_count) {
+                if ($value['api_provider'] == 'yasin') {
+                    if ($value['Route'] == $endRoute) {
+                        $to_count++;
+                        return true;
+                    }
+                } elseif ($value['api_provider'] == 'flydubai') {
+                    return $value['leg_count'] == 2;
+                }
             });
+
+            $total_count = count($from_flight) + count($to_flight);
+
         @endphp
 
-        <div class="departing_flight">
-            <h3>SELECT DEPARTING FLIGHT</h3>
-            @foreach ($from_fligth as $fdata)
-                <div class="flight_search_item_wrappper" id="cont_{{ $loop->iteration }}">
-                    <div class="flight_search_items">
-                        <div class="multi_city_flight_lists">
-                            @if ($data['search_type'] == 'Return')
-                                <div class="flight_multis_area_wrapper">
-                                    <div class="flight_logo">
-                                        <img src="{{ isset($fdata['airline']) ? $data['flightData'][$fdata['airline']]['AirLineLogo'] : '' }}"
-                                            alt="img">
-                                        <div class="flight-details">
-                                            <h4>{{ isset($fdata['airline']) ? $data['flightData'][$fdata['airline']]['AirLineName'] : '' }}
-                                            </h4>
-                                            <h6 class="flight_num">{{ $fdata['flightNum'] }}</h6>
-                                        </div>
-                                    </div>
-                                    <div class="flight_search_left">
-                                        <div class="flight_search_destination">
-                                            <p>From</p>
-                                            <span
-                                                class="dep_date">{{ date('d M, Y', strtotime($fdata['dep_time'])) }}</span>
-                                            <h2 class="dep_time">{{ date('H:i', strtotime($fdata['dep_time'])) }}
-                                            </h2>
-                                            <h3>{{ isset($data['airports'][$fdata['origin']]) ? $data['airports'][$fdata['origin']]['City'] : $fdata['origin'] }}
-                                            </h3>
-                                            <h6>{{ isset($data['airports'][$fdata['origin']]) ? $data['airports'][$fdata['origin']]['AirportName'] : '' }}
-                                            </h6>
-                                        </div>
-                                    </div>
-
-                                    <div class="flight_search_middel">
-                                        <div class="flight_right_arrow">
-                                            <img src="{{ asset('assets/img/icon/right_arrow.png') }}" alt="icon">
-                                            <h6>
-                                                @if ($fdata['stops'] > 0)
-                                                    {{ $fdata['stops'] . ' ' . Str::plural('stop', (int) $fdata['stops']) }}
-                                                    Via
-                                                    {{ getFDStops($fdata, $data['legDetails']) }}
-                                                @else
-                                                    Non-stop
-                                                @endif
-                                            </h6>
-                                            <p>{{ $fdata['flightTime'] }}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="flight_search_third">
-                                        <div class="flight_search_destination">
-                                            <p>To</p>
-                                            <span
-                                                class="arr_date">{{ date('d M, Y', strtotime($fdata['arv_time'])) }}</span>
-                                            <h2 class="arr_time">{{ date('H:i', strtotime($fdata['arv_time'])) }}</h2>
-                                            <h3>{{ isset($data['airports'][$fdata['destination']]) ? $data['airports'][$fdata['destination']]['City'] : $fdata['destination'] }}
-                                            </h3>
-                                            <h6>{{ isset($data['airports'][$fdata['destination']]) ? $data['airports'][$fdata['destination']]['AirportName'] : '' }}
-                                            </h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="flight_search_right">
-                            @php
-                                $totalFareMargin = ($fdata['lowest_fare'] / 100) * $totalmargin + $fdata['lowest_fare'];
-                                $totalFareMargin = floor($totalFareMargin * 100) / 100;
-                                $displayAmount = convertCurrency($totalFareMargin, $data['currency'][$fdata['api_provider']]);
-                            @endphp
-                            <p class="text-center">Lowest Fare</p>
-                            <h2 class="d_fare">
-                                <span class="crc">
-                                    {{ getActiveCurrency() }}</span>
-                                {{ $displayAmount }}
-                            </h2>
-                            <h6 data-id="{{ $loop->iteration }}" data-api_provider="{{ $fdata['api_provider'] }}"
-                                data-LFID="{{ $fdata['LFID'] }}" data-search_type="{{ $data['search_type'] }}"
-                                data-cabin_type="{{ $data['cabin_type'] }}" data-session_id="{{ $data['search_id'] }}"
-                                data-data_loaded="false" class="viewFlightDetails">View Details<i
-                                    class="fas fa-chevron-down"></i></h6>
-                        </div>
-                    </div>
-
-                    <div class="flight_policy_refund collapse" id="detialsView_{{ $loop->iteration }}">
-                    </div>
-                </div>
-            @endforeach
-        </div>
-        <div class="returning_flight">
-            <h3>SELECT RETURNING FLIGHT</h3>
-
-            <div class="r_flight_contaier">
-                <div class="r_flight_overlay">
-                    <p>
-                        Please select a departure flight first.
-                    </p>
-                </div>
-                @foreach ($to_fligth as $fdata)
-                    <div class="flight_search_item_wrappper" id="cont_r_{{ $loop->iteration }}">
-                        <div class="flight_search_items">
-                            <div class="multi_city_flight_lists">
-                                @if ($data['search_type'] == 'Return')
-                                    <div class="flight_multis_area_wrapper">
-                                        <div class="flight_logo">
-                                            <img src="{{ isset($fdata['airline']) ? $data['flightData'][$fdata['airline']]['AirLineLogo'] : '' }}"
-                                                alt="img">
-                                            <div class="flight-details">
-                                                <h4>{{ isset($fdata['airline']) ? $data['flightData'][$fdata['airline']]['AirLineName'] : '' }}
-                                                </h4>
-                                                <h6 class="flight_num">{{ $fdata['flightNum'] }}</h6>
-                                            </div>
-                                        </div>
-                                        <div class="flight_search_left">
-                                            <div class="flight_search_destination">
-                                                <p>From</p>
-                                                <span>{{ date('d M, Y', strtotime($fdata['dep_time'])) }}</span>
-                                                <h2 class="dep_time">{{ date('H:i', strtotime($fdata['dep_time'])) }}
-                                                </h2>
-                                                <h3>{{ isset($data['airports'][$fdata['origin']]) ? $data['airports'][$fdata['origin']]['City'] : $fdata['origin'] }}
-                                                </h3>
-                                                <h6>{{ isset($data['airports'][$fdata['origin']]) ? $data['airports'][$fdata['origin']]['AirportName'] : '' }}
-                                                </h6>
-                                            </div>
-                                        </div>
-
-                                        <div class="flight_search_middel">
-                                            <div class="flight_right_arrow">
-                                                <img src="{{ asset('assets/img/icon/right_arrow.png') }}"
-                                                    alt="icon">
-                                                <h6>
-                                                    @if ($fdata['stops'] > 0)
-                                                        {{ $fdata['stops'] . ' ' . Str::plural('stop', (int) $fdata['stops']) }}
-                                                        Via
-                                                        {{ getFDStops($fdata, $data['legDetails']) }}
-                                                    @else
-                                                        Non-stop
-                                                    @endif
-                                                </h6>
-                                                <p>{{ $fdata['flightTime'] }}</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="flight_search_third">
-                                            <div class="flight_search_destination">
-                                                <p>To</p>
-                                                <span>{{ date('d M, Y', strtotime($fdata['arv_time'])) }}</span>
-                                                <h2 class="arr_time">{{ date('H:i', strtotime($fdata['arv_time'])) }}
-                                                </h2>
-                                                <h3>{{ isset($data['airports'][$fdata['destination']]) ? $data['airports'][$fdata['destination']]['City'] : $fdata['destination'] }}
-                                                </h3>
-                                                <h6>{{ isset($data['airports'][$fdata['destination']]) ? $data['airports'][$fdata['destination']]['AirportName'] : '' }}
-                                                </h6>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="flight_search_right">
-                                @php
-                                    $totalFareMargin = ($fdata['lowest_fare'] / 100) * $totalmargin + $fdata['lowest_fare'];
-                                    $totalFareMargin = floor($totalFareMargin * 100) / 100;
-                                    $displayAmount = convertCurrency($totalFareMargin, $data['currency'][$fdata['api_provider']]);
-                                @endphp
-                                <p class="text-center">Lowest Fare</p>
-                                <h2 class="d_fare">
-                                    <span class="crc">
-                                        {{ getActiveCurrency() }}</span>
-                                    {{ $displayAmount }}
-                                </h2>
-                                <h6 data-id="r_{{ $loop->iteration }}"
-                                    data-api_provider="{{ $fdata['api_provider'] }}" data-LFID="{{ $fdata['LFID'] }}"
-                                    data-search_type="{{ $data['search_type'] }}"
-                                    data-cabin_type="{{ $data['cabin_type'] }}"
-                                    data-session_id="{{ $data['search_id'] }}" data-data_loaded="false"
-                                    class="viewFlightDetails">View Details<i class="fas fa-chevron-down"></i></h6>
-                            </div>
-                        </div>
-
-                        <div class="flight_policy_refund collapse" id="detialsView_r_{{ $loop->iteration }}">
-                        </div>
-                    </div>
+        @if ($total_count == 0 && $from_count == 0 && $to_count == 0)
+            <div class="text-center fontSize24">
+                <span>No Flights Found. </span>
+            </div>
+        @else
+            <div class="departing_flight">
+                <h3>SELECT DEPARTING FLIGHT</h3>
+                @foreach ($from_flight as $fdata)
+                    @if ($fdata['api_provider'] == 'flydubai')
+                        @include('web.search.providers.return-flydubai')
+                    @elseif ($fdata['api_provider'] == 'yasin')
+                        @include('web.search.providers.return-yasin_from')
+                    @endif
                 @endforeach
             </div>
-        </div>
+            <div class="returning_flight">
+                <h3>SELECT RETURNING FLIGHT</h3>
+
+                <div class="r_flight_contaier">
+                    <div class="r_flight_overlay">
+                        <p>
+                            Please select a departure flight first.
+                        </p>
+                    </div>
+                    @foreach ($to_flight as $fdata)
+                        @if ($fdata['api_provider'] == 'flydubai')
+                            @include('web.search.providers.return-flydubai')
+                        @elseif ($fdata['api_provider'] == 'yasin')
+                            @include('web.search.providers.return-yasin_to')
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        @endif
     @else
         <div class="text-center fontSize24">
             <span>No Flights Found. </span>
@@ -262,6 +136,35 @@
                             <button id="stickyButton" style="display: none"
                                 class="button bookingBtn btn-40 ret_book_btn" type="submit">Book Now</button>
                         </form>
+
+                        <form method="POST" id="yasaddToCart" action="{{ route('yasin.details') }}">
+                            @csrf
+                            <input type="hidden" name="search_id" value="">
+
+                            <input type="hidden" name="dep_airline" value="">
+                            <input type="hidden" name="rtn_airline" value="">
+
+                            <input type="hidden" name="dep_route" value="">
+                            <input type="hidden" name="rtn_route" value="">
+
+                            <input type="hidden" name="dep_date_time" value="">
+                            <input type="hidden" name="rtn_date_time" value="">
+
+                            <input type="hidden" name="dep_flight_num" value="">
+                            <input type="hidden" name="rtn_flight_num" value="">
+
+                            <input type="hidden" name="dep_rbd" value="">
+                            <input type="hidden" name="rtn_rbd" value="">
+
+                            <input type="hidden" name="dep_rph" value="">
+                            <input type="hidden" name="rtn_rph" value="">
+
+                            <input type="hidden" name="price" value="">
+
+                            <button id="yasstickyButton" style="display: none"
+                                class="button bookingBtn btn-40 ret_book_btn" type="submit">Book Now</button>
+                        </form>
+
                     </div>
                 </div>
             </div>
@@ -489,6 +392,123 @@
         }
 
     });
+
+
+    var dep_search_id = 0;
+    var dep_airline = "";
+    var dep_route = "";
+    var dep_date_time = "";
+    var dep_flight_num = "";
+    var dep_rbd = "";
+    var dep_rph = "";
+    var dep_loop_id = 0;
+    var dep_fare = 0;
+
+    var rtn_search_id = 0;
+    var rtn_airline = "";
+    var rtn_route = "";
+    var rtn_date_time = "";
+    var rtn_flight_num = "";
+    var rtn_rbd = "";
+    var rtn_loop_id = 0;
+    var rtn_rph = "";
+    var rtn_fare = 0;
+
+    $(document).on('click', '.yas_ret_add_to_cart', function() {
+        $('.bottomStickyBooking').show();
+
+        if ($(this).data('flight_type') == 'dep') {
+            dep_search_id = $(this).data('search_id');
+            dep_airline = $(this).data('airline');
+            dep_route = $(this).data('route');
+            dep_date_time = $(this).data('date_time');
+            dep_flight_num = $(this).data('flight_num');
+            dep_rbd = $(this).data('rbd');
+            dep_rph = $(this).data('rph');
+            dep_loop_id = $(this).data('loop_id');
+            dep_fare = $(this).data('fare');
+
+            dep_time = $('#cont_' + dep_loop_id + ' .dep_time').html()
+            arr_time = $('#cont_' + dep_loop_id + ' .arr_time').html()
+            flight_num = $('#cont_' + dep_loop_id + ' .flight_num').html()
+            d_fare = $(this).parent().siblings('.d_fare').html()
+
+            $('#stickyDepFlight').html(flight_num)
+            $('#stickyDepFromTime').html(dep_time)
+            $('#stickyDepToTime').html(arr_time)
+            $('#stickyDepFare').html(d_fare)
+
+            $('.r_flight_overlay').hide();
+
+
+            $('#yasaddToCart input[name=search_id]').val(dep_search_id);
+
+            $('#yasaddToCart input[name=rtn_airline]').val('');
+            $('#yasaddToCart input[name=rtn_route]').val('');
+            $('#yasaddToCart input[name=rtn_date_time]').val('');
+            $('#yasaddToCart input[name=rtn_date_time]').val('');
+            $('#yasaddToCart input[name=rtn_rph]').val('');
+            $('#yasaddToCart input[name=rtn_rbd]').val('');
+
+            $('#yasaddToCart input[name=dep_airline]').val(dep_airline);
+            $('#yasaddToCart input[name=dep_route]').val(dep_route);
+            $('#yasaddToCart input[name=dep_date_time]').val(dep_date_time);
+            $('#yasaddToCart input[name=dep_flight_num]').val(dep_flight_num);
+            $('#yasaddToCart input[name=dep_rbd]').val(dep_rbd);
+            $('#yasaddToCart input[name=dep_rph]').val(dep_rph);
+
+            $('#stickyReturnFlight').html('')
+            $('#stickyReturnFromTime').html('')
+            $('#stickyReturnToTime').html('')
+            $('#stickyReturnFare').html('')
+
+        } else {
+
+            rtn_search_id = $(this).data('search_id');
+            rtn_airline = $(this).data('r_airline');
+            rtn_route = $(this).data('r_route');
+            rtn_date_time = $(this).data('r_date_time');
+            rtn_flight_num = $(this).data('r_flight_num');
+            rtn_rbd = $(this).data('r_rbd');
+            rtn_rph = $(this).data('r_rph');
+            rtn_loop_id = $(this).data('loop_id');
+            rtn_fare = $(this).data('fare');
+
+            dep_time = $('#cont_' + rtn_loop_id + ' .dep_time').html()
+            arr_time = $('#cont_' + rtn_loop_id + ' .arr_time').html()
+            flight_num = $('#cont_' + rtn_loop_id + ' .flight_num').html()
+            d_fare = $(this).parent().siblings('.d_fare').html()
+
+            $('#stickyReturnFlight').html(flight_num)
+            $('#stickyReturnFromTime').html(dep_time)
+            $('#stickyReturnToTime').html(arr_time)
+            $('#stickyReturnFare').html(d_fare)
+
+            $('#yasaddToCart input[name=rtn_airline]').val(rtn_airline);
+            $('#yasaddToCart input[name=rtn_route]').val(rtn_route);
+            $('#yasaddToCart input[name=rtn_date_time]').val(rtn_date_time);
+            $('#yasaddToCart input[name=rtn_flight_num]').val(rtn_flight_num);
+            $('#yasaddToCart input[name=rtn_rph]').val(rtn_rph);
+            $('#yasaddToCart input[name=rtn_rbd]').val(rtn_rbd);
+        }
+
+        console.log([dep_rbd, rtn_rbd]);
+
+        if (dep_rbd !== '' && rtn_rbd !== '') {
+            $('#yasstickyButton').show();
+            $('.stickyTotalCont').show();
+            var total = parseFloat(rtn_fare) + parseFloat(dep_fare);
+            $('#stickyTotal').html(Math.round(total * 100) / 100);
+            $('#yasaddToCart input[name=price]').val(Math.round(total * 100) / 100);
+        } else {
+            $('#yasstickyButton').hide();
+            $('.stickyTotalCont').hide();
+            $('#stickyTotal').html('');
+        }
+
+    });
+
+
 
     function hideIncompatible() {
         if (dep_solnid !== 0) {

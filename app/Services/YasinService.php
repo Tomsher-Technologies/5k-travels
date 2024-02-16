@@ -21,14 +21,6 @@ class YasinService
     public function get($url, $data, $needJson = true)
     {
         try {
-
-            $cred = array(
-                'Username' => env('YASEIN_USERNAME'),
-                'Password' => env('YASIN_PASSWORD'),
-            );
-
-            $data = array_merge($data, $cred);
-
             $response = Http::timeout(300)->withOptions($this->getHttpOptions())->get(env('YASEIN_API_URL') . $url, $data);
 
             // dd($response );

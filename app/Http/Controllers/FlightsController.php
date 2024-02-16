@@ -89,6 +89,7 @@ class FlightsController extends Controller
         $data['legDetails'] = $fly_dubai_res['legDetails'];
         $data['combinability'] = getCombinability($fly_dubai_res['combinability']);
 
+
         $yasin_con = new YasinBookingController();
         $yasin_res = $yasin_con->search($request, $search_id);
 
@@ -97,6 +98,8 @@ class FlightsController extends Controller
         // dd($data);
 
         // dd($data['serviceDetails']);
+
+        // dd($data['flightDetails']);
 
         // dd($data['combinability']);
 
@@ -269,7 +272,6 @@ class FlightsController extends Controller
         if ($request->pnr) {
             $booking = FlightBookings::where('unique_booking_id', $request->pnr)->firstOrFail();
             $booking['passengers'] = FlightPassengers::where('booking_id', $booking->id)->get();
-            // dd($booking);
             return view('web.booking_success', compact('booking'));
         } else {
             abort(404);

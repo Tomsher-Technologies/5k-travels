@@ -253,7 +253,7 @@
                                                         span.attr('data-selected');
                                                         span.attr('tooltip', c_seat['currency'] + ' ' +c_seat['amount']);
                                                         span.attr('data-rate',c_seat['amount']);
-                                                        span.attr('data-code',c_seat['serviceCode'] + '_' + seat_map['rowNumber'] + '_' + c_seat['seat'] );
+                                                        span.attr('data-code',c_seat['serviceCode'] + '_' + seat_map['rowNumber'] + '_' + c_seat['seat'] + '_' + c_seat['amount'] );
                                                         span.addClass(seat_class);
 
                                                         if (order ==

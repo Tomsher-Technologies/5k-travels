@@ -306,17 +306,7 @@
                             <div class="pricing__feature-info-wrapper">
                                 <div class="pricing__feature-info-available text-center">
                                     @if (request()->search_type == 'OneWay')
-                                        {{-- <form class="addToCart" action="{{ route('flight.booking') }}">
-                                                @csrf
-                                                <input type="hidden" name="search_id"
-                                                    value="{{ request()->session_id }}">
-                                                <input type="hidden" name="LFID" value="{{ $LFID }}">
-                                                <input type="hidden" name="FareTypeID"
-                                                    value="{{ $fare['FareTypeID'] }}">
-                                                <button type="submit">Add To Cart</button>
-                                            </form> --}}
-
-                                        <button class="btn btn_theme btn_md  ret_add_to_cart addToCart"
+                                        <button class="btn btn_theme btn_md ret_add_to_cart addToCart"
                                             data-action="{{ route('flight.booking') }}"
                                             data-loop_id="{{ request()->id }}"
                                             data-search_id="{{ request()->session_id }}"
@@ -324,7 +314,7 @@
                                             data-FareTypeID="{{ $fare['FareTypeID'] }}" type="button">Book
                                             Now</button>
                                     @elseif(request()->search_type == 'Return')
-                                        <button class="btn btn_theme btn_md  ret_add_to_cart"
+                                        <button class="btn btn_theme btn_md ret_add_to_cart"
                                             data-fare="{{ $displayAmount }}" data-loop_id="{{ request()->id }}"
                                             data-search_id="{{ request()->session_id }}"
                                             data-LFID="{{ $LFID }}" data-solnID="{{ $fare['SolnId'] }}"

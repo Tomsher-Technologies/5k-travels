@@ -675,32 +675,6 @@ function convertCurrency($amount, $fromCurrency)
         return $amount;
     }
 
-    // $apiToken = getToken();
-
-    // $options = [];
-
-    // if (App::environment('local')) {
-    //     $options = ['verify' => false];
-    // }
-
-    // $response = Http::timeout(300)->withOptions($options)->withHeaders([
-    //     'Accept-Encoding' => 'gzip, deflate',
-    //     'Authorization' => 'Bearer ' . $apiToken
-    // ])->get(env('FLY_DUBAI_API_URL') . 'order/payment/currencies/xrates', [
-    //     'from' => $fromCurrency,
-    //     'to' => $activeCurreny,
-    //     'amt' => 1
-    // ]);
-
-    // $result = $response->getBody()->getContents();
-    // $result = json_decode($result, TRUE);
-
-    // if ($result && isset($result['xRate'])) {
-    //     return priceFormat($amount * $result['xRate']);
-    // } else {
-    //     return 0;
-    // }
-
     $rates = Cache::remember('exchange_rates', now()->addDay(1), function () {
         $rates = ExchangeRate::all();
         return  $rates;
@@ -975,6 +949,30 @@ function getMealDetails($pfid, $code, $ancillary)
 
     return $arr;
 }
+function getSeatDetails($pfid, $code, $seats)
+{
+    $arr = [];
+
+    foreach ($seats['seatQuotes']['flights'] as $flight) {
+        dd($flight);
+        // if ($legs['pfID'] == $pfid) {
+        //     $arr["lfID"] = $legs['lfID'];
+        //     $arr["pfID"] = $legs['pfID'];
+        //     $arr["depDate"] = $legs['depDate'];
+        //     $arr["origin"] = $legs['origin'];
+        //     $arr["dest"] = $legs['dest'];
+        //     $arr["flightNum"] = $legs['flightNum'];
+
+        //     foreach ($legs['serviceQuotes'] as $serviceQuotes) {
+        //         if ($serviceQuotes['code']  ==  $code) {
+        //             $arr["meal"] = $serviceQuotes;
+        //         }
+        //     }
+        // }
+    }
+
+    return $arr;
+}
 
 // Start Yasin
 function getYasinAirLines($flights)
@@ -994,5 +992,21 @@ function getYasinFlightTime($flight)
 {
     $depatureTime = Carbon::parse($flight['FlightDate'] . ' ' . $flight['DepatureTime']);
     $arrivalTime = Carbon::parse($flight['ArrivalDate'] . ' ' . $flight['ArrivalTime']);
+}
+
+function getYasinFlight($search_id, $rph, $rbd)
+{
+    $result = Cache::get('yas_search_result_' . $search_id, null);
+    if ($result && isset($result['flights'])) {
+        foreach ($result['flights'] as $flight) {
+            if (
+                $flight['RPH']  == $rph &&
+                $flight['RBD']  == $rbd
+            ) {
+                return $flight;
+            }
+        }
+    }
+    return [];
 }
 // End Yasin

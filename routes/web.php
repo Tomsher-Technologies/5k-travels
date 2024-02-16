@@ -6,6 +6,7 @@ use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FlightsApiController;
 use App\Http\Controllers\Providers\FlyDubaiController;
+use App\Http\Controllers\Providers\Yasin\YasinBookingController;
 use App\Models\ExchangeRate;
 use App\Models\FlightBookings;
 use Carbon\Carbon;
@@ -82,7 +83,7 @@ Route::get('/cur', function () {
     // return view('web.provides.flydubai.ancillary');
 
 
-
+    Cache::forget('exchange_rates');
     Cache::remember('exchange_rates', now()->addDay(1), function () {
         $url = 'https://api.currencybeacon.com/v1/convert';
 
@@ -160,6 +161,10 @@ Route::get('/flydubai/seats', [FlyDubaiController::class, 'loadSeatHTML'])->name
 Route::get('/flydubai/optional', [FlyDubaiController::class, 'getAncillaryOffers'])->name('flydubai.ancillary');
 Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
 // Route::post('/flydubai/summery', [FlyDubaiController::class, 'submitPnr'])->name('flydubai.pnrsummery');
+
+// Yasin routes
+Route::post('/yas/details', [YasinBookingController::class, 'bookingPage'])->name('yasin.details');
+Route::post('/yas/book', [YasinBookingController::class, 'bookingConfirm'])->name('yasin.book');
 
 Route::get('/flights/booking/fail', [FlightsController::class, 'bookingFail'])->name('flight.booking.fail');
 Route::get('/flights/booking/success', [FlightsController::class, 'bookingSuccess'])->name('flight.booking.success');
