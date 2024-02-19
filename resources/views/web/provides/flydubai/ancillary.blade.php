@@ -85,7 +85,7 @@
                                                 data-bs-target="#nav-seats" type="button" role="tab"
                                                 aria-controls="nav-seats" aria-selected="false">Seats</button>
                                         @endif
-                                        <button class="nav-link" id="nav-details-tab" data-bs-toggle="tab"
+                                        <button class="nav-link active" id="nav-details-tab" data-bs-toggle="tab"
                                             data-bs-target="#nav-details" type="button" role="tab"
                                             aria-controls="nav-details" aria-selected="false">Personal Details</button>
                                     </div>
@@ -120,7 +120,9 @@
                                         @include('web.provides.flydubai.seats')
                                     @endif
 
-                                    @include('web.provides.flydubai.passenger-details')
+                                    @include('web.provides.flydubai.passenger-details',[
+                                        'active' => true
+                                    ])
                                 </div>
                             </form>
                         </div>
@@ -140,13 +142,13 @@
                                     <div class="tour_bokking_subtotal_area">
                                         <h6>Total Tax <span>{{ getDisplyPrice($prices['tax_fare']) }}</span></h6>
                                     </div>
-                                    <div class="tour_bokking_subtotal_area">
+                                    {{-- <div class="tour_bokking_subtotal_area">
                                         <h6>Add Ons <span>{{ getActiveCurrency() }} <span id="addons">0</span></span>
                                         </h6>
                                         <div id="addon_items">
 
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="total_subtotal_booking">
                                         <h4>Total Amount <span>{{ getActiveCurrency() }} <span
                                                     id="amountSpan">{{ convertCurrency($prices['total_fare'], 'AED') }}</span></span>

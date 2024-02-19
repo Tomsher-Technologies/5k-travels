@@ -187,6 +187,7 @@
                                                                                                     name="oAdult"
                                                                                                     id="oAdult"
                                                                                                     class="count"
+                                                                                                    max=9
                                                                                                     value="{{ $oAdult }}">
                                                                                                 <div
                                                                                                     class="type-label">

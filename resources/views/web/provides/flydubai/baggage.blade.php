@@ -10,9 +10,6 @@
                         @php
                             $segments = $flights['segments'];
                             $segment_details = getSegmentDetails($segments['lfID'], $segments['depDate'], $res_data['search_result']['segmentDetails']);
-
-                            dd([$flights, $segments, $segment_details, $res_data['search_result']['taxDetails'], $fare]);
-
                         @endphp
                         <div class="accordion" id="accordionExample{{ $segments['lfID'] }}">
                             <div class="accordion-item">
