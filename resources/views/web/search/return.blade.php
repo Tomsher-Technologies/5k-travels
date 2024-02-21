@@ -134,7 +134,7 @@
                             <input type="hidden" name="rtn_solnid" value="">
 
                             <button id="stickyButton" style="display: none"
-                                class="button bookingBtn btn-40 ret_book_btn" type="submit">Book Now</button>
+                                class="button bookingBtn btn-40 ret_book_btn" type="button">Book Now</button>
                         </form>
 
                         <form method="POST" id="yasaddToCart" action="{{ route('yasin.details') }}">
@@ -162,7 +162,7 @@
                             <input type="hidden" name="price" value="">
 
                             <button id="yasstickyButton" style="display: none"
-                                class="button bookingBtn btn-40 ret_book_btn" type="submit">Book Now</button>
+                                class="button bookingBtn btn-40 ret_book_btn" type="button">Book Now</button>
                         </form>
 
                     </div>
@@ -523,4 +523,32 @@
     $(document).on("rtn_details_loaded", null, function(event) {
         hideIncompatible()
     });
+</script>
+
+<script>
+    // $('.ret_book_btn').on('click', function(e) {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     var btn = $(this);
+    //     $.ajaxSetup({
+    //         headers: {
+    //             'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+    //         }
+    //     });
+    //     $('.ajaxloader').css('display', 'block');
+
+    //     $.ajax({
+    //         type: "GET",
+    //         url: config.routes.checklogin,
+    //         success: function(data) {
+    //             var resp = JSON.parse(data);
+    //             if (resp.status == true) {
+    //                 btn.closest("form").submit();
+    //             } else {
+    //                 $('.ajaxloader').css('display', 'none');
+    //                 new bootstrap.Modal(document.getElementById("common_author-forms"), {}).show();
+    //             }
+    //         }
+    //     });
+    // })
 </script>

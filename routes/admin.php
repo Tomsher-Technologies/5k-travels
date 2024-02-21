@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\AgentsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\FlightController;
 use App\Http\Controllers\Admin\Auth\AdminLoginController;
+use App\Http\Controllers\Admin\Yasin\RoutesController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,6 +18,7 @@ use App\Http\Controllers\Admin\Auth\AdminLoginController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 Route::namespace('Admin')->prefix('admin')->group(function () {
 
     // Login Routes...
@@ -45,8 +48,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     // Route::get('email/verify/{id}/{hash}', 'VerificationController@verify')->name('admin.verification.verify');
     // Route::post('email/resend', 'VerificationController@resend')->name('admin.verification.resend');
 
-    Route::group(['middleware' => ['auth','admin']], function () {
-        
+    Route::group(['middleware' => ['auth', 'admin']], function () {
         Route::get('/dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
         Route::get('/dashboard-counts', [HomeController::class, 'dashboardCounts'])->name('dashboard-counts');
         Route::get('/allusers-counts', [HomeController::class, 'allUsersCounts'])->name('allusers-counts');
@@ -63,7 +65,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('/agent/approve', [AgentsController::class, 'approve'])->name('agent.approve');
         Route::post('/agent/change-status', [AgentsController::class, 'statusChange'])->name('agent.change.status');
         Route::get('/agent/graph', [AgentsController::class, 'agentGraph'])->name('agent.graph');
-        
+
         /* ------------------- Users -----------------*/
         Route::get('/user', [UserController::class, 'index'])->name('user.index');
         Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
@@ -98,6 +100,11 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('/flight-bookings', [HomeController::class, 'getAllBookings'])->name('bookings');
         Route::get('/booking-view/{id}', [HomeController::class, 'getBookingDetails'])->name('booking.view');
         Route::get('/flight-bookings-export', [HomeController::class, 'exportData'])->name('export');
-        
+
+        Route::prefix('yasin')->name('yasin.')->group(function () {
+            Route::get('/autocompleteairports', [RoutesController::class, 'autocompleteAirports'])->name('autocompleteairports');
+            Route::resource('/routes', RoutesController::class);
+            Route::post('/routes/chnage_status', [RoutesController::class,'changeStatus'])->name('routes.change_status');
+        });
     });
 });

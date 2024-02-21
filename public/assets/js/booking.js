@@ -68,36 +68,52 @@ $(document).on('click', '#addToCart', function (e) {
         }
     });
     $('.ajaxloader').css('display', 'block');
+
+
     $.ajax({
-        type: "POST",
-        url: formURL,
-        data: form.serialize(),
+        type: "GET",
+        url: config.routes.checklogin,
         success: function (data) {
-            $('.ajaxloader').css('display', 'none');
             var resp = JSON.parse(data);
             if (resp.status == true) {
-                // console.log(data);
-                var data = resp.data;
-                $('<form/>', { action: config.routes.flydubai_ancillary, method: 'GET' }).append(
-                    $('<input>', { type: 'hidden', name: 'search_id', value: data.search_id }),
-                    $('<input>', { type: 'hidden', name: 'dep_LFID', value: data.dep_LFID }),
-                    $('<input>', { type: 'hidden', name: 'rtn_LFID', value: data.rtn_LFID }),
-                    $('<input>', { type: 'hidden', name: 'dep_FareTypeID', value: data.dep_FareTypeID }),
-                    $('<input>', { type: 'hidden', name: 'rtn_FareTypeID', value: data.rtn_FareTypeID }),
-                    $('<input>', { type: 'hidden', name: 'dep_solnid', value: data.dep_solnid }),
-                    $('<input>', { type: 'hidden', name: 'rtn_solnid', value: data.rtn_solnid }),
-                ).appendTo('body').submit();
+                $.ajax({
+                    type: "POST",
+                    url: formURL,
+                    data: form.serialize(),
+                    success: function (data) {
+                        $('.ajaxloader').css('display', 'none');
+                        var resp = JSON.parse(data);
+                        if (resp.status == true) {
+                            // console.log(data);
+                            var data = resp.data;
+                            $('<form/>', { action: config.routes.flydubai_ancillary, method: 'GET' }).append(
+                                $('<input>', { type: 'hidden', name: 'search_id', value: data.search_id }),
+                                $('<input>', { type: 'hidden', name: 'dep_LFID', value: data.dep_LFID }),
+                                $('<input>', { type: 'hidden', name: 'rtn_LFID', value: data.rtn_LFID }),
+                                $('<input>', { type: 'hidden', name: 'dep_FareTypeID', value: data.dep_FareTypeID }),
+                                $('<input>', { type: 'hidden', name: 'rtn_FareTypeID', value: data.rtn_FareTypeID }),
+                                $('<input>', { type: 'hidden', name: 'dep_solnid', value: data.dep_solnid }),
+                                $('<input>', { type: 'hidden', name: 'rtn_solnid', value: data.rtn_solnid }),
+                            ).appendTo('body').submit();
 
-            } else {
-                swal({
-                    title: "Not Available",
-                    text: "Flights fare may have changed. Please refresh the page.",
-                    icon: "warning"
-                }).then(function () {
-                    // window.location.reload();
+                        } else {
+                            swal({
+                                title: "Not Available",
+                                text: "Flights fare may have changed. Please refresh the page.",
+                                icon: "warning"
+                            }).then(function () {
+                                // window.location.reload();
+                            });
+                        }
+                    }
                 });
+            } else {
+                $('.ajaxloader').css('display', 'none');
+                new bootstrap.Modal(document.getElementById("common_author-forms"), {}).show();
             }
         }
     });
+
+
 
 });

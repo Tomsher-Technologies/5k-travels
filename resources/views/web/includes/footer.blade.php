@@ -15,6 +15,12 @@
                             <h3> <a href="mailto:info@5ktravels.com">info@5ktravels.com</a></h3>
                         </div>
                         <div class="footer_inquery_area">
+                            <h5>Visit Us At</h5>
+                            <h3>
+                                808, XL Damac Tower, Business Bay, <br> Dubai, UAE
+                            </h3>
+                        </div>
+                        <div class="footer_inquery_area">
                             <h5>Follow us on</h5>
                             <ul class="soical_icon_footer">
                                 <li><a href="#!"><i class="fab fa-facebook"></i></a></li>

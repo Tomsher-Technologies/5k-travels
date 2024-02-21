@@ -26,6 +26,10 @@ use Illuminate\Support\Facades\Http;
 */
 
 
+Route::get('/payment_test', function () {
+    return view('web.demo');
+});
+
 Route::get('/cur', function () {
 
 
