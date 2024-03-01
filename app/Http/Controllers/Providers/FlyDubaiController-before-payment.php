@@ -6,10 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Airports;
 use App\Models\Countries;
 use App\Models\FlightBookings;
-use App\Models\FlightItineraryDetails;
-use App\Models\FlightMarginAmounts;
 use App\Models\FlightPassengers;
-use App\Models\UserDetails;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -1253,11 +1250,10 @@ class FlyDubaiController extends Controller
         }
 
         $segmentsArray = [];
-        $FareTypeIDArray = [];
 
         if ($search_result['search_type'] == 'OneWay') {
             $search_lfdi = $request->LFID;
-            $FareTypeIDArray[] = (int)$request->FareTypeID;
+            $search_FareTypeID = $request->FareTypeID;
             foreach ($search_result['flights'] as $flight) {
                 if ($flight['LFID'] == $search_lfdi) {
                     $segmentsArray[] = $flight;
@@ -1266,8 +1262,8 @@ class FlyDubaiController extends Controller
         } else if ($search_result['search_type'] == 'Return') {
             $dep_LFID = $request->dep_LFID;
             $rtn_LFID = $request->rtn_LFID;
-            $FareTypeIDArray[] = (int)$request->dep_FareTypeID;
-            $FareTypeIDArray[] = (int)$request->rtn_FareTypeID;
+            $dep_FareTypeID = $request->dep_FareTypeID;
+            $rtn_FareTypeID = $request->rtn_FareTypeID;
             foreach ($search_result['flights'] as $flight) {
                 if ($flight['LFID'] == $dep_LFID || $flight['LFID'] == $rtn_LFID) {
                     $segmentsArray[] = $flight;
@@ -1275,6 +1271,7 @@ class FlyDubaiController extends Controller
             }
         }
 
+        // dd($segmentsArray);
 
         $adt_array = $chd_array = $inf_array = [];
 
@@ -1422,69 +1419,42 @@ class FlyDubaiController extends Controller
 
             if ($commit_response && isset($commit_response['Exceptions']) && $commit_response['Exceptions'][0]['ExceptionCode'] == 0) {
 
-                $search_details =  getOrginDestinationSession($search_result['search_type']);
-                $flight_booking = FlightBookings::create([
-                    'api_provider' => 'flydubai',
-                    'user_id' => Auth::user()->id,
-                    'fare_type' => "0",
-                    'client_ref' => $commit_response['ConfirmationNumber'],
-                    'unique_booking_id' => $commit_response['ConfirmationNumber'],
-                    'direction' =>  $search_result['search_type'],
-                    'origin' => $search_details['origin'],
-                    'destination' =>  $search_details['destination'],
-                    'adult_count' =>  $search_details['adult'],
-                    'child_count' =>  $search_details['child'],
-                    'infant_count' =>  $search_details['infant'],
-                    'booking_status' =>  "Created",
-                    'ticket_status' =>  "Created",
-                    'cancel_request' =>  0,
-                    'is_cancelled' => 0,
-                    'payment_status' => config('app.payment_status.pending'),
-                    'currency' =>  getActiveCurrency(),
-                    'customer_name' =>  $request->adult_first_name[0] . ' '  . $request->adult_last_name[0],
-                    'customer_email' =>  $request->email,
-                    'phone_code' =>  $request->mobile_code,
-                    'customer_phone' =>  $request->mobile_no,
-                ]);
-                $this->savePriceDetails(
-                    $flight_booking->id,
-                    $segmentsArray,
-                    $FareTypeIDArray,
-                    $search_details
-                );
-                $this->savePassengerDetails($request, $flight_booking->id, $commit_response['ConfirmationNumber']);
+                // Payment
+                $payment_status =  $this->makePayment($request->search_id, $commit_response);
 
-                $this->saveItinerary($request, $flight_booking->id, $commit_response, $search_details, $commit_response['ConfirmationNumber']);
+                if ($payment_status) {
+                    $search_details =  getOrginDestinationSession($search_result['search_type']);
 
-                if (Auth::user()->user_type == 'user') {
-                    $margin = getMargin();
-                    $paymentForm = [
-                        'pnr' => $commit_response['ConfirmationNumber'],
-                        'search_id' => $request->search_id,
-                        'amt' => ($margin['totalmargin'] > 0) ? (($commit_response['ReservationBalance'] / 100) * $margin['totalmargin']) * 100 : $commit_response['ReservationBalance'] * 100,
-                        'amtReal' => $commit_response['ReservationBalance'],
-                    ];
+                    $flight_booking = FlightBookings::create([
+                        'api_provider' => 'flydubai',
+                        'user_id' => Auth::user()->id,
+                        'fare_type' => "0",
+                        'client_ref' => $commit_response['ConfirmationNumber'],
+                        'unique_booking_id' => $commit_response['ConfirmationNumber'],
+                        'direction' =>  $search_result['search_type'],
+                        'origin' => $search_details['origin'],
+                        'destination' =>  $search_details['destination'],
+                        'adult_count' =>  $search_details['adult'],
+                        'child_count' =>  $search_details['child'],
+                        'infant_count' =>  $search_details['infant'],
+                        'booking_status' =>  "Booked",
+                        'ticket_status' =>  "Ticketed",
+                        'cancel_request' =>  0,
+                        'is_cancelled' => 0,
+                        'currency' =>  getActiveCurrency(),
+                        'customer_name' =>  $request->adult_first_name[0] . ' '  . $request->adult_last_name[0],
+                        'customer_email' =>  $request->email,
+                        'phone_code' =>  $request->mobile_code,
+                        'customer_phone' =>  $request->mobile_no,
+                    ]);
 
-                    $order = ngCreateOrder($paymentForm);
-                    if ($order) {
-                        return redirect($order);
-                    } else {
-                        return $this->redirectFail();
-                    }
+                    $this->savePassengerDetails($request, $flight_booking->id, $commit_response['ConfirmationNumber']);
+
+                    generateApiToken();
+
+                    return $this->redirectSuccess($commit_response['ConfirmationNumber']);
                 } else {
-                    // Payment
-                    $payment_status =  $this->makePayment($request->search_id, $commit_response['ConfirmationNumber'], $commit_response['ReservationBalance']);
-                    if ($payment_status) {
-                        $flight_booking->payment_status = config('app.payment_status.completed');
-                        $flight_booking->booking_status =  "Booked";
-                        $flight_booking->ticket_status =  "Ticketed";
-                        $flight_booking->save();
-                        return $this->redirectSuccess($commit_response['ConfirmationNumber']);
-                    } else {
-                        $flight_booking->booking_status =  "Failed";
-                        $flight_booking->ticket_status =  "Failed";
-                        return $this->redirectFail();
-                    }
+                    return $this->redirectFail();
                 }
             } else {
                 return $this->redirectFail();
@@ -1494,9 +1464,108 @@ class FlyDubaiController extends Controller
         }
     }
 
+    public function redirectFail()
+    {
+        return redirect()->route('flight.booking.fail');
+    }
+
+    public function redirectSuccess($pnr)
+    {
+        
+        return redirect()->route('flight.booking.success', [
+            'pnr' => $pnr
+        ]);
+    }
+
+    public function savePassengerDetails(Request $request, $flight_booking_id, $pnr)
+    {
+        foreach ($request->adult_title as $key => $adult) {
+            FlightPassengers::create([
+                'booking_id' => $flight_booking_id,
+                'passenger_type' => "ADT",
+                'eticket_number' => $pnr,
+                'passenger_first_name' => $request->adult_first_name[$key],
+                'passenger_last_name' => $request->adult_last_name[$key],
+                'passenger_title' => $request->adult_title[$key],
+                'gender' => $request->adult_gender[$key],
+                'date_of_birth' => $request->adult_dob[$key],
+                'passenger_nationality' => $request->adult_nationality[$key],
+                'passport_number' => $request->adult_passport[$key],
+                'passport_issue_country' => $request->adult_passport_country[$key],
+                'passport_issue_date' => $request->adult_passport_issue[$key],
+                'passport_expiry_date' => $request->adult_passport_expiry[$key],
+            ]);
+        }
+
+        if (isset($request->child_title)) {
+            foreach ($request->child_title as $key => $child) {
+                FlightPassengers::create([
+                    'booking_id' => $flight_booking_id,
+                    'passenger_type' => "ADT",
+                    'eticket_number' => $pnr,
+                    'passenger_first_name' => $request->child_first_name[$key],
+                    'passenger_last_name' => $request->child_last_name[$key],
+                    'passenger_title' => $request->child_title[$key],
+                    'gender' => $request->child_gender[$key],
+                    'date_of_birth' => $request->child_dob[$key],
+                    'passenger_nationality' => $request->child_nationality[$key],
+                    'passport_number' => $request->child_passport[$key],
+                    'passport_issue_country' => $request->child_passport_country[$key],
+                    'passport_issue_date' => $request->child_passport_issue[$key],
+                    'passport_expiry_date' => $request->child_passport_expiry[$key],
+                ]);
+            }
+        }
+        if (isset($request->infant_title)) {
+            foreach ($request->infant_title as $key => $infant) {
+                FlightPassengers::create([
+                    'booking_id' => $flight_booking_id,
+                    'passenger_type' => "ADT",
+                    'eticket_number' => $pnr,
+                    'passenger_first_name' => $request->infant_first_name[$key],
+                    'passenger_last_name' => $request->infant_last_name[$key],
+                    'passenger_title' => $request->infant_title[$key],
+                    'gender' => $request->infant_gender[$key],
+                    'date_of_birth' => $request->infant_dob[$key],
+                    'passenger_nationality' => $request->infant_nationality[$key],
+                    'passport_number' => $request->infant_passport[$key],
+                    'passport_issue_country' => $request->infant_passport_country[$key],
+                    'passport_issue_date' => $request->infant_passport_issue[$key],
+                    'passport_expiry_date' => $request->infant_passport_expiry[$key],
+                ]);
+            }
+        }
+    }
+
+    public function loadSeatHTML(Request $request)
+    {
+
+        $seat_request = Cache::get('fd_seat_req_' . $request->search_id);
+        $res_data = Cache::get('fd_seat_res_data_' . $request->search_id);
+
+        if (Cache::has('fd_search_seat_' . $request->search_id)) {
+            Cache::forget('fd_search_seat_' . $request->search_id);
+        }
+
+        $seat_response = $this->flightBookingService->callAPI('pricing/seats', $seat_request);
+
+        Cache::set('fd_search_seat_' . $request->search_id, $seat_response);
+
+        $logger =  Log::build([
+            'driver' => 'single',
+            'path' => storage_path('logs/se/' . $request->search_id . '/seat_req.json'),
+        ]);
+        $logger->info(json_encode($seat_response));
 
 
-    public function makePayment($search_id, $ConfirmationNumber, $ReservationBalance)
+        // return response()->json(array('success' => true, 'seat_response' => $seat_response, 'res_data' => $res_data));
+
+        $returnHTML = view('web.provides.flydubai.seats_html', compact('seat_response', 'res_data'))->render();
+
+        return response()->json(array('success' => true, 'html' => $returnHTML));
+    }
+
+    public function makePayment($search_id, $commit_response)
     {
         $date = Carbon::now()->format('Y-d-m\TH:i:s');
 
@@ -1515,7 +1584,7 @@ class FlyDubaiController extends Controller
             ],
             "ReservationInfo" => [
                 "SeriesNumber" => "299",
-                "ConfirmationNumber" => $ConfirmationNumber
+                "ConfirmationNumber" => $commit_response['ConfirmationNumber']
             ],
             "PNRPayments" => [
                 [
@@ -1528,16 +1597,16 @@ class FlyDubaiController extends Controller
                     "ExpirationDate" => $date,
                     "ExchangeRate" => 0,
                     "ExchangeRateDate" => $date,
-                    "OriginalAmount" => $ReservationBalance,
-                    "PaymentAmount" => $ReservationBalance,
+                    "OriginalAmount" => $commit_response['ReservationBalance'],
+                    "PaymentAmount" => $commit_response['ReservationBalance'],
                     "BalanceAmount" => 0,
                     "PaymentMethod" => "INVC",
                     "UserID" => env('FLY_DUBAI_USERNAME'),
                     "IataNumber" => env('FLY_DUBAI_IATA'),
                     "ReservationCurrency" => "AED",
-                    "ReservationAmount" => $ReservationBalance,
+                    "ReservationAmount" => $commit_response['ReservationBalance'],
                     "TransactionStatus" => "NOTYETPROCESSED",
-                    "BaseAmount" => $ReservationBalance,
+                    "BaseAmount" => $commit_response['ReservationBalance'],
                     "PaymentComment" => "",
                     "AuthorizationCode" => "",
                     "PaymentReference" => "",
@@ -1617,277 +1686,5 @@ class FlyDubaiController extends Controller
         $logger->info($response);
 
         return true;
-    }
-
-
-
-    public function redirectFail()
-    {
-        return redirect()->route('flight.booking.fail');
-    }
-
-    public function redirectSuccess($pnr)
-    {
-        generateApiToken();
-        return redirect()->route('flight.booking.success', [
-            'pnr' => $pnr
-        ]);
-    }
-
-    public function saveItinerary($request, $flight_booking_id, $commit_response, $search_details, $pnr)
-    {
-        $data = [];
-
-        $totalPass = $search_details['adult'] + $search_details['child'] + $search_details['infant'];
-
-        foreach ($commit_response['Airlines'] as $airlines) {
-            foreach ($airlines['LogicalFlight'] as $logicalFlight) {
-                foreach ($logicalFlight['PhysicalFlights'] as $physicalFlights) {
-                    $data[] = [
-                        'booking_id' => $flight_booking_id,
-                        'airline_pnr' => $pnr,
-                        'arrival_airport' => $physicalFlights['Destination'],
-                        'arrival_date_time' => $physicalFlights['Arrivaltime'],
-                        'arrival_terminal' => $physicalFlights['DestinationDefaultTerminal'],
-                        'baggage' => '',
-                        'cabin_class' => $search_details['class'],
-                        'departure_airport' => $physicalFlights['Origin'],
-                        'departure_date_time' => $physicalFlights['DepartureTime'],
-                        'departure_terminal' => $physicalFlights['OriginDefaultTerminal'],
-                        'flight_number' => $physicalFlights['FlightNumber'],
-                        'item_rph' => '',
-                        'journey_duration' => $physicalFlights['FlightDuration'],
-                        'marketing_airline_code' => $physicalFlights['CarrierCode'],
-                        'number_in_party' => $totalPass,
-                        'operating_airline_code' => $physicalFlights['OperatingCarrier'],
-                        'res_book_desig_code' => '',
-                        'stop_quantity' => '',
-                        'is_return' => 0,
-                    ];
-                }
-            }
-        }
-
-        if (!empty($data)) {
-            FlightItineraryDetails::insert($data);
-        }
-    }
-
-    public function savePassengerDetails(Request $request, $flight_booking_id, $pnr)
-    {
-        foreach ($request->adult_title as $key => $adult) {
-            FlightPassengers::create([
-                'booking_id' => $flight_booking_id,
-                'passenger_type' => "ADT",
-                'eticket_number' => $pnr,
-                'passenger_first_name' => $request->adult_first_name[$key],
-                'passenger_last_name' => $request->adult_last_name[$key],
-                'passenger_title' => $request->adult_title[$key],
-                'gender' => $request->adult_gender[$key],
-                'date_of_birth' => $request->adult_dob[$key],
-                'passenger_nationality' => $request->adult_nationality[$key],
-                'passport_number' => $request->adult_passport[$key],
-                'passport_issue_country' => $request->adult_passport_country[$key],
-                'passport_issue_date' => $request->adult_passport_issue[$key],
-                'passport_expiry_date' => $request->adult_passport_expiry[$key],
-            ]);
-        }
-
-        if (isset($request->child_title)) {
-            foreach ($request->child_title as $key => $child) {
-                FlightPassengers::create([
-                    'booking_id' => $flight_booking_id,
-                    'passenger_type' => "ADT",
-                    'eticket_number' => $pnr,
-                    'passenger_first_name' => $request->child_first_name[$key],
-                    'passenger_last_name' => $request->child_last_name[$key],
-                    'passenger_title' => $request->child_title[$key],
-                    'gender' => $request->child_gender[$key],
-                    'date_of_birth' => $request->child_dob[$key],
-                    'passenger_nationality' => $request->child_nationality[$key],
-                    'passport_number' => $request->child_passport[$key],
-                    'passport_issue_country' => $request->child_passport_country[$key],
-                    'passport_issue_date' => $request->child_passport_issue[$key],
-                    'passport_expiry_date' => $request->child_passport_expiry[$key],
-                ]);
-            }
-        }
-        if (isset($request->infant_title)) {
-            foreach ($request->infant_title as $key => $infant) {
-                FlightPassengers::create([
-                    'booking_id' => $flight_booking_id,
-                    'passenger_type' => "ADT",
-                    'eticket_number' => $pnr,
-                    'passenger_first_name' => $request->infant_first_name[$key],
-                    'passenger_last_name' => $request->infant_last_name[$key],
-                    'passenger_title' => $request->infant_title[$key],
-                    'gender' => $request->infant_gender[$key],
-                    'date_of_birth' => $request->infant_dob[$key],
-                    'passenger_nationality' => $request->infant_nationality[$key],
-                    'passport_number' => $request->infant_passport[$key],
-                    'passport_issue_country' => $request->infant_passport_country[$key],
-                    'passport_issue_date' => $request->infant_passport_issue[$key],
-                    'passport_expiry_date' => $request->infant_passport_expiry[$key],
-                ]);
-            }
-        }
-    }
-
-    public function savePriceDetails($flight_booking_id, $segmentsArray, $fareIdsArray, $search_details)
-    {
-        $fares = [];
-
-        $adult_price = 0;
-        $adult_tax = 0;
-        $child_price = 0;
-        $child_tax = 0;
-        $infant_price = 0;
-        $infant_tax = 0;
-
-        foreach ($segmentsArray as $segments) {
-            foreach ($segments['fares'] as $fare) {
-                if (in_array($fare['FareTypeID'], $fareIdsArray)) {
-                    $fares[] = $fare;
-                }
-            }
-        }
-
-        foreach ($fares as $fare) {
-            foreach ($fare['FareInfos'] as $FareInfos) {
-                foreach ($FareInfos as $FareInfo) {
-                    foreach ($FareInfo['Pax'] as $Pax) {
-                        if ($Pax['PTCID'] == 1) {
-                            $adult_price += $Pax['FareAmtNoTaxes'];
-                            $adult_tax += $Pax['DisplayTaxSum'];
-                        }
-                        if ($Pax['PTCID'] == 5) {
-                            $infant_price += $Pax['FareAmtNoTaxes'];
-                            $infant_tax += $Pax['DisplayTaxSum'];
-                        }
-                        if ($Pax['PTCID'] == 6) {
-                            $child_price += $Pax['FareAmtNoTaxes'];
-                            $child_tax += $Pax['DisplayTaxSum'];
-                        }
-                    }
-                }
-            }
-        }
-
-        $margins = getMargin();
-
-
-        $total_amt = $adult_price +  $infant_price + $child_price;
-        $total_tax = $adult_tax + $infant_tax + $child_tax;
-        $grand_total = $total_amt + $total_tax;
-
-
-        $adminMargin = $margins['admin_margin'];
-        $adminMarginAmount = (($grand_total / 100) * $margins['admin_margin']);
-        $adminMarginAmount = number_format(floor($adminMarginAmount * 100) / 100, 2, '.', '');
-
-        $agentsMarginAmount = (($grand_total / 100) * ($margins['totalmargin'] - $margins['admin_margin']));
-        $agentsMarginAmount = ($agentsMarginAmount != 0) ? number_format(floor($agentsMarginAmount * 100) / 100, 2, '.', '') : 0;
-
-        $total_amount = convertCurrency($grand_total + $adminMarginAmount + $agentsMarginAmount, 'AED');
-
-        FlightBookings::where('id', $flight_booking_id)
-            ->update([
-                'adult_amount' => convertCurrency((($adult_price / 100) * $margins['totalmargin']) + $adult_price, 'AED'),
-                'child_amount' => convertCurrency((($child_price / 100) * $margins['totalmargin']) + $child_price, 'AED'),
-                'infant_amount' => convertCurrency((($infant_price / 100) * $margins['totalmargin']) + $infant_price, 'AED'),
-                'total_tax' => convertCurrency((($total_tax / 100) * $margins['totalmargin']) + $total_tax, 'AED'),
-                'total_amount' => $total_amount,
-
-                'total_amount_actual' => convertCurrency($total_amt, 'AED'),
-                'total_tax_actual' => convertCurrency($total_tax, 'AED'),
-
-                'admin_margin' => convertCurrency($adminMargin, 'AED'),
-                'admin_amount' => number_format((convertCurrency($adminMarginAmount, 'AED')), 2, '.', ''),
-                'agents_amount' => number_format((convertCurrency($agentsMarginAmount, 'AED')), 2, '.', ''),
-            ]);
-
-
-        // Agetnt margins
-        $oneCurrency = convertRate('AED', "USD");
-
-        if (isset($margins['agent_margin'])) {
-            $currentAgentMargin = $margins['agent_margin'];
-            $agentAmount = (($grand_total / 100) * $currentAgentMargin);
-            $agentAmount = number_format(floor($agentAmount * 100) / 100, 2, '.', '');
-
-            $deductUsd = convertCurrency($total_amount, 'AED', 'USD');
-
-            $currentAgent = UserDetails::where('user_id', Auth::user()->id)->first();
-            $currentCredit = $currentAgent->credit_balance;
-
-            $currentCreditNew = $currentCredit - $deductUsd;
-            $agentUSD = convertCurrency($agentAmount, 'AED', 'USD');
-            $agentMargins[] = array(
-                'booking_id' => $flight_booking_id,
-                'agent_id'   => Auth::user()->id,
-                'from_agent_id' => NULL,
-                'margin'     => $currentAgentMargin,
-                'amount'    => $total_amount,
-                'total_amount' => $grand_total,
-                'currency' => getActiveCurrency(),
-                'usd_amount' => $deductUsd,
-                'usd_rate' => $oneCurrency,
-                'credit_balance' => $currentCreditNew,
-                'transaction_type' => 'dr',
-                'created_at' => date('Y-m-d H:i:s')
-            );
-
-            $agentMargins[] = array(
-                'booking_id' => $flight_booking_id,
-                'agent_id'   => Auth::user()->id,
-                'from_agent_id' => NULL,
-                'margin'     => $currentAgentMargin,
-                'amount'    => $agentAmount,
-                'total_amount' => $grand_total,
-                'currency' => getActiveCurrency(),
-                'usd_amount' => $agentUSD,
-                'usd_rate' => $oneCurrency,
-                'transaction_type' => 'cr',
-                'credit_balance' => $currentCreditNew + $agentUSD,
-                'created_at' => date('Y-m-d H:i:s')
-            );
-            $currentAgent->credit_balance = ($currentCreditNew + $agentUSD);
-            $currentAgent->save();
-        }
-        if (isset($margins['main_agents'])) {
-            foreach ($margins['main_agents'] as $agentid => $marg) {
-                $agentAmount = (($grand_total / 100) * $marg);
-                $agentAmount = number_format(floor($agentAmount * 100) / 100, 2, '.', '');
-
-                $creditAmount = $agentAmount;
-                $creditUsd = number_format(($creditAmount * $oneCurrency), 2, '.', '');
-                $mainAgent = UserDetails::where('user_id', $agentid)->first();
-                $currentCreditMain = $mainAgent->credit_balance;
-                $mainAgent->credit_balance += $creditUsd;
-                $mainAgent->save();
-
-                $agentUSDMain = number_format(($agentAmount * $oneCurrency), 2, '.', '');
-                $agentMargins[] = array(
-                    'booking_id' => $flight_booking_id,
-                    'agent_id'   =>  $agentid,
-                    'from_agent_id' => Auth::user()->id,
-                    'margin'     => $marg,
-                    'amount'    => $agentAmount,
-                    'total_amount' => $grand_total,
-                    'currency' => getActiveCurrency(),
-                    'usd_amount' => $agentUSDMain,
-                    'usd_rate' => $oneCurrency,
-                    'transaction_type' => 'cr',
-                    'credit_balance' => $currentCreditMain + $agentUSDMain,
-                    'created_at' => date('Y-m-d H:i:s')
-                );
-            }
-        }
-
-        // echo '<pre>';
-        // print_r($agentMargins);
-        if (!empty($agentMargins)) {
-            FlightMarginAmounts::insert($agentMargins);
-        }
     }
 }

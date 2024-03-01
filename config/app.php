@@ -144,6 +144,12 @@ return [
         // 'store'  => 'redis',
     ],
 
+    'payment_status' => [
+        'pending' => 'payment_pending',
+        'completed' => 'payment_completed',
+        'failed' => 'payment_failed',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

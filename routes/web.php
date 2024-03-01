@@ -10,6 +10,7 @@ use App\Http\Controllers\Providers\Yasin\YasinBookingController;
 use App\Models\ExchangeRate;
 use App\Models\FlightBookings;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -25,15 +26,29 @@ use Illuminate\Support\Facades\Http;
 |
 */
 
+Route::get('/ngreturn', function (Request $request) {
+    return ngDecodeData($request->ref);
+});
 
-Route::get('/payment_test', function () {
-    return view('web.demo');
+Route::get('/ngcancel', function (Request $request) {
+    return redirect()->route('flight.booking.fail');
 });
 
 Route::get('/cur', function () {
+    sendBookingMail('UK0HHA');
 
+    // $margin = getMargin();
 
+    // // dd($margin);
 
+    // // // dd(ngRequestAccessToken());
+    // // dd(ngCreateOrder());
+    // return ngCreateOrder([
+    //     'pnr' => "JWTAYU",
+    //     'search_id' => 'search_1111',
+    //     'amt' => 1000,
+    //     'amtReal' => 900
+    // ]);
 
     // $booking = FlightBookings::find(2);
     // $action = "cancelBooking";
@@ -87,34 +102,34 @@ Route::get('/cur', function () {
     // return view('web.provides.flydubai.ancillary');
 
 
-    Cache::forget('exchange_rates');
-    Cache::remember('exchange_rates', now()->addDay(1), function () {
-        $url = 'https://api.currencybeacon.com/v1/convert';
+    // Cache::forget('exchange_rates');
+    // Cache::remember('exchange_rates', now()->addDay(1), function () {
+    //     $url = 'https://api.currencybeacon.com/v1/convert';
 
-        $rates = ExchangeRate::all();
-        foreach ($rates as $rate) {
-            $data = [
-                'from' => $rate->from,
-                'to' => $rate->to,
-                'amount' => 1,
-                'api_key' => env('CURRENCY_API_KEY')
-            ];
+    //     $rates = ExchangeRate::all();
+    //     foreach ($rates as $rate) {
+    //         $data = [
+    //             'from' => $rate->from,
+    //             'to' => $rate->to,
+    //             'amount' => 1,
+    //             'api_key' => env('CURRENCY_API_KEY')
+    //         ];
 
-            $response = Http::timeout(300)->withOptions(['verify' => false])
-                ->get($url, $data);
+    //         $response = Http::timeout(300)->withOptions(['verify' => false])
+    //             ->get($url, $data);
 
-            $apiResult = $response->json();
+    //         $apiResult = $response->json();
 
-            if ($apiResult && isset($apiResult['meta']['code']) && $apiResult['meta']['code'] == 200) {
-                $rate->rate =  number_format((float)$apiResult['value'], 10, '.', '');
-                $rate->save();
-            }
-        }
+    //         if ($apiResult && isset($apiResult['meta']['code']) && $apiResult['meta']['code'] == 200) {
+    //             $rate->rate =  number_format((float)$apiResult['value'], 10, '.', '');
+    //             $rate->save();
+    //         }
+    //     }
 
-        return  $rates;
-    });
+    //     return  $rates;
+    // });
 
-    dd(Cache::get('exchange_rates'));
+    // dd(Cache::get('exchange_rates'));
 
     // $resultData = json_decode($apiResult, true);
 
@@ -192,8 +207,8 @@ Route::group(['middleware' => ['auth', 'web']], function () {
     Route::post('/subagent-update', [HomeController::class, 'updateSubAgent'])->name('subagent.update');
     Route::post('/subagent-delete', [HomeController::class, 'deleteSubAgent'])->name('subagent.delete');
     Route::get('/subagent-view/{agent}', [HomeController::class, 'viewSubAgent'])->name('subagent.view');
-    Route::post('/agent-profile-update', [HomeController::class, 'updateAgentProfile'])->name('agent.profile.update');
-    Route::get('/agent-profile', [HomeController::class, 'viewAgentProfile'])->name('agent.profile');
+    Route::post('/my-profile-update', [HomeController::class, 'updateAgentProfile'])->name('agent.profile.update');
+    Route::get('/my-profile', [HomeController::class, 'viewAgentProfile'])->name('agent.profile');
 
     Route::get('/flights/cancel', [FlightsController::class, 'cancelTicket'])->name('flight.cancel');
     // Route::get('/flights/voidQuote', [FlightsController::class, 'voidQuote'])->name('flight.voidQuote');

@@ -45,6 +45,8 @@ class FlightBookings extends Model
         'parent_id',
         'customer_name',
         'reschedule_fare_difference',
-        'is_domestic'
+        'is_domestic',
+        'payment_status',
+        'payment_reference',
     ];
 }

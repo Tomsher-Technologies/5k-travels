@@ -7,7 +7,7 @@
                 <div class="col-lg-12">
                     <div class="common_bannner_text text-dark">
                         <h2>
-                            @if (!empty($booking))
+                            @if (!empty($bookings))
                                 Successfully Booked
                             @endif
                         </h2>
@@ -18,27 +18,347 @@
 
     </section>
     <!-- Tour Booking Submission Areas -->
-    <section id="tour_booking_submission" class="section_padding" style="padding: 150px 0;">
+    <section id="tour_booking_submission" class="section_padding" style="padding: 20px 0;">
         <div class="container container-bboking">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="tou_booking_form_Wrapper padding20 text-center">
-                        @if (!empty($booking))
-                            <i class="fa fa-check-circle" style=" color: #21ff85; font-size: 55px; margin-bottom: 20px;">
-                            </i>
-                            <h3><b>Successfully Booked</b></h3>
+                    <div class="tou_booking_form_Wrapper padding20">
 
-                            <h3 style="padding: 10px 0 0">
-                                Your {{ $booking->direction }} trip from <b>{{ $booking->origin }}</b> to
-                                <b>{{ $booking->destination }}</b> has been succesfully booked.
-                            </h3>
-                            <h3 style="padding: 10px 0">
-                                Your Booking Id is <b>{{ $booking->unique_booking_id }}</b>
-                            </h3>
+                        @if (!empty($bookings))
+                            <div class="col-sm-12">
+                                <div class="card-box table-responsive">
+                                    <div class="dashboard_common_table col-sm-12">
+                                        <div id="tab-booking-details">
+                                            <div class="tab-content">
+                                                <div class="tab-pane fade show active" id="family-house" role="tabpanel">
+                                                    <div class="accordion accordion--separated accordion--secondary"
+                                                        id="accordionExample">
+                                                        <div class="accordion-item">
+                                                            @php $airlinePNR = ''; @endphp
+                                                            <div id="collapseOne" style="">
+                                                                <div class="">
+                                                                    <div class="fb-cb" style="padding: 2%;">
+
+                                                                        @if (isset($bookings))
+                                                                            <h3 class="fw-medium mb-3 text-left">
+                                                                                {{ $bookings->direction }} trip from
+                                                                                {{ $bookings->origin }} to
+                                                                                {{ $bookings->destination }}
+                                                                                <span style="font-size: 14px;float: right;"
+                                                                                    class="mt-2">Booking Id :
+                                                                                    {{ $bookings->unique_booking_id }}</span>
+                                                                            </h3>
+
+                                                                            @foreach ($bookings['flights'] as $flights)
+                                                                                @php
+                                                                                    $airlineData = getAirlineData(
+                                                                                        $flights->marketing_airline_code,
+                                                                                    );
+                                                                                    $deptAirportData = getAirportData(
+                                                                                        $flights->departure_airport,
+                                                                                    );
+                                                                                    $arrAirportData = getAirportData(
+                                                                                        $flights->arrival_airport,
+                                                                                    );
+                                                                                    $airlinePNR = $flights->airline_pnr;
+                                                                                @endphp
+                                                                                <div class="row y-gap-10 justify-between">
+                                                                                    <div class="col-auto">
+                                                                                        <div
+                                                                                            class="d-flex items-center mb-15">
+                                                                                            <div
+                                                                                                class="flight_logo d-flex justify-center mr-15">
+                                                                                                <img src="{{ isset($airlineData) ? $airlineData['AirLineLogo'] : '' }}"
+                                                                                                    alt="image">
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="text-14 text-light-1">
+                                                                                                {{ isset($airlineData) ? $airlineData['AirLineName'] : '' }}
+                                                                                                {{ $flights->flight_number }}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="relative z-0">
+                                                                                            <div class="border-line-2">
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="d-flex items-center">
+                                                                                                <div
+                                                                                                    class="w-28 d-flex justify-center mr-15">
+                                                                                                    <div
+                                                                                                        class="size-10 border-light rounded-full bg-white">
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col-auto">
+                                                                                                        <div
+                                                                                                            class="lh-14 fw-500">
+                                                                                                            {{ date('d M, Y', strtotime($flights->departure_date_time)) }}
+                                                                                                        </div>
+                                                                                                        <div
+                                                                                                            class="lh-14 fw-500">
+                                                                                                            {{ date('H:i', strtotime($flights->departure_date_time)) }}
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col-auto">
+                                                                                                        <div
+                                                                                                            class="lh-14 fw-500">
+                                                                                                            {{ $deptAirportData['AirportName'] }},
+                                                                                                            {{ $deptAirportData['City'] }}
+                                                                                                            ({{ $flights->departure_airport }})
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="d-flex items-center m-15">
+                                                                                                <div
+                                                                                                    class="w-28 d-flex justify-center mr-15">
+                                                                                                    <img src="{{ asset('assets/img/icon/plane.svg') }}"
+                                                                                                        alt="image">
+                                                                                                </div>
+                                                                                                @if ($flights->journey_duration)
+                                                                                                    @if ($bookings->api_provider == 'flydubai')
+                                                                                                        <div
+                                                                                                            class="text-14 text-light-1">
+                                                                                                            {{ convertSecsToHours($flights->journey_duration) }}
+                                                                                                        </div>
+                                                                                                    @else
+                                                                                                        <div
+                                                                                                            class="text-14 text-light-1">
+                                                                                                            {{ convertToHoursMins($flights->journey_duration) }}
+                                                                                                        </div>
+                                                                                                    @endif
+                                                                                                @endif
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="d-flex items-center mt-15">
+                                                                                                <div
+                                                                                                    class="w-28 d-flex justify-center mr-15">
+                                                                                                    <div
+                                                                                                        class="size-10 border-light rounded-full bg-border">
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col-auto">
+                                                                                                        <div
+                                                                                                            class="lh-14 fw-500">
+                                                                                                            {{ date('d M, Y', strtotime($flights->arrival_date_time)) }}
+                                                                                                        </div>
+                                                                                                        <div
+                                                                                                            class="lh-14 fw-500">
+                                                                                                            {{ date('H:i', strtotime($flights->arrival_date_time)) }}
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col-auto">
+                                                                                                        <div
+                                                                                                            class="lh-14 fw-500">
+                                                                                                            {{ $arrAirportData['AirportName'] }},
+                                                                                                            {{ $arrAirportData['City'] }}
+                                                                                                            ({{ $flights->arrival_airport }})
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-auto text-right md:text-left"
+                                                                                        style="line-height:30px">
+                                                                                        @php
+                                                                                            $cabinClass = '';
+                                                                                            if (
+                                                                                                $flights->cabin_class ==
+                                                                                                'Y'
+                                                                                            ) {
+                                                                                                $cabinClass = 'Economy';
+                                                                                            } elseif (
+                                                                                                $flights->cabin_class ==
+                                                                                                'S'
+                                                                                            ) {
+                                                                                                $cabinClass =
+                                                                                                    'Premium Economy';
+                                                                                            } elseif (
+                                                                                                $flights->cabin_class ==
+                                                                                                'C'
+                                                                                            ) {
+                                                                                                $cabinClass =
+                                                                                                    'Business';
+                                                                                            } elseif (
+                                                                                                $flights->cabin_class ==
+                                                                                                'F'
+                                                                                            ) {
+                                                                                                $cabinClass = 'First';
+                                                                                            }
+                                                                                        @endphp
+
+                                                                                        <div class="text-14 text-light-1">
+                                                                                            {{ $cabinClass }}</div>
+                                                                                        <div class="text-14 mt-15 md:mt-5">
+                                                                                            Airline PNR :<strong>
+                                                                                                {{ $airlinePNR }}</strong>
+                                                                                        </div>
+                                                                                        <!-- <div class="text-14 mt-15 md:mt-5">Cabin bag <strong> 7
+                                                                                                Kgs</strong><br>
+                                                                                            Check-in<strong> 30 Kgs</strong><br>
+                                                                                            Cancellation Fee Starting AED 307 upto 3 days before
+                                                                                            departure
+
+
+                                                                                        </div> -->
+                                                                                    </div>
+                                                                                </div>
+                                                                                <hr>
+                                                                            @endforeach
+
+                                                                            <div class="row">
+                                                                                @foreach ($bookings['passengers'] as $pass)
+                                                                                    <div class="col-md-6">
+                                                                                        <div class="traveler-b-detl">
+
+                                                                                            <h4>TRAVELLER
+                                                                                                ({{ $pass->passenger_type == 'ADT' ? 'Adult' : ($pass->passenger_type == 'CHD' ? 'Child' : 'Infant') }})
+                                                                                                - <span
+                                                                                                    class="head-travel">{{ $pass->is_return == 0 ? 'Onward Trip' : 'Return Trip' }}</span>
+                                                                                            </h4>
+                                                                                            <div class="form-check-label">
+                                                                                                <span
+                                                                                                    class="mb-2 fw-semibold fs-12 d-block text-muted text-uppercase fw-500">
+                                                                                                    {{ $pass->passenger_first_name }}
+                                                                                                    {{ $pass->passenger_last_name }}
+                                                                                                </span>
+                                                                                                @php
+
+                                                                                                @endphp
+                                                                                                <span
+                                                                                                    class="fs-14 mb-2 fw-semibold  d-block">Gender
+                                                                                                    :
+                                                                                                    {{ $pass->gender }}</span>
+                                                                                                <span
+                                                                                                    class="fs-14 mb-2 fw-semibold  d-block">Date
+                                                                                                    Of Birth :
+                                                                                                    {{ date('Y-m-d', strtotime($pass->date_of_birth)) }}</span>
+                                                                                                <span
+                                                                                                    class="fs-14 mb-2 fw-semibold  d-block">Passport
+                                                                                                    Number :
+                                                                                                    {{ $pass->passport_number }}</span>
+
+                                                                                                <span
+                                                                                                    class=" mb-2 fw-600 d-block">E-TICKET
+                                                                                                    NUMBER :
+                                                                                                    {{ $pass->eticket_number }}</span>
+                                                                                                <!-- <span class=" mb-2 fw-600 d-block">SEAT : 16F</span>
+                                                                                        <span class=" mb-2 fw-600 d-block">MEAL : Biriyani,
+                                                                                            Coffee</span> -->
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                @endforeach
+
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    @if (!empty($bookings['extraServices']))
+                                        @php
+                                            $desc = [
+                                                'GROUP_PAX' => '(Entire group)',
+                                                'PER_PAX' => '(Each passenger)',
+                                                'GROUP_PAX_INBOUND' => '(Entire group only on the return trip)',
+                                                'GROUP_PAX_OUTBOUND' => '(Entire group only on for the onward travel)',
+                                                'PER_PAX_INBOUND' => '(Each passenger only on the return trip)',
+                                                'PER_PAX_OUTBOUND' => '(Each passenger only on for the onward travel)',
+                                            ];
+                                        @endphp
+                                        <div class="tour_detail_right_sidebar mt-1 col-sm-12" style="padding: 1%;">
+                                            <div class="tour_details_right_boxed">
+                                                <div class="tour_details_right_box_heading">
+                                                    <h3>Extra Services</h3>
+                                                </div>
+
+                                                <div class="tour_booking_amount_area">
+                                                    <ul>
+                                                        @foreach ($bookings['extraServices'] as $extra)
+                                                            <li style="border-bottom:none;">{{ $extra->description }}
+                                                                {{ isset($desc[$extra->behavior]) ? $desc[$extra->behavior] : '' }}
+                                                                <span>{{ $extra->currency }}
+                                                                    {{ $extra->service_amount }}</span>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div class="tour_detail_right_sidebar mt-1 col-sm-12" style="padding: 1%;">
+                                        <div class="tour_details_right_boxed">
+                                            <div class="tour_details_right_box_heading">
+                                                <h3>Fare Details</h3>
+                                            </div>
+
+                                            <div class="tour_booking_amount_area">
+                                                <ul>
+                                                    @if ($bookings->adult_count != 0)
+                                                        <li>Adult Price x {{ $bookings->adult_count }}
+                                                            <span>{{ $bookings->currency }}
+                                                                {{ $bookings->adult_amount }}</span>
+                                                        </li>
+                                                    @endif
+
+                                                    @if ($bookings->child_count != 0)
+                                                        <li>Child Price x {{ $bookings->child_count }}
+                                                            <span>{{ $bookings->currency }}
+                                                                {{ $bookings->child_amount }}</span>
+                                                        </li>
+                                                    @endif
+
+                                                    @if ($bookings->infant_count != 0)
+                                                        <li>Infant Price x {{ $bookings->infant_count }}
+                                                            <span>{{ $bookings->currency }}
+                                                                {{ $bookings->infant_amount }}</span>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                                <div class="tour_bokking_subtotal_area">
+                                                    <h6>Total Base Fare <span>{{ $bookings->currency }}
+                                                            {{ $bookings->adult_amount + $bookings->child_amount + $bookings->infant_amount }}</span>
+                                                    </h6>
+                                                </div>
+                                                <div class="tour_bokking_subtotal_area">
+                                                    <h6>Total Tax <span>{{ $bookings->currency }}
+                                                            {{ $bookings->total_tax }}</span></h6>
+                                                </div>
+
+                                                <div class="tour_bokking_subtotal_area">
+                                                    <h6>Add Ons <span id="addons">{{ $bookings->currency }}
+                                                            {{ $bookings->addon_amount }}</span></h6>
+                                                </div>
+                                                <div class="total_subtotal_booking">
+                                                    <h4 class="font-size20 bold">Total Amount
+                                                        <span>{{ $bookings->currency }}
+                                                            {{ $bookings->total_amount }}</span>
+                                                    </h4>
+                                                </div>
+                                                <hr>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @else
                             <i class="fa fa-xmark-circle" style=" color: #ff2121; font-size: 55px; margin-bottom: 20px;">
                             </i>
-                            <h3>{{ $msg }}</h3>
                         @endif
                     </div>
                 </div>

@@ -492,7 +492,6 @@
             $('#yasaddToCart input[name=rtn_rbd]').val(rtn_rbd);
         }
 
-        console.log([dep_rbd, rtn_rbd]);
 
         if (dep_rbd !== '' && rtn_rbd !== '') {
             $('#yasstickyButton').show();

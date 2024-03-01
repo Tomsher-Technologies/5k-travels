@@ -275,7 +275,7 @@ $('.oAdult').on('click touchstart', function (event) {
     var counter = $('#oAdult').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if (result != 0) {
+    if (result > 0 && result <= 9) {
         $('#oAdult').val(result);
         addOnewayValue(elemId);
     }
@@ -288,7 +288,7 @@ $('.oChild').on('click touchstart', function (event) {
     var counter = $('#oChild').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if (result >= 0) {
+    if (result >= 0 && result <= 9) {
         $('#oChild').val(result);
         addOnewayValue(elemId);
     }
@@ -301,7 +301,8 @@ $('.oInfant').on('click touchstart', function (event) {
     var counter = $('#oInfant').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if (result >= 0) {
+    var adultCount = $('#oAdult').val();
+    if (result >= 0 && result <= adultCount) {
         $('#oInfant').val(result);
         addOnewayValue(elemId);
     }
@@ -322,7 +323,7 @@ $('.rAdult').on('click touchstart', function (event) {
     var counter = $('#rAdult').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if (result != 0) {
+    if (result > 0 && result <= 9) {
         $('#rAdult').val(result);
         addReturnValue(elemId);
     }
@@ -335,7 +336,7 @@ $('.rChild').on('click touchstart', function (event) {
     var counter = $('#rChild').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if (result >= 0) {
+    if (result >= 0 && result <= 9) {
         $('#rChild').val(result);
         addReturnValue(elemId);
     }
@@ -348,7 +349,8 @@ $('.rInfant').on('click touchstart', function (event) {
     var counter = $('#rInfant').val();
     var parsed = parseInt(counter);
     var result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if (result >= 0) {
+    var adultCount = $('#rAdult').val();
+    if (result >= 0 && result <= adultCount) {
         $('#rInfant').val(result);
         addReturnValue(elemId);
     }
