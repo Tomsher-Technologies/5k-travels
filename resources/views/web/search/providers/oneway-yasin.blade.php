@@ -60,7 +60,7 @@
                 echo $displayAmount;
             @endphp
         </h2>
-        <form action="{{ route('yasin.details') }}" method="POST">
+        <form action="{{ route('yasin.details') }}" class="yasonewayform" method="POST" >
             @csrf
             <input value="{{ $data['search_id'] }}" type="hidden" name="search_id">
             <input value="{{ $fdata['AirLine'] }}" type="hidden" name="Airline">
@@ -70,7 +70,7 @@
             <input value="{{ $fdata['RBD'] }}" type="hidden" name="RBD">
             <input value="{{ $fdata['RPH'] }}" type="hidden" name="RPH">
             <input value="{{ $fdata['total_price'] }}" type="hidden" name="price">
-            <button type="submit" class="btn btn_theme btn_sm w-100">Book Now</button>
+            <button type="submit" class="btn btn_theme btn_sm w-100 yasonewaysubmit">Book Now</button>
         </form>
     </div>
 </div>

@@ -1,17 +1,17 @@
 var one_way_sum = 1;
 
 function addOnewayValue(elemId) {
-    one_way_sum = (elemId == 'plus') ? parseInt(one_way_sum)+1  : parseInt(one_way_sum)-1;
+    one_way_sum = (elemId == 'plus') ? parseInt(one_way_sum) + 1 : parseInt(one_way_sum) - 1;
     var passenger = (one_way_sum > 1) ? ' Passengers' : ' Passenger';
     $('.one_way_final_count').text(`${one_way_sum}` + passenger);
 }
 
 $('.oAdult').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#oAdult').val();
+    var counter = $('#oAdult').val();
     var parsed = parseInt(counter);
     let result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result !=0){
+    if (result > 0 && result <= 9) {
         $('#oAdult').val(result);
         addOnewayValue(elemId);
     }
@@ -21,10 +21,10 @@ $('.oAdult').on('click touchstart', function (event) {
 
 $('.oChild').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#oChild').val();
+    var counter = $('#oChild').val();
     var parsed = parseInt(counter);
     let result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#oChild').val(result);
         addOnewayValue(elemId);
     }
@@ -34,10 +34,10 @@ $('.oChild').on('click touchstart', function (event) {
 
 $('.oInfant').on('click touchstart', function (event) {
     var elemId = $(this).attr('id');
-    var counter =  $('#oInfant').val();
+    var counter = $('#oInfant').val();
     var parsed = parseInt(counter);
     let result = elemId == "minus" ? parsed - 1 : parsed + 1;
-    if(result >= 0){
+    if (result >= 0) {
         $('#oInfant').val(result);
         addOnewayValue(elemId);
     }

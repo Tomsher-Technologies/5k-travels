@@ -77,10 +77,9 @@ class FlightsController extends Controller
         $data['flightData'] = Airlines::get()->keyBy('AirLineCode')->toArray();
         $data['airports'] = Airports::get()->keyBy('AirportCode')->toArray();
         $data['search_type'] = $request->search_type;
-        $data['margins'] = (Auth::check()) ? getAgentMarginData(Auth::user()->id) : getUserMarginData();
+        $data['margins'] = getMargin();
         $data['cabin_type'] = $cabin_type;
         $data['search_id'] = $search_id;
-
 
         $fly_dubai_con = new FlyDubaiController();
         $fly_dubai_res = $fly_dubai_con->search($request, $search_id);
@@ -153,7 +152,7 @@ class FlightsController extends Controller
 
             $LFID = $request->LFID;
 
-            $margin = Auth::check() ? getAgentMarginData(Auth::user()->id) : getUserMarginData();
+            $margin = getMargin();
 
             $viewdata = view('web.provides.flydubai.details', compact('matchingFlight', 'cabin_type', 'LFID', 'margin', 'data'))->render();
             $msg = array(
@@ -196,18 +195,6 @@ class FlightsController extends Controller
         }
 
         return  json_encode($msg);
-    }
-
-    public function sendBookingMail($bookings)
-    {
-        $name = $to_name = $bookings[0]->customer_name;
-        $to_email = $bookings[0]->customer_email;
-        $viewdata = view('web.booking_email', compact('name', 'bookings'))->render();
-        $data = array('name' => $to_name, 'body' => $viewdata);
-        Mail::send('web.email.booking_email', $data, function ($message) use ($to_name, $to_email) {
-            $message->to($to_email, $to_name)->subject('Flight Booked!');
-            $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-        });
     }
 
     public function sendReissueBookingMail($bookings)
@@ -270,9 +257,10 @@ class FlightsController extends Controller
     public function bookingSuccess(Request $request)
     {
         if ($request->pnr) {
-            $booking = FlightBookings::where('unique_booking_id', $request->pnr)->firstOrFail();
-            $booking['passengers'] = FlightPassengers::where('booking_id', $booking->id)->get();
-            return view('web.booking_success', compact('booking'));
+            $bookings = FlightBookings::where('unique_booking_id', $request->pnr)->firstOrFail();
+            $bookings['passengers'] = FlightPassengers::where('booking_id', $bookings->id)->get();
+            $bookings['flights'] = FlightItineraryDetails::where('booking_id', $bookings->id)->orderBy('id', 'ASC')->get();
+            return view('web.booking_success', compact('bookings'));
         } else {
             abort(404);
         }

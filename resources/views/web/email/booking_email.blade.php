@@ -19,8 +19,9 @@
 
 <body>
 
-    <section style="font-family: 'Poppins', sans-serif; box-sizing: border-box; font-size: 15px; width: 100%; background-color: transparent; margin: 35px 0;color: #06283D;">
-       {!! $body !!}
+    <section
+        style="font-family: 'Poppins', sans-serif; box-sizing: border-box; font-size: 15px; width: 100%; background-color: transparent; margin: 35px 0;color: #06283D;">
+        {!! $body !!}
     </section>
 
 

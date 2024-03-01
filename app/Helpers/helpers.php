@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Providers\FlyDubaiController;
+use App\Http\Controllers\Providers\Yasin\YasinBookingController;
 use Carbon\Carbon;
 use App\Models\UserDetails;
 use App\Models\GeneralSettings;
@@ -7,13 +9,18 @@ use App\Models\FlightBookings;
 use App\Models\Airlines;
 use App\Models\Airports;
 use App\Models\ExchangeRate;
+use App\Models\FlightExtraServices;
+use App\Models\FlightItineraryDetails;
+use App\Models\FlightPassengers;
 use App\Models\User;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 
 use function PHPUnit\Framework\returnSelf;
@@ -117,6 +124,14 @@ if (!function_exists('convertMinsToHours')) {
         return $hours . ' hrs ' . $min . ' min';
     }
 }
+if (!function_exists('convertSecsToHours')) {
+    function convertSecsToHours($secs)
+    {
+        return gmdate("H \h\\r\\s i \\m\\i\\n", $secs);
+    }
+}
+
+
 if (!function_exists('getAirlines')) {
     function getAirlines()
     {
@@ -160,7 +175,7 @@ if (!function_exists('getUserMarginData')) {
 
 function getMargin()
 {
-    if (Auth::check()) {
+    if (Auth::check() && Auth::user()->user_type == 'agent') {
         return getAgentMarginData(Auth::user()->id);
     }
     return getUserMarginData();
@@ -189,8 +204,8 @@ if (!function_exists('getAirlineData')) {
     function getAirlineData($code)
     {
         $details = Airlines::select('*')->where('AirLineCode', $code)
-            ->get()->toArray();
-        if (isset($details[0])) {
+            ->first()->toArray();
+        if (isset($details)) {
             $details = $details;
         } else {
             $details[] = array(
@@ -304,16 +319,20 @@ function generateApiToken()
     try {
         $response = Http::timeout(300)->withOptions(['verify' => false])->asForm()->post(env('FLY_DUBAI_API_URL') . 'authenticate', $data);
 
-        $result = $response->getBody()->getContents();
-        $res = json_decode($result);
+        if ($response->successful()) {
+            $result = $response->getBody()->getContents();
+            $res = json_decode($result);
 
-        $nowTime = strtotime(date("Y-m-d H:i:s"));
-        $expiryTime = date("Y-m-d H:i:s", strtotime('+2399 seconds', $nowTime));
-        session(['api_token' => $res->access_token]);
-        session(['api_token_expiry' => $expiryTime]);
-        session()->save();
+            $nowTime = strtotime(date("Y-m-d H:i:s"));
+            $expiryTime = date("Y-m-d H:i:s", strtotime('+2399 seconds', $nowTime));
+            session(['api_token' => $res->access_token]);
+            session(['api_token_expiry' => $expiryTime]);
+            session()->save();
 
-        return $res->access_token;
+            return $res->access_token;
+        } else {
+            abort(500);
+        }
     } catch (\Illuminate\Http\Client\ConnectionException $e) {
         return null;
     } catch (RequestException $e) {
@@ -379,13 +398,12 @@ function createFDPassengerArray(Request $request)
 
 function getFDLowestFare($FareInfos)
 {
-    $lowest = PHP_INT_MAX;
-
+    $lowest = 0;
     if ($FareInfos) {
         foreach ($FareInfos as $FareInfo) {
             foreach ($FareInfo as $fareInfo) {
                 foreach ($fareInfo['Pax'] as $pax) {
-                    $lowest = min($lowest, $pax['FareAmtInclTax']);
+                    $lowest += $pax['FareAmtInclTax'];
                 }
             }
         }
@@ -566,12 +584,13 @@ function getFDCombinedData(&$FareTypes, $serviceDetails)
             } else {
                 $refund++;
             }
-
+            $total = 0;
             foreach ($FareType['FareInfos']['FareInfo'] as $fareInfo) {
                 foreach ($fareInfo['Pax'] as $pax) {
-                    $lowest = min($lowest, $pax['FareAmtInclTax']);
+                    $total += $pax['FareAmtInclTax'];
                 }
             }
+            $lowest = min($lowest, $total);
         }
     }
 
@@ -667,9 +686,31 @@ function getFDStops($fdata, $legDetails)
     return implode(', ', $stopsName);
 }
 
-function convertCurrency($amount, $fromCurrency)
+function convertRate($fromCurrency, $toCurreny = null)
 {
-    $activeCurreny = getActiveCurrency();
+    $activeCurreny = $toCurreny !== null ? $toCurreny : getActiveCurrency();
+
+    if ($activeCurreny == $fromCurrency) {
+        return 1;
+    }
+
+    $rates = Cache::remember('exchange_rates', now()->addDay(1), function () {
+        $rates = ExchangeRate::all();
+        return  $rates;
+    });
+
+    $cur = $rates->where('to', $activeCurreny)->where('from',  $fromCurrency)->first();
+
+    if ($cur) {
+        return $cur->rate;
+    }
+
+    return 1;
+}
+
+function convertCurrency($amount, $fromCurrency, $toCurreny = null, $format = true)
+{
+    $activeCurreny = $toCurreny !== null ? $toCurreny : getActiveCurrency();
 
     if ($activeCurreny == $fromCurrency) {
         return $amount;
@@ -683,7 +724,11 @@ function convertCurrency($amount, $fromCurrency)
     $cur = $rates->where('to', $activeCurreny)->where('from',  $fromCurrency)->first();
 
     if ($cur) {
-        return priceFormat($amount * $cur->rate);
+        if ($format) {
+            return priceFormat($amount * $cur->rate);
+        } else {
+            return $amount * $cur->rate;
+        }
     }
 
     return 1;
@@ -862,10 +907,8 @@ function getFarePrices($FareInfos)
 
     $margin = getMargin();
 
-    // dd($margin );
-
     foreach ($rates as $key => $rate) {
-        $rates[$key] += ($margin['totalmargin'] / 100) * $rate;
+        $rates[$key] += ($rate / 100) * $margin['totalmargin'];
     }
 
     return $rates;
@@ -1010,3 +1053,178 @@ function getYasinFlight($search_id, $rph, $rbd)
     return [];
 }
 // End Yasin
+
+
+// Start Payment
+function ngRequestAccessToken()
+{
+    $url = "https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token";
+    $options =  ['verify' => false];
+
+
+    if (App::environment('local')) {
+        $options = ['verify' => false];
+    }
+
+    $response = Http::timeout(300)->withOptions($options)->withHeaders([
+        "accept" => "application/vnd.ni-identity.v1+json",
+        "authorization" => "Basic " . env('NETWORK_API_KEY'),
+        "content-type" => "application/vnd.ni-identity.v1+json"
+    ])->post($url, [
+        'realmName' => 'ni'
+    ]);
+
+    if ($response->failed()) {
+        return null;
+    }
+
+    return $response->json();
+}
+
+function ngCreateOrder($data)
+{
+    $url = "https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/" . env('NETWORK_REFERENCE') . '/orders';
+    $options =  ['verify' => false];
+
+    if (App::environment('local')) {
+        $options = ['verify' => false];
+    }
+
+    $accessToken = ngRequestAccessToken();
+
+    if ($accessToken) {
+        $accessToken = $accessToken['access_token'];
+
+        $response = Http::timeout(300)->withOptions($options)->withHeaders([
+            "Content-Type" => "application/vnd.ni-payment.v2+json",
+            "Authorization" => "Bearer " . $accessToken,
+            "Accept" => "application/vnd.ni-payment.v2+json"
+        ])->post($url, [
+            'action' => 'SALE',
+            'amount' => [
+                'currencyCode' => "AED",
+                'value' => (int)$data['amt']
+            ],
+            'emailAddress' => Auth::user()->email,
+            'merchantAttributes' => [
+                'redirectUrl' => "http://5k.local:8000/ngreturn",
+                'cancelUrl' => "http://5k.local:8000/ngcancel",
+            ],
+            'merchantDefinedData' => [
+                "pnr" => $data['pnr'],
+                "search_id" => $data['search_id'],
+                "amtReal" => $data['amtReal'],
+            ]
+        ]);
+        // dd($data['amt']);
+        if ($response->failed()) {
+            return null;
+        }
+
+        $response_json = $response->json();
+
+
+
+        $reference = $response_json['reference'];
+
+        $booking = FlightBookings::where('unique_booking_id', $data['pnr'])->first();
+
+        $booking->payment_reference = $reference;
+        $booking->save();
+
+        $order_paypage_url = $response_json['_links']['payment']['href'];
+
+        return $order_paypage_url;
+    }
+
+    return null;
+}
+
+function ngDecodeData($ref)
+{
+    $url = "https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/" . env('NETWORK_REFERENCE') . '/orders/' . $ref;
+    $options =  ['verify' => true];
+
+    if (App::environment('local')) {
+        $options = ['verify' => false];
+    }
+
+    $accessToken = ngRequestAccessToken();
+
+    if ($accessToken) {
+        $accessToken = $accessToken['access_token'];
+
+        $response = Http::timeout(300)->withOptions($options)->withHeaders([
+            "Authorization" => "Bearer " . $accessToken,
+        ])->get($url);
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        $response_json = $response->json();
+        $status = $response_json['_embedded']['payment'][0]['state'];
+        $pnr = $response_json['merchantDefinedData']['pnr'];
+        $search_id = $response_json['merchantDefinedData']['search_id'];
+        $amtReal = $response_json['merchantDefinedData']['amtReal'];
+
+        $booking = FlightBookings::where('unique_booking_id', $pnr)->firstOrFail();
+
+        if ($status == 'FAILED') {
+            $booking->payment_status = config('app.payment_status.failed');
+            $booking->save();
+        } else {
+            $booking->payment_status = config('app.payment_status.completed');
+            if ($booking->api_provider == 'flydubai') {
+                $flydubai = new FlyDubaiController();
+                $payment_status = $flydubai->makePayment($search_id, $pnr, $amtReal);
+                if ($payment_status) {
+                    $booking->booking_status =  "Booked";
+                    $booking->ticket_status =  "Ticketed";
+                    $booking->save();
+                    sendBookingMail($pnr);
+                    return $flydubai->redirectSuccess($pnr);
+                } else {
+                    $booking->booking_status =  "Failed";
+                    $booking->ticket_status =  "Failed";
+                    $booking->save();
+                    return $flydubai->redirectFail();
+                }
+            } else if ($booking->api_provider == 'yasin') {
+                $booking->save();
+                $yasin = new YasinBookingController();
+                $payment_status = $yasin->confirmFlight($pnr);
+                return $payment_status;
+            }
+        }
+
+        return true;
+    }
+}
+
+function sendBookingMail($pnr)
+{
+    $bookings = getBookingDetails($pnr);
+
+    $name = $to_name = $bookings->customer_name;
+    $to_email = $bookings->customer_email;
+    $viewdata = view('web.booking_email', compact('name', 'bookings'))->render();
+    $data = array('name' => $to_name, 'body' => $viewdata);
+    Mail::send('web.email.booking_email', $data, function ($message) use ($to_name, $to_email) {
+        $message->to($to_email, $to_name)->subject('Flight Booked!');
+        $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+    });
+}
+
+function getBookingDetails($pnr)
+{
+    $bookings = FlightBookings::where('unique_booking_id', $pnr)->first();
+    if (isset($bookings)) {
+        $bookings['flights'] = FlightItineraryDetails::where('booking_id', $bookings->id)->orderBy('id', 'ASC')->get();
+        $bookings['passengers'] = FlightPassengers::where('booking_id', $bookings->id)->orderBy('id', 'ASC')->get();
+        $bookings['extraServices'] = FlightExtraServices::where('booking_id', $bookings->id)->orderBy('id', 'ASC')->get();
+    }
+    return $bookings;
+}
+
+// End Payment

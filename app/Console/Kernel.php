@@ -26,14 +26,18 @@ class Kernel extends ConsoleKernel
                 ];
                 $response = Http::timeout(300)->withOptions(['verify' => false])
                     ->get($url, $data);
-        
+
                 $apiResult = $response->json();
                 if ($apiResult && isset($apiResult['meta']['code']) && $apiResult['meta']['code'] == 200) {
                     $rate->rate =  number_format((float)$apiResult['value'], 10, '.', '');
                     $rate->save();
                 }
             }
-        })->daily();
+        })->everySixHours();
+
+        // $schedule->command('queue:work --stop-when-empty')
+        //     ->everyMinute()
+        //     ->withoutOverlapping();
     }
 
     /**

@@ -1,3 +1,61 @@
+// $(document).on('click', '.yasonewaysubmit', function (event) {
+//     event.preventDefault();
+
+//     var that = $(this);
+
+//     $.ajaxSetup({
+//         headers: {
+//             'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+//         }
+//     });
+//     $('.ajaxloader').css('display', 'block');
+
+//     $.ajax({
+//         type: "GET",
+//         url: config.routes.checklogin,
+//         success: function (data) {
+//             var resp = JSON.parse(data);
+//             if (resp.status == true) {
+//                 $('.ajaxloader').css('display', 'none');
+//                 $(this).parents('form:first').submit();
+//             } else {
+//                 $('.ajaxloader').css('display', 'none');
+//                 new bootstrap.Modal(document.getElementById("common_author-forms"), {}).show();
+//             }
+//         }
+//     });
+
+// });
+
+
+$('.yasonewayform').submit(function (event) {
+
+    event.preventDefault();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $('.ajaxloader').css('display', 'block');
+    var $form = $(this);
+    $.ajax({
+        type: "GET",
+        url: config.routes.checklogin,
+        success: function (data) {
+            var resp = JSON.parse(data);
+            if (resp.status == true) {
+                $('.ajaxloader').css('display', 'none');
+                $form .off('submit');
+                $form .submit();
+            } else {
+                $('.ajaxloader').css('display', 'none');
+                new bootstrap.Modal(document.getElementById("common_author-forms"), {}).show();
+            }
+        }
+    });
+});
+
 $(document).on('click', '.addToCart', function () {
 
     var form = $(this);
@@ -15,7 +73,6 @@ $(document).on('click', '.addToCart', function () {
         url: config.routes.checklogin,
         success: function (data) {
             var resp = JSON.parse(data);
-            console.log(resp.status);
             if (resp.status == true) {
                 $.ajax({
                     type: "POST",

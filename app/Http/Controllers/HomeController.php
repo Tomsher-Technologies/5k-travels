@@ -161,16 +161,17 @@ class HomeController extends Controller
 
     public function bookingDetails(Request $request)
     {
-        $bookings = FlightBookings::where('id', $request->id)->get();
+        $bookings = FlightBookings::where('id', $request->id)->first();
+        // dd($bookings);
         // echo '<pre>';
         // echo '================================' . $bookings[0]['ticket_status'];
         // print_r($bookings);
         // die;
-        if (isset($bookings[0])) {
+        if (isset($bookings)) {
             $itineraries = FlightItineraryDetails::where('booking_id', $request->id)->orderBy('id', 'ASC')->get();
             $passengers = FlightPassengers::where('booking_id', $request->id)->orderBy('id', 'ASC')->get();
 
-            if ($bookings[0]['ticket_status'] != "Ticketed") {
+            if ($bookings['ticket_status'] != "Ticketed") {
                 $tripDetails = $this->getTripDetails($bookings[0]['unique_booking_id']);
                 $tripDetails = json_decode($tripDetails, true);
                 if (isset($tripDetails['TripDetailsResponse'])) {
@@ -179,13 +180,13 @@ class HomeController extends Controller
                         $tripDetailsResult = $TripDetailsResponse['TripDetailsResult'];
                         $tripDetailsResultInbound = $TripDetailsResponse['TripDetailsResultInbound'];
                         if ($tripDetailsResult['Success'] == 'true') {
-                            $bookingId = $this->updateDomesticFlightBookingData($tripDetailsResult, $tripDetailsResultInbound, $bookings[0]['id']);
+                            $bookingId = $this->updateDomesticFlightBookingData($tripDetailsResult, $tripDetailsResultInbound, $bookings['id']);
                         }
                     } else {
                         $tripDetailsResult = $tripDetails['TripDetailsResponse']['TripDetailsResult'];
                         if ($tripDetailsResult['Success'] == 'true') {
-                            $ticketStatus = $this->updateFlightBookingData($tripDetailsResult, $bookings[0]['id']);
-                            $bookings[0]['ticket_status'] = $ticketStatus;
+                            $ticketStatus = $this->updateFlightBookingData($tripDetailsResult, $bookings['id']);
+                            $bookings['ticket_status'] = $ticketStatus;
                         }
                     }
                 }
@@ -212,14 +213,14 @@ class HomeController extends Controller
                     }
                 }
             }
-            if (isset($itineraries[0]) && isset($passengers[0])) {
-                $bookings[0]['flights'] = $itineraries;
-                $bookings[0]['passengers'] = $passengers;
+            if (isset($itineraries) && isset($passengers)) {
+                $bookings['flights'] = $itineraries;
+                $bookings['passengers'] = $passengers;
             } else {
-                $bookings[0]['flights'] = FlightItineraryDetails::where('booking_id', $request->id)->orderBy('id', 'ASC')->get();
-                $bookings[0]['passengers'] = FlightPassengers::where('booking_id', $request->id)->orderBy('id', 'ASC')->get();
+                $bookings['flights'] = FlightItineraryDetails::where('booking_id', $request->id)->orderBy('id', 'ASC')->get();
+                $bookings['passengers'] = FlightPassengers::where('booking_id', $request->id)->orderBy('id', 'ASC')->get();
             }
-            $bookings[0]['extraServices'] = FlightExtraServices::where('booking_id', $request->id)->get();
+            $bookings['extraServices'] = FlightExtraServices::where('booking_id', $request->id)->get();
         }
 
         $type = $request->type;
