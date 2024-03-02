@@ -35,9 +35,9 @@ class Kernel extends ConsoleKernel
             }
         })->everySixHours();
 
-        $schedule->command('queue:work --stop-when-empty')
-            ->everyMinute()
-            ->withoutOverlapping();
+        // $schedule->command('queue:work --stop-when-empty')
+        //     ->everyMinute()
+        //     ->withoutOverlapping();
     }
 
     /**
