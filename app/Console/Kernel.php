@@ -14,8 +14,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $url = 'https://api.currencybeacon.com/v1/convert';
+       
         $schedule->call(function ($url) {
+            $url = 'https://api.currencybeacon.com/v1/convert';
             $rates = ExchangeRate::all();
             foreach ($rates as $rate) {
                 $data = [
